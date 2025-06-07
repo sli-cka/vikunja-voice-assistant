@@ -1,6 +1,7 @@
 """Constants for the Vikunja Todo AI integration."""
 
 DOMAIN = "vikunja_todo_ai"
+CONF_API_TOKEN = "api_token"
 CONF_OPENAI_API_KEY = "openai_api_key"
 CONF_OPENAI_MODEL = "openai_model"
 DEFAULT_PROJECT_ID = 1
