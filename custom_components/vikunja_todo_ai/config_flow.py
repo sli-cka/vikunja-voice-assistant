@@ -11,7 +11,7 @@ from .vikunja_api import VikunjaAPI
 
 _LOGGER = logging.getLogger(__name__)
 
-class VikunjaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Vikunja Todo AI."""
 
     VERSION = 1
@@ -68,5 +68,3 @@ class VikunjaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             ),
             errors=errors,
         )
-
-config_entries.HANDLERS.register(DOMAIN)(VikunjaConfigFlow)
