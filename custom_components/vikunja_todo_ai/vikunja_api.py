@@ -22,13 +22,9 @@ class VikunjaAPI:
         projects_url = f"{self.url}/projects"
         
         try:
-            _LOGGER.debug("Testing connection to %s with token: %s...", projects_url, self.api_token[:5] + "...")
             response = requests.get(projects_url, headers=self.headers)
             
             # Log more details about the request and response
-            _LOGGER.debug("Request headers: %s", self.headers)
-            _LOGGER.debug("Response status: %s", response.status_code)
-            _LOGGER.debug("Response body: %s", response.text[:100] + "..." if len(response.text) > 100 else response.text)
             
             response.raise_for_status()
             return True

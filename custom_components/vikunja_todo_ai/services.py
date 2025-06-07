@@ -4,7 +4,7 @@ import json
 import voluptuous as vol
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import config_validation as cv
-from homeassistant.const import CONF_URL, CONF_USERNAME, CONF_PASSWORD
+from homeassistant.const import CONF_URL, CONF_API_TOKEN
 
 from .const import DOMAIN
 from .vikunja_api import VikunjaAPI
@@ -22,14 +22,13 @@ def setup_services(hass: HomeAssistant):
     """Set up services for Vikunja integration."""
     domain_config = hass.data.get(DOMAIN, {})
     vikunja_url = domain_config.get(CONF_URL)
-    username = domain_config.get(CONF_USERNAME)
-    password = domain_config.get(CONF_PASSWORD)
+    api_token = domain_config.get(CONF_API_TOKEN)
     
-    if not all([vikunja_url, username, password]):
+    if not all([vikunja_url, api_token]):
         _LOGGER.error("Missing configuration for Vikunja Todo AI")
         return
         
-    vikunja_api = VikunjaAPI(vikunja_url, username, password)
+    vikunja_api = VikunjaAPI(vikunja_url, api_token)
     
     async def create_task(call: ServiceCall):
         """Create a task in Vikunja."""

@@ -5,9 +5,7 @@ import voluptuous as vol
 import aiohttp
 import asyncio
 
-from homeassistant.components.automation import AutomationActionType
-from homeassistant.const import CONF_URL
-from homeassistant.core import HomeAssistant, Context, Event
+from homeassistant.core import HomeAssistant, Context, Event, callback
 from homeassistant.helpers import intent
 from homeassistant.helpers.typing import ConfigType
 
@@ -16,11 +14,25 @@ from .vikunja_api import VikunjaAPI
 
 _LOGGER = logging.getLogger(__name__)
 
+# Remove AutomationActionType from imports and use more standard approaches
+
 async def async_get_automations(hass: HomeAssistant, config: ConfigType) -> list[dict]:
     """Return all automations for this platform."""
     return [vikunja_todo_automation]
 
-async def vikunja_todo_automation(hass: HomeAssistant, config: ConfigType) -> AutomationActionType:
+@callback
+async def async_setup_platform(hass: HomeAssistant, config: dict) -> bool:
+    """Set up the Vikunja Todo automation platform."""
+    # This function is needed for platform registration
+    return True
+
+async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities) -> bool:
+    """Set up the Vikunja Todo automation from config entry."""
+    # Register the handler even though we don't have automation entities
+    await vikunja_todo_automation(hass, config_entry.data)
+    return True
+
+async def vikunja_todo_automation(hass: HomeAssistant, config: ConfigType):
     """Create an automation for handling todo voice commands."""
     
     domain_config = hass.data.get(DOMAIN, {})
@@ -30,7 +42,7 @@ async def vikunja_todo_automation(hass: HomeAssistant, config: ConfigType) -> Au
     openai_model = domain_config.get(CONF_OPENAI_MODEL)
     
     if not all([vikunja_url, api_token, openai_api_key]):
-        _LOGGER.error("Missing configuration for Vikunja Todo AI")
+        _LOGGER.error("Missing configuration for Vikunja Todo AI automation")
         return None
         
     vikunja_api = VikunjaAPI(vikunja_url, api_token)
@@ -143,5 +155,3 @@ async def vikunja_todo_automation(hass: HomeAssistant, config: ConfigType) -> Au
             
     # Subscribe to the intent recognition event
     hass.bus.async_listen("intent_speech", handle_todo_trigger)
-    
-    return {"trigger_todo": handle_todo_trigger}
