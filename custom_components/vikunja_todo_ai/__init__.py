@@ -15,19 +15,19 @@ from .services import setup_services
 
 _LOGGER = logging.getLogger(__name__)
 
-CONFIG_SCHEMA = vol.Schema(
-    {
-        DOMAIN: vol.Schema(
-            {
-                vol.Required(CONF_URL): cv.string,
-                vol.Required(CONF_USERNAME): cv.string,
-                vol.Required(CONF_PASSWORD): cv.string,
-                vol.Required(CONF_OPENAI_CONVERSATION): cv.string,
-            }
-        )
-    },
-    extra=vol.ALLOW_EXTRA,
-)
+# CONFIG_SCHEMA = vol.Schema(
+#     {
+#         DOMAIN: vol.Schema(
+#             {
+#                 vol.Required(CONF_URL): cv.string,
+#                 vol.Required(CONF_USERNAME): cv.string,
+#                 vol.Required(CONF_PASSWORD): cv.string,
+#                 vol.Required(CONF_OPENAI_CONVERSATION): cv.string,
+#             }
+#         )
+#     },
+#     extra=vol.ALLOW_EXTRA,
+# )
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the Vikunja Todo AI component from yaml configuration."""
