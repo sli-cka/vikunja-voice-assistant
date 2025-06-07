@@ -22,11 +22,21 @@ class VikunjaAPI:
         projects_url = f"{self.url}/projects"
         
         try:
+            _LOGGER.debug("Testing connection to %s with token: %s...", projects_url, self.api_token[:5] + "...")
             response = requests.get(projects_url, headers=self.headers)
+            
+            # Log more details about the request and response
+            _LOGGER.debug("Request headers: %s", self.headers)
+            _LOGGER.debug("Response status: %s", response.status_code)
+            _LOGGER.debug("Response body: %s", response.text[:100] + "..." if len(response.text) > 100 else response.text)
+            
             response.raise_for_status()
             return True
         except requests.exceptions.RequestException as err:
             _LOGGER.error("Connection test failed: %s", err)
+            # Additional debug info
+            if hasattr(err, 'response') and err.response is not None:
+                _LOGGER.error("Response content: %s", err.response.text)
             return False
             
     def get_projects(self):
@@ -39,6 +49,8 @@ class VikunjaAPI:
             return response.json()
         except requests.exceptions.RequestException as err:
             _LOGGER.error("Failed to get projects: %s", err)
+            if hasattr(err, 'response') and err.response is not None:
+                _LOGGER.error("Response content: %s", err.response.text)
             return []
             
     def add_task(self, task_data):
@@ -51,4 +63,6 @@ class VikunjaAPI:
             return response.json()
         except requests.exceptions.RequestException as err:
             _LOGGER.error("Failed to create task: %s", err)
+            if hasattr(err, 'response') and err.response is not None:
+                _LOGGER.error("Response content: %s", err.response.text)
             return None
