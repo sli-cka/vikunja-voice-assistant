@@ -6,7 +6,7 @@ from homeassistant import config_entries
 from homeassistant.const import CONF_URL, CONF_USERNAME, CONF_PASSWORD
 from homeassistant.helpers import config_validation as cv
 
-from .const import DOMAIN, CONF_OPENAI_CONVERSATION
+from .const import DOMAIN, CONF_OPENAI_API_KEY, CONF_OPENAI_MODEL, DEFAULT_MODEL, MODEL_OPTIONS
 from .vikunja_api import VikunjaAPI
 
 _LOGGER = logging.getLogger(__name__)
@@ -22,9 +22,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
 
         if user_input is not None:
+            # Format the URL by appending /api/v1 if it's not already there
+            base_url = user_input[CONF_URL].rstrip('/')
+            if not base_url.endswith('/api/v1'):
+                api_url = f"{base_url}/api/v1"
+            else:
+                api_url = base_url
+                
             # Validate the inputs
             vikunja_api = VikunjaAPI(
-                user_input[CONF_URL],
+                api_url,
                 user_input[CONF_USERNAME],
                 user_input[CONF_PASSWORD]
             )
@@ -33,6 +40,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             success = await self.hass.async_add_executor_job(vikunja_api.authenticate)
             
             if success:
+                # Save the formatted URL
+                user_input[CONF_URL] = api_url
+                
                 # Avoid duplicate entries
                 await self.async_set_unique_id(f"vikunja_{user_input[CONF_USERNAME]}")
                 self._abort_if_unique_id_configured()
@@ -52,7 +62,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_URL): str,
                     vol.Required(CONF_USERNAME): str,
                     vol.Required(CONF_PASSWORD): str,
-                    vol.Required(CONF_OPENAI_CONVERSATION): str,
+                    vol.Required(CONF_OPENAI_API_KEY): str,
+                    vol.Required(CONF_OPENAI_MODEL, default=DEFAULT_MODEL): vol.In(MODEL_OPTIONS),
                 }
             ),
             errors=errors,

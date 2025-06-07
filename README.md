@@ -7,10 +7,12 @@ This integration allows you to create tasks in your Vikunja instance using voice
 - Automatically detect mentioned projects and assign tasks accordingly
 - Extract date and time information for task scheduling
 - Falls back to default project (ID: 1) when no project is specified
+- Choose between GPT-4o-mini (default, more economical) or GPT-4o models
 
 ## Requirements
-- Home Assistant with OpenAI conversation integration set up
+- Home Assistant 
 - A running Vikunja instance
+- OpenAI API key
 - HACS (Home Assistant Community Store)
 
 ## Installation
@@ -24,10 +26,11 @@ Add the following to your `configuration.yaml`:
 
 ```yaml
 vikunja_todo_ai:
-  url: https://your-vikunja-instance.com/api/v1
+  url: https://your-vikunja-instance.com
   username: your-username
   password: your-password
-  openai_conversation: conversation.openai_1  # Your OpenAI conversation entity ID
+  openai_api_key: your-openai-api-key
+  openai_model: gpt-4o-mini  # Optional, defaults to gpt-4o-mini, can be gpt-4o
 ```
 
 ## Usage

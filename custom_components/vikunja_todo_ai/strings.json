@@ -6,10 +6,11 @@
         "title": "Connect to Vikunja",
         "description": "Set up Vikunja Todo AI Integration",
         "data": {
-          "url": "Vikunja API URL (e.g. https://vikunja.example.com/api/v1)",
+          "url": "Vikunja base URL (e.g. https://vikunja.example.com)",
           "username": "Username",
           "password": "Password",
-          "openai_conversation": "OpenAI Conversation Entity ID"
+          "openai_api_key": "OpenAI API Key",
+          "openai_model": "OpenAI Model (gpt-4o-mini is more economical)"
         }
       }
     },
