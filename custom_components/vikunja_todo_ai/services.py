@@ -6,7 +6,7 @@ from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import config_validation as cv
 from homeassistant.const import CONF_URL, CONF_USERNAME, CONF_PASSWORD
 
-from .const import DOMAIN, CONF_OPENAI_CONVERSATION
+from .const import DOMAIN
 from .vikunja_api import VikunjaAPI
 
 _LOGGER = logging.getLogger(__name__)
