@@ -11,7 +11,7 @@ from .vikunja_api import VikunjaAPI
 
 _LOGGER = logging.getLogger(__name__)
 
-class VikunjaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Vikunja Todo AI."""
 
     VERSION = 1
@@ -33,13 +33,18 @@ class VikunjaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             success = await self.hass.async_add_executor_job(vikunja_api.authenticate)
             
             if success:
+                # Avoid duplicate entries
+                await self.async_set_unique_id(f"vikunja_{user_input[CONF_USERNAME]}")
+                self._abort_if_unique_id_configured()
+                
                 return self.async_create_entry(
-                    title="Vikunja Todo AI",
+                    title=f"Vikunja ({user_input[CONF_USERNAME]})",
                     data=user_input
                 )
             else:
                 errors["base"] = "cannot_connect"
 
+        # Show form
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(

@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Vikunja",
+        "description": "Set up Vikunja Todo AI Integration",
+        "data": {
+          "url": "Vikunja API URL (e.g. https://vikunja.example.com/api/v1)",
+          "username": "Username",
+          "password": "Password",
+          "openai_conversation": "OpenAI Conversation Entity ID"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to Vikunja API, please check your URL and credentials."
+    },
+    "abort": {
+      "already_configured": "This Vikunja account is already configured."
+    }
+  }
+}

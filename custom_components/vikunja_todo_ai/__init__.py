@@ -1,7 +1,6 @@
 """The Vikunja Todo AI integration."""
 import logging
 import voluptuous as vol
-from .services import setup_services
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.const import (
@@ -12,6 +11,7 @@ from homeassistant.const import (
 import homeassistant.helpers.config_validation as cv
 
 from .const import DOMAIN, CONF_OPENAI_CONVERSATION
+from .services import setup_services
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,9 +29,9 @@ CONFIG_SCHEMA = vol.Schema(
     extra=vol.ALLOW_EXTRA,
 )
 
-async def async_setup(hass: HomeAssistant, config: dict):
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the Vikunja Todo AI component from yaml configuration."""
-    hass.data[DOMAIN] = {}
+    hass.data.setdefault(DOMAIN, {})
     
     if DOMAIN in config:
         # Store yaml configuration to be accessible by other components
@@ -41,12 +41,14 @@ async def async_setup(hass: HomeAssistant, config: dict):
             CONF_PASSWORD: config[DOMAIN][CONF_PASSWORD],
             CONF_OPENAI_CONVERSATION: config[DOMAIN][CONF_OPENAI_CONVERSATION],
         })
+        
+        # Setup services for YAML config
+        setup_services(hass)
     
     return True
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Vikunja Todo AI from a config entry."""
-    setup_services(hass)
     # Store config entry data
     hass.data.setdefault(DOMAIN, {}).update({
         CONF_URL: entry.data[CONF_URL],
@@ -55,14 +57,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         CONF_OPENAI_CONVERSATION: entry.data[CONF_OPENAI_CONVERSATION],
     })
     
-    # Register services
+    # Setup services
+    setup_services(hass)
+    
+    # Register automation platform
     hass.async_create_task(
         hass.config_entries.async_forward_entry_setup(entry, "automation")
     )
     
     return True
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     await hass.config_entries.async_forward_entry_unload(entry, "automation")
     return True
