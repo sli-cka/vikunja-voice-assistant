@@ -3,32 +3,14 @@ import logging
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.const import (
-    CONF_URL, 
-    CONF_USERNAME, 
-    CONF_PASSWORD,
-)
+from homeassistant.const import CONF_URL
 import homeassistant.helpers.config_validation as cv
 
-from .const import DOMAIN, CONF_OPENAI_API_KEY, CONF_OPENAI_MODEL, DEFAULT_MODEL
+from .const import DOMAIN, CONF_API_TOKEN, CONF_OPENAI_API_KEY, CONF_OPENAI_MODEL, DEFAULT_MODEL
 from .services import setup_services
 
 _LOGGER = logging.getLogger(__name__)
 
-# CONFIG_SCHEMA = vol.Schema(
-#     {
-#         DOMAIN: vol.Schema(
-#             {
-#                 vol.Required(CONF_URL): cv.string,
-#                 vol.Required(CONF_USERNAME): cv.string,
-#                 vol.Required(CONF_PASSWORD): cv.string,
-#                 vol.Required(CONF_OPENAI_API_KEY): cv.string,
-#                 vol.Optional(CONF_OPENAI_MODEL, default=DEFAULT_MODEL): cv.string,
-#             }
-#         )
-#     },
-#     extra=vol.ALLOW_EXTRA,
-# )
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the Vikunja Todo AI component from yaml configuration."""
@@ -38,8 +20,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         # Store yaml configuration to be accessible by other components
         hass.data[DOMAIN].update({
             CONF_URL: config[DOMAIN][CONF_URL],
-            CONF_USERNAME: config[DOMAIN][CONF_USERNAME],
-            CONF_PASSWORD: config[DOMAIN][CONF_PASSWORD],
+            CONF_API_TOKEN: config[DOMAIN][CONF_API_TOKEN],
             CONF_OPENAI_API_KEY: config[DOMAIN][CONF_OPENAI_API_KEY],
             CONF_OPENAI_MODEL: config[DOMAIN].get(CONF_OPENAI_MODEL, DEFAULT_MODEL),
         })
@@ -54,8 +35,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Store config entry data
     hass.data.setdefault(DOMAIN, {}).update({
         CONF_URL: entry.data[CONF_URL],
-        CONF_USERNAME: entry.data[CONF_USERNAME],
-        CONF_PASSWORD: entry.data[CONF_PASSWORD],
+        CONF_API_TOKEN: entry.data[CONF_API_TOKEN],
         CONF_OPENAI_API_KEY: entry.data[CONF_OPENAI_API_KEY],
         CONF_OPENAI_MODEL: entry.data.get(CONF_OPENAI_MODEL, DEFAULT_MODEL),
     })

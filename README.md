@@ -7,7 +7,7 @@ This integration allows you to create tasks in your Vikunja instance using voice
 - Automatically detect mentioned projects and assign tasks accordingly
 - Extract date and time information for task scheduling
 - Falls back to default project (ID: 1) when no project is specified
-- Choose between GPT-4o-mini (default, more economical) or GPT-4o models
+- Choose between GPT-4.1-mini (default, more economical) or GPT-4.1 models
 
 ## Requirements
 - Home Assistant 
@@ -27,10 +27,9 @@ Add the following to your `configuration.yaml`:
 ```yaml
 vikunja_todo_ai:
   url: https://your-vikunja-instance.com
-  username: your-username
-  password: your-password
+  api_token: your-vikunja-api-token
   openai_api_key: your-openai-api-key
-  openai_model: gpt-4o-mini  # Optional, defaults to gpt-4o-mini, can be gpt-4o
+  openai_model: gpt-4.1-mini  # Optional, defaults to gpt-4.1-mini, can be gpt-4.1
 ```
 
 ## Usage

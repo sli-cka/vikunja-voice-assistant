@@ -7,15 +7,14 @@
         "description": "Set up Vikunja Todo AI Integration",
         "data": {
           "url": "Vikunja base URL (e.g. https://vikunja.example.com)",
-          "username": "Username",
-          "password": "Password",
+          "api_token": "Vikunja API Token",
           "openai_api_key": "OpenAI API Key",
-          "openai_model": "OpenAI Model (gpt-4o-mini is more economical)"
+          "openai_model": "OpenAI Model (gpt-4.1-mini is more economical)"
         }
       }
     },
     "error": {
-      "cannot_connect": "Failed to connect to Vikunja API, please check your URL and credentials."
+      "cannot_connect": "Failed to connect to Vikunja API, please check your URL and API token."
     },
     "abort": {
       "already_configured": "This Vikunja account is already configured."

@@ -6,12 +6,12 @@ import aiohttp
 import asyncio
 
 from homeassistant.components.automation import AutomationActionType
-from homeassistant.const import CONF_URL, CONF_USERNAME, CONF_PASSWORD
+from homeassistant.const import CONF_URL
 from homeassistant.core import HomeAssistant, Context, Event
 from homeassistant.helpers import intent
 from homeassistant.helpers.typing import ConfigType
 
-from .const import DOMAIN, CONF_OPENAI_API_KEY, CONF_OPENAI_MODEL, DEFAULT_PROJECT_ID
+from .const import DOMAIN, CONF_API_TOKEN, CONF_OPENAI_API_KEY, CONF_OPENAI_MODEL, DEFAULT_PROJECT_ID
 from .vikunja_api import VikunjaAPI
 
 _LOGGER = logging.getLogger(__name__)
@@ -25,16 +25,15 @@ async def vikunja_todo_automation(hass: HomeAssistant, config: ConfigType) -> Au
     
     domain_config = hass.data.get(DOMAIN, {})
     vikunja_url = domain_config.get(CONF_URL)
-    username = domain_config.get(CONF_USERNAME)
-    password = domain_config.get(CONF_PASSWORD)
+    api_token = domain_config.get(CONF_API_TOKEN)
     openai_api_key = domain_config.get(CONF_OPENAI_API_KEY)
     openai_model = domain_config.get(CONF_OPENAI_MODEL)
     
-    if not all([vikunja_url, username, password, openai_api_key]):
+    if not all([vikunja_url, api_token, openai_api_key]):
         _LOGGER.error("Missing configuration for Vikunja Todo AI")
         return None
         
-    vikunja_api = VikunjaAPI(vikunja_url, username, password)
+    vikunja_api = VikunjaAPI(vikunja_url, api_token)
     
     async def handle_todo_trigger(event: Event, context: Context = None) -> None:
         """Handle the todo voice trigger."""

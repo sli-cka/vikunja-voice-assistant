@@ -4,5 +4,5 @@ DOMAIN = "vikunja_todo_ai"
 CONF_OPENAI_API_KEY = "openai_api_key"
 CONF_OPENAI_MODEL = "openai_model"
 DEFAULT_PROJECT_ID = 1
-DEFAULT_MODEL = "gpt-4o-mini"
-MODEL_OPTIONS = ["gpt-4o-mini", "gpt-4o"]
+DEFAULT_MODEL = "gpt-4.1-mini"
+MODEL_OPTIONS = ["gpt-4.1-mini", "gpt-4.1"]
