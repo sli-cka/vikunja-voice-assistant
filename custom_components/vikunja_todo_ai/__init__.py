@@ -8,10 +8,10 @@ import homeassistant.helpers.config_validation as cv
 
 from .const import DOMAIN, CONF_API_TOKEN, CONF_OPENAI_API_KEY, CONF_OPENAI_MODEL, DEFAULT_MODEL
 from .services import setup_services
+from .automation import setup_automation
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = ["automation"]
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the Vikunja Todo AI component from yaml configuration."""
@@ -28,6 +28,9 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         
         # Setup services for YAML config
         setup_services(hass)
+        
+        # Setup automation directly
+        await setup_automation(hass, config[DOMAIN])
     
     return True
 
@@ -44,12 +47,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Setup services
     setup_services(hass)
     
-    # Use the recommended async_forward_entry_setups instead of deprecated async_forward_entry_setup
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    # Setup automation directly instead of using platforms
+    await setup_automation(hass, entry.data)
     
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    return unload_ok
+    # Since we're not using platforms, we just need to remove our event listener
+    # This would be handled in the automation.py file
+    return True
