@@ -1,0 +1,17 @@
+# Example automation to use in Home Assistant
+- id: 'vikunja_todo_voice_command'
+  alias: 'Vikunja Todo Voice Command'
+  description: 'Create a task in Vikunja when the word "todo" is heard'
+  trigger:
+    - platform: event
+      event_type: 'conversation_processing'
+      event_data:
+        text: 'todo*'
+  action:
+    - service: conversation.process
+      data:
+        agent_id: !input 'openai_conversation_id'
+        text: '{{ trigger.event.data.text }}'
+    - service: vikunja_todo_ai.create_task
+      data_template:
+        task: '{{ response }}'

@@ -1,0 +1,10 @@
+{
+  "domain": "vikunja_todo_ai",
+  "name": "Vikunja Todo AI",
+  "documentation": "https://github.com/your-username/vikunja-todo-ai-homeassistant",
+  "dependencies": [],
+  "codeowners": ["@your-username"],
+  "requirements": ["requests"],
+  "iot_class": "cloud_polling",
+  "version": "0.1.0"
+}
