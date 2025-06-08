@@ -3,10 +3,12 @@ intents:
   VikunjaAddTask:
     data:
       - sentences:
-          - "add (a) task {task_description}"
-          - "create (a) task {task_description}"
-          - "add (a) {task_description} task"
-          - "create (a) {task_description} task"
+          - "add [filler_words] task {task_description}"
+          - "create [filler_words] task {task_description}"
+          - "add [filler_words] {task_description} task"
+          - "create [filler_words] {task_description} task"
 lists:
   task_description:
+    wildcard: true
+  filler_words:
     wildcard: true

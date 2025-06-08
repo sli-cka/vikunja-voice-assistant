@@ -3,9 +3,8 @@ import logging
 import os
 import json
 from homeassistant.helpers import intent
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_URL, CONF_TOKEN
 
 from .const import (
     DOMAIN,
@@ -15,14 +14,13 @@ from .const import (
     CONF_VIKUNJA_URL
 )
 from .vikunja_api import VikunjaAPI
-from .automation import setup_automation, process_with_openai
+from .process_with_openai import process_with_openai
 from .services import setup_services
 
 _LOGGER = logging.getLogger(__name__)
 
 # Copy custom sentences to the correct location
 def copy_custom_sentences(hass: HomeAssistant):
-    """Copy custom sentences to the correct location."""
     component_path = os.path.dirname(os.path.realpath(__file__))
     source_sentences_dir = os.path.join(component_path, "custom_sentences")
     
@@ -103,7 +101,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         await hass.async_add_executor_job(
             lambda: vikunja_api.add_task(json.loads(openai_response))
         )
-        
+
     # Create a proper intent handler class
     class VikunjaAddTaskIntentHandler(intent.IntentHandler):
         """Handle VikunjaAddTask intents."""
@@ -125,12 +123,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     
     # Register the intent handler
     intent.async_register(hass, VikunjaAddTaskIntentHandler())
-
-    
-    # Set up the existing automation for direct voice commands
-    # Convert entry.data to a regular dict to avoid type issues
-    config_data = dict(entry.data)
-    await setup_automation(hass, config_data)
     
     # Set up services
     setup_services(hass)
