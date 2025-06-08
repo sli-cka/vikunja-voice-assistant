@@ -89,7 +89,6 @@ async def process_with_openai(task_description, projects, api_key, model):
                 # Extract the JSON from the response
                 raw_response = result.get("choices", [{}])[0].get("message", {}).get("content", "")
                 
-                # Clean up the response to extract just the JSON part
                 try:
                     # Find JSON in the response if it's wrapped in other text
                     start_idx = raw_response.find('{')
@@ -97,13 +96,22 @@ async def process_with_openai(task_description, projects, api_key, model):
                     if start_idx >= 0 and end_idx > start_idx:
                         json_str = raw_response[start_idx:end_idx]
                         # Validate the JSON
-                        json.loads(json_str)
+                        task_data = json.loads(json_str)
+                        
+                        # Ensure required fields are present
+                        if "title" not in task_data or not task_data["title"]:
+                            _LOGGER.error("OpenAI response missing required 'title' field")
+                            _LOGGER.debug("Raw OpenAI response: %s", raw_response)
+                            return None
+                            
                         return json_str
                     else:
                         _LOGGER.error("No JSON found in OpenAI response")
+                        _LOGGER.debug("Raw OpenAI response: %s", raw_response)
                         return None
                 except (json.JSONDecodeError, ValueError) as err:
                     _LOGGER.error("Failed to parse JSON from OpenAI response: %s", err)
+                    _LOGGER.debug("Raw OpenAI response: %s", raw_response)
                     return None
                 
     except Exception as err:

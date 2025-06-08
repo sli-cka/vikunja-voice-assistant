@@ -96,11 +96,33 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         if not openai_response:
             _LOGGER.error("Failed to process with OpenAI")
             return
+        
+        # Log the response for debugging
+        _LOGGER.debug("OpenAI response: %s", openai_response)
+        
+        try:
+            # Parse the response
+            task_data = json.loads(openai_response)
             
-        # Send request to Vikunja
-        await hass.async_add_executor_job(
-            lambda: vikunja_api.add_task(json.loads(openai_response))
-        )
+            # Validate required fields
+            if not task_data.get("title"):
+                _LOGGER.error("Missing required 'title' field in task data")
+                return
+            
+            # Send request to Vikunja
+            result = await hass.async_add_executor_job(
+                lambda: vikunja_api.add_task(task_data)
+            )
+            
+            if result:
+                _LOGGER.info("Successfully created task: %s", task_data.get("title"))
+            else:
+                _LOGGER.error("Failed to create task in Vikunja")
+                
+        except json.JSONDecodeError as err:
+            _LOGGER.error("Failed to parse OpenAI response as JSON: %s", err)
+        except Exception as err:
+            _LOGGER.error("Unexpected error creating task: %s", err)
 
     # Create a proper intent handler class
     class VikunjaAddTaskIntentHandler(intent.IntentHandler):

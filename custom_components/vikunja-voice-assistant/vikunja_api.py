@@ -46,12 +46,17 @@ class VikunjaAPI:
             return []
             
     def add_task(self, task_data):
-    
+        """Create a new task in a Vikunja project."""
         project_id = task_data.get("project_id", 1)
         
         if "project_id" in task_data:
             del task_data["project_id"]
-            
+        
+        # Validate required fields
+        if not task_data.get("title"):
+            _LOGGER.error("Cannot create task: missing 'title' field in task data")
+            return None
+                
         tasks_url = f"{self.url}/projects/{project_id}/tasks"
         
         try:
