@@ -143,10 +143,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             slots = call.slots
             task_description = slots.get("task_description", {}).get("value", "")
             
+            response = intent.IntentResponse(language=call.language)
+            
+            if not task_description.strip():
+                response.async_set_speech("Failed to add task as no task title was given")
+                return response
+            
             # Process the task
             await handle_vikunja_task(task_description)
             
-            response = intent.IntentResponse(language=call.language)
             response.async_set_speech(f"Adding task: {task_description}")
             return response   
     
