@@ -69,15 +69,16 @@ async def setup_automation(hass: HomeAssistant, config: ConfigType) -> bool:
             Available projects: {json.dumps(project_names)}
             
             If a project is mentioned in the task description, use its project ID.
-            If no project is mentioned, use project ID 0.
+            If no project is mentioned, use project ID 1.
             
-            If a date or time is mentioned, add it to the 'due_date' field in ISO format (YYYY-MM-DDTHH:MM:SS).
+            If a date or time is mentioned, add it to the 'due_date' field in ISO format with timezone (YYYY-MM-DDTHH:MM:SSZ).
+            Always include the 'Z' timezone designator at the end of date-time strings.
             
             Output only valid JSON that can be sent to the Vikunja API, with these fields:
             - title (string): The main task title
             - description (string): Any details about the task
             - project_id (number): The project ID (always required, use 1 if no project specified)
-            - due_date (string, optional): The due date if specified
+            - due_date (string, optional): The due date if specified, always in format YYYY-MM-DDTHH:MM:SSZ
             """
         }
         
