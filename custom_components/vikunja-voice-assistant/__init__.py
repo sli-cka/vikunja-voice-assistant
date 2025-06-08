@@ -68,6 +68,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         CONF_VIKUNJA_API_TOKEN: entry.data[CONF_VIKUNJA_API_TOKEN],
         CONF_OPENAI_API_KEY: entry.data[CONF_OPENAI_API_KEY],
         CONF_OPENAI_MODEL: entry.data[CONF_OPENAI_MODEL],
+        CONF_DUE_DATE: entry.data[CONF_DUE_DATE]
     }
     
     # Copy custom sentences
