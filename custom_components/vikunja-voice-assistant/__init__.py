@@ -103,12 +103,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         await hass.async_add_executor_job(
             lambda: vikunja_api.add_task(json.loads(openai_response))
         )
-    
+        
     # Create a proper intent handler class
     class VikunjaAddTaskIntentHandler(intent.IntentHandler):
         """Handle VikunjaAddTask intents."""
         
-        intent_type = "VikunjaAddTask" 
+        def __init__(self):
+            self.intent_type = "VikunjaAddTask"  # Explicitly set intent_type
         
         async def async_handle(self, call: intent.Intent):
             """Handle the intent."""
@@ -121,8 +122,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             response = intent.IntentResponse(language=call.language)
             response.async_set_speech(f"Adding task: {task_description}")
             return response   
+    
     # Register the intent handler
     intent.async_register(hass, VikunjaAddTaskIntentHandler())
+
     
     # Set up the existing automation for direct voice commands
     # Convert entry.data to a regular dict to avoid type issues
