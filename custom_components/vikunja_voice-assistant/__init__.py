@@ -2,10 +2,16 @@ import logging
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.const import CONF_VIKUNJA_URL
 import homeassistant.helpers.config_validation as cv
 
-from .const import DOMAIN, CONF_VIKUNJA_API_TOKEN, CONF_OPENAI_API_KEY, CONF_OPENAI_MODEL, DEFAULT_MODEL
+from .const import (
+    DOMAIN, 
+    CONF_VIKUNJA_API_TOKEN, 
+    CONF_OPENAI_API_KEY, 
+    CONF_OPENAI_MODEL,
+    CONF_VIKUNJA_URL,  # Add this here
+    DEFAULT_MODEL
+)
 from .services import setup_services
 from .automation import setup_automation
 

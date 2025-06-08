@@ -1,16 +1,19 @@
 """Automation for Vikunja voice assistant."""
 import logging
 import json
-import voluptuous as vol
 import aiohttp
-import asyncio
+from typing import Optional
 
-from homeassistant.core import HomeAssistant, Context, Event, callback
-from homeassistant.helpers import intent
+from homeassistant.core import HomeAssistant, Context, Event
 from homeassistant.helpers.typing import ConfigType
-from homeassistant.const import CONF_VIKUNJA_URL
 
-from .const import DOMAIN, CONF_VIKUNJA_API_TOKEN, CONF_OPENAI_API_KEY, CONF_OPENAI_MODEL, DEFAULT_PROJECT_ID
+from .const import (
+    DOMAIN, 
+    CONF_VIKUNJA_API_TOKEN, 
+    CONF_OPENAI_API_KEY, 
+    CONF_OPENAI_MODEL, 
+    CONF_VIKUNJA_URL
+)
 from .vikunja_api import VikunjaAPI
 
 _LOGGER = logging.getLogger(__name__)
@@ -29,13 +32,12 @@ async def setup_automation(hass: HomeAssistant, config: ConfigType) -> bool:
         return False
         
     vikunja_api = VikunjaAPI(vikunja_url, vikunja_api_token)
-    
-    async def handle_task_trigger(event: Event, context: Context = None) -> None:
+    async def handle_task_trigger(event: Event, context: Optional[Context] = None) -> None:
         """Handle the add task voice trigger."""
         # Extract the voice command
         voice_command = event.data.get("text", "")
         
-        if not voice_command.lower().includes("task") and not voice_command.lower().includes("add"):
+        if "task" not in voice_command.lower() or "add" not in voice_command.lower():
             _LOGGER.info("Voice command does not match task trigger")
             return
             

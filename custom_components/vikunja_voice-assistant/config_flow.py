@@ -1,12 +1,18 @@
-"""Config flow for Vikunja voice assistant integration."""
 import logging
 import voluptuous as vol
 
 from homeassistant import config_entries
-from homeassistant.const import CONF_VIKUNJA_URL, CONF_VIKUNJA_API_TOKEN
 from homeassistant.helpers import config_validation as cv
 
-from .const import DOMAIN, CONF_OPENAI_API_KEY, CONF_OPENAI_MODEL, DEFAULT_MODEL, MODEL_OPTIONS
+from .const import (
+    DOMAIN, 
+    CONF_OPENAI_API_KEY, 
+    CONF_OPENAI_MODEL, 
+    DEFAULT_MODEL, 
+    MODEL_OPTIONS,
+    CONF_VIKUNJA_URL,  # Add these two constants
+    CONF_VIKUNJA_API_TOKEN
+)
 from .vikunja_api import VikunjaAPI
 
 _LOGGER = logging.getLogger(__name__)

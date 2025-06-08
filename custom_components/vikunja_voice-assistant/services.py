@@ -1,10 +1,13 @@
 """Services for Vikunja voice assistant integration."""
 import logging
-import json
 import voluptuous as vol
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import config_validation as cv
-from homeassistant.const import CONF_VIKUNJA_URL, CONF_VIKUNJA_API_TOKEN
+from .const import (
+    DOMAIN,
+    CONF_VIKUNJA_URL,  # Add these two constants
+    CONF_VIKUNJA_API_TOKEN
+)
 
 from .const import DOMAIN
 from .vikunja_api import VikunjaAPI

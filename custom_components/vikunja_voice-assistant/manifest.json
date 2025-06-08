@@ -3,9 +3,9 @@
   "name": "Vikunja voice assistant",
   "documentation": "https://github.com/NeoHuncho/vikunja-voice-assistant",
   "dependencies": [],
-  "codeowners": ["@your-username"],
+  "codeowners": ["@NeoHuncho"],
   "requirements": ["requests", "aiohttp"],
   "iot_class": "cloud_polling",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "config_flow": true
 }

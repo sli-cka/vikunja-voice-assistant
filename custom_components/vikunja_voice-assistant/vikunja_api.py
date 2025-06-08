@@ -1,4 +1,3 @@
-"""Vikunja API helper."""
 import logging
 import requests
 import json
@@ -6,10 +5,7 @@ import json
 _LOGGER = logging.getLogger(__name__)
 
 class VikunjaAPI:
-    """Class to handle Vikunja API calls."""
-
     def __init__(self, url, vikunja_api_token):
-        """Initialize the API client."""
         self.url = url.rstrip('/')
         self.api_token = vikunja_api_token
         self.headers = {
@@ -18,7 +14,7 @@ class VikunjaAPI:
         }
         
     def test_connection(self):
-        """Test the connection to Vikunja API."""
+    
         projects_url = f"{self.url}/projects"
         
         try:
@@ -36,7 +32,7 @@ class VikunjaAPI:
             return False
             
     def get_projects(self):
-        """Get all projects from Vikunja."""
+    
         projects_url = f"{self.url}/projects"
         
         try:
@@ -50,7 +46,7 @@ class VikunjaAPI:
             return []
             
     def add_task(self, task_data):
-        """Add a task to Vikunja."""
+    
         project_id = task_data.get("project_id", 1)
         
         if "project_id" in task_data:
