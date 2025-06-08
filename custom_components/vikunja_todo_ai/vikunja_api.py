@@ -60,7 +60,7 @@ class VikunjaAPI:
         
         try:
             _LOGGER.debug("Creating task in project %s with data: %s", project_id, json.dumps(task_data))
-            response = requests.post(tasks_url, headers=self.headers, json=task_data)
+            response = requests.put(tasks_url, headers=self.headers, json=task_data)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as err:
