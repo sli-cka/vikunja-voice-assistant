@@ -146,7 +146,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             response = intent.IntentResponse(language=call.language)
             
             if not task_description.strip():
-                response.async_set_speech("Failed to add task as no task title was given")
+                response.async_set_speech("Tell the user that the task could not be added")
                 return response
             
             # Process the task
