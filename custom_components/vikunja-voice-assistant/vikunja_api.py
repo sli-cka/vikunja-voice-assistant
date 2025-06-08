@@ -59,6 +59,7 @@ class VikunjaAPI:
                 
         tasks_url = f"{self.url}/projects/{project_id}/tasks"
         
+        _LOGGER.debug("Adding task to project %s with data: %s", project_id, json.dumps(task_data)) 
         try:
             _LOGGER.debug("Creating task in project %s with data: %s", project_id, json.dumps(task_data))
             response = requests.put(tasks_url, headers=self.headers, json=task_data)
