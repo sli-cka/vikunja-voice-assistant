@@ -38,6 +38,12 @@ async def process_with_openai(task_description, projects, api_key, model):
         If a project is mentioned in the task description, use its project ID.
         If no project is mentioned, use project ID 1.
         
+        CRITICAL TASK FORMATTING INSTRUCTIONS:
+        - ALWAYS extract a clear, concise title from the task description
+        - The title MUST NOT be empty - this is required
+        - If the task is described vaguely, create a reasonable title based on context
+        - Move details to the description field
+        
         CRITICAL DATE HANDLING INSTRUCTIONS:
         - Current date and time: {current_timestamp}
         - Today's date is: {current_date}
@@ -49,18 +55,23 @@ async def process_with_openai(task_description, projects, api_key, model):
         - Always include the 'Z' timezone designator at the end of date-time strings.
         
         Output only valid JSON that can be sent to the Vikunja API, with these fields:
-        - title (string): The main task title
+        - title (string): The main task title (REQUIRED, MUST NOT BE EMPTY)
         - description (string): Any details about the task
         - project_id (number): The project ID (always required, use 1 if no project specified)
         - due_date (string, optional): The due date if specified, always in format YYYY-MM-DDTHH:MM:SSZ
+        
+        EXAMPLES:
+        Input: "Reminder to pick up groceries tomorrow"
+        Output: {{"title": "Pick up groceries", "description": "", "project_id": 1, "due_date": "2023-06-09T12:00:00Z"}}
+        
+        Input: "I need to finish the report for work by Friday at 5pm"
+        Output: {{"title": "Finish work report", "description": "Complete and submit the report", "project_id": 1, "due_date": "2023-06-09T17:00:00Z"}}
         """
     }
-    
     user_message = {
         "role": "user",
-        "content": task_description
+        "content": f"Create a task with this description (be sure to include a title): {task_description}"
     }
-    
     payload = {
         "model": model,
         "messages": [system_message, user_message],
