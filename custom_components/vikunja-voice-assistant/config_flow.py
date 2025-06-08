@@ -10,8 +10,10 @@ from .const import (
     CONF_OPENAI_MODEL, 
     DEFAULT_MODEL, 
     MODEL_OPTIONS,
-    CONF_VIKUNJA_URL,  # Add these two constants
-    CONF_VIKUNJA_API_TOKEN
+    CONF_VIKUNJA_URL,
+    CONF_VIKUNJA_API_TOKEN,
+    CONF_DUE_DATE,  
+    DUE_DATE_OPTIONS
 )
 from .vikunja_api import VikunjaAPI
 
@@ -66,6 +68,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_VIKUNJA_API_TOKEN): str,
                     vol.Required(CONF_OPENAI_API_KEY): str,
                     vol.Required(CONF_OPENAI_MODEL, default=DEFAULT_MODEL): vol.In(MODEL_OPTIONS),
+                    vol.Required(CONF_DUE_DATE, default="none"): vol.In(DUE_DATE_OPTIONS),
                 }
             ),
             errors=errors,

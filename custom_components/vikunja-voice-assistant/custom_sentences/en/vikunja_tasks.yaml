@@ -5,8 +5,8 @@ intents:
       - sentences:
           - "add (a) task {task_description}"
           - "create (a) task {task_description}"
-          - "add (a) {task_description} task"
-          - "create (a) {task_description} task"
+          - "great (a) task {task_description}"
+          
 lists:
   task_description:
     wildcard: true

@@ -19,13 +19,42 @@ from .vikunja_api import VikunjaAPI
 _LOGGER = logging.getLogger(__name__)
 
 # Process with OpenAI, moved outside to be reused
-async def process_with_openai(task_description, projects, api_key, model):
+import logging
+import json
+import aiohttp
+from datetime import datetime, timezone, timedelta
+
+
+async def process_with_openai(task_description, projects, api_key, model, default_due_date="none"):
     """Process the task with OpenAI API directly."""
     project_names = [{"id": p.get("id"), "name": p.get("title")} for p in projects]
     
     # Get current date and time in ISO format to provide context
     current_timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     current_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Calculate default due dates
+    tomorrow = (datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=12, minute=0, second=0).strftime("%Y-%m-%dT%H:%M:%SZ")
+    end_of_week = (datetime.now(timezone.utc) + timedelta(days=7)).replace(hour=17, minute=0, second=0).strftime("%Y-%m-%dT%H:%M:%SZ")
+    end_of_month = (datetime.now(timezone.utc) + timedelta(days=30)).replace(hour=17, minute=0, second=0).strftime("%Y-%m-%dT%H:%M:%SZ")
+    
+    # Default due date instructions based on config
+    default_due_date_instructions = ""
+    if default_due_date != "none":
+        default_due_date_value = ""
+        if default_due_date == "tomorrow":
+            default_due_date_value = tomorrow
+        elif default_due_date == "end_of_week":
+            default_due_date_value = end_of_week
+        elif default_due_date == "end_of_month":
+            default_due_date_value = end_of_month
+            
+        default_due_date_instructions = f"""
+        IMPORTANT DEFAULT DUE DATE RULE:
+        - If no specific project or due date is mentioned in the task, use this default due date: {default_due_date_value}
+        - If a specific project is mentioned, do not set any due date unless the user explicitly mentions one
+        - If a specific due date is mentioned by the user, always use that instead of the default
+        """
     
     system_message = {
         "role": "system",
@@ -54,6 +83,8 @@ async def process_with_openai(task_description, projects, api_key, model):
         - NEVER set due dates in the past - all dates should be future dates.
         - Always include the 'Z' timezone designator at the end of date-time strings.
         
+        {default_due_date_instructions}
+        
         Output only valid JSON that can be sent to the Vikunja API, with these fields:
         - title (string): The main task title (REQUIRED, MUST NOT BE EMPTY)
         - description (string): Any details about the task
@@ -68,6 +99,7 @@ async def process_with_openai(task_description, projects, api_key, model):
         Output: {{"title": "Finish work report", "description": "Complete and submit the report", "project_id": 1, "due_date": "2023-06-09T17:00:00Z"}}
         """
     }
+
     user_message = {
         "role": "user",
         "content": f"Create a task with this description (be sure to include a title): {task_description}"

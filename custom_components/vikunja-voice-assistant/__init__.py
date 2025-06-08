@@ -11,7 +11,8 @@ from .const import (
     CONF_VIKUNJA_API_TOKEN,
     CONF_OPENAI_API_KEY,
     CONF_OPENAI_MODEL,
-    CONF_VIKUNJA_URL
+    CONF_VIKUNJA_URL,
+    CONF_DUE_DATE,
 )
 from .vikunja_api import VikunjaAPI
 from .process_with_openai import process_with_openai
@@ -74,12 +75,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     
     # Create the task handling function that both conversation and voice can use
     async def handle_vikunja_task(task_description: str):
-        """Process a task request from any input source."""
         domain_config = hass.data.get(DOMAIN, {})
         vikunja_url = domain_config.get(CONF_VIKUNJA_URL)
         vikunja_api_token = domain_config.get(CONF_VIKUNJA_API_TOKEN)
         openai_api_key = domain_config.get(CONF_OPENAI_API_KEY)
         openai_model = domain_config.get(CONF_OPENAI_MODEL)
+        default_due_date = domain_config.get(CONF_DUE_DATE, "none")
         
         if not all([vikunja_url, vikunja_api_token, openai_api_key]):
             _LOGGER.error("Missing configuration for Vikunja voice assistant")
@@ -91,7 +92,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         projects = await hass.async_add_executor_job(vikunja_api.get_projects)
         
         # Process with OpenAI
-        openai_response = await process_with_openai(task_description, projects, openai_api_key, openai_model)
+        openai_response = await process_with_openai(
+            task_description, 
+            projects, 
+            openai_api_key, 
+            openai_model, 
+            default_due_date
+        )
         
         if not openai_response:
             _LOGGER.error("Failed to process with OpenAI")
