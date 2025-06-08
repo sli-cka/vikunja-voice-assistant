@@ -3,7 +3,7 @@ import logging
 import voluptuous as vol
 
 from homeassistant import config_entries
-from homeassistant.const import CONF_URL, CONF_API_TOKEN
+from homeassistant.const import CONF_VIKUNJA_URL, CONF_VIKUNJA_API_TOKEN
 from homeassistant.helpers import config_validation as cv
 
 from .const import DOMAIN, CONF_OPENAI_API_KEY, CONF_OPENAI_MODEL, DEFAULT_MODEL, MODEL_OPTIONS
@@ -12,8 +12,6 @@ from .vikunja_api import VikunjaAPI
 _LOGGER = logging.getLogger(__name__)
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Vikunja voice assistant."""
-
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
 
@@ -23,7 +21,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             # Format the URL by appending /api/v1 if it's not already there
-            base_url = user_input[CONF_URL].rstrip('/')
+            base_url = user_input[CONF_VIKUNJA_URL].rstrip('/')
             if not base_url.endswith('/api/v1'):
                 api_url = f"{base_url}/api/v1"
             else:
@@ -32,7 +30,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             # Validate the inputs
             vikunja_api = VikunjaAPI(
                 api_url,
-                user_input[CONF_API_TOKEN]
+                user_input[CONF_VIKUNJA_API_TOKEN]
             )
             
             # Test the connection
@@ -40,7 +38,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             
             if success:
                 # Save the formatted URL
-                user_input[CONF_URL] = api_url
+                user_input[CONF_VIKUNJA_URL] = api_url
                 
                 # Avoid duplicate entries
                 await self.async_set_unique_id(f"vikunja_{api_url}")
@@ -58,8 +56,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_URL): str,
-                    vol.Required(CONF_API_TOKEN): str,
+                    vol.Required(CONF_VIKUNJA_URL): str,
+                    vol.Required(CONF_VIKUNJA_API_TOKEN): str,
                     vol.Required(CONF_OPENAI_API_KEY): str,
                     vol.Required(CONF_OPENAI_MODEL, default=DEFAULT_MODEL): vol.In(MODEL_OPTIONS),
                 }

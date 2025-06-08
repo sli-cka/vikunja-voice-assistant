@@ -6,7 +6,7 @@
         "description": "Set up Vikunja voice assistant integration",
         "data": {
           "url": "Vikunja base URL (e.g. https://vikunja.example.com)",
-          "api_token": "Vikunja API Token",
+          "vikunja_api_token": "Vikunja API Token",
           "openai_api_key": "OpenAI API Key",
           "openai_model": "OpenAI Model (gpt-4.1-mini is more economical)"
         }

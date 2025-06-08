@@ -8,13 +8,13 @@ _LOGGER = logging.getLogger(__name__)
 class VikunjaAPI:
     """Class to handle Vikunja API calls."""
 
-    def __init__(self, url, api_token):
+    def __init__(self, url, vikunja_api_token):
         """Initialize the API client."""
         self.url = url.rstrip('/')
-        self.api_token = api_token
+        self.api_token = vikunja_api_token
         self.headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_token}"
+            "Authorization": f"Bearer {vikunja_api_token}"
         }
         
     def test_connection(self):

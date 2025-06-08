@@ -8,9 +8,9 @@ import asyncio
 from homeassistant.core import HomeAssistant, Context, Event, callback
 from homeassistant.helpers import intent
 from homeassistant.helpers.typing import ConfigType
-from homeassistant.const import CONF_URL
+from homeassistant.const import CONF_VIKUNJA_URL
 
-from .const import DOMAIN, CONF_API_TOKEN, CONF_OPENAI_API_KEY, CONF_OPENAI_MODEL, DEFAULT_PROJECT_ID
+from .const import DOMAIN, CONF_VIKUNJA_API_TOKEN, CONF_OPENAI_API_KEY, CONF_OPENAI_MODEL, DEFAULT_PROJECT_ID
 from .vikunja_api import VikunjaAPI
 
 _LOGGER = logging.getLogger(__name__)
@@ -19,16 +19,16 @@ _LOGGER = logging.getLogger(__name__)
 async def setup_automation(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the Vikunja voice automation."""
     domain_config = hass.data.get(DOMAIN, {})
-    vikunja_url = domain_config.get(CONF_URL)
-    api_token = domain_config.get(CONF_API_TOKEN)
+    vikunja_url = domain_config.get(CONF_VIKUNJA_URL)
+    vikunja_api_token = domain_config.get(CONF_VIKUNJA_API_TOKEN)
     openai_api_key = domain_config.get(CONF_OPENAI_API_KEY)
     openai_model = domain_config.get(CONF_OPENAI_MODEL)
     
-    if not all([vikunja_url, api_token, openai_api_key]):
+    if not all([vikunja_url, vikunja_api_token, openai_api_key]):
         _LOGGER.error("Missing configuration for Vikunja voice assistant automation")
         return False
         
-    vikunja_api = VikunjaAPI(vikunja_url, api_token)
+    vikunja_api = VikunjaAPI(vikunja_url, vikunja_api_token)
     
     async def handle_task_trigger(event: Event, context: Context = None) -> None:
         """Handle the add task voice trigger."""
