@@ -51,14 +51,20 @@ class VikunjaAPI:
             
     def add_task(self, task_data):
         """Add a task to Vikunja."""
-        tasks_url = f"{self.url}/tasks"
+        project_id = task_data.get("project_id", 1)
+        
+        if "project_id" in task_data:
+            del task_data["project_id"]
+            
+        tasks_url = f"{self.url}/projects/{project_id}/tasks"
         
         try:
+            _LOGGER.debug("Creating task in project %s with data: %s", project_id, json.dumps(task_data))
             response = requests.post(tasks_url, headers=self.headers, json=task_data)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as err:
-            _LOGGER.error("Failed to create task: %s", err)
+            _LOGGER.error("Failed to create task in project %s: %s", project_id, err)
             if hasattr(err, 'response') and err.response is not None:
                 _LOGGER.error("Response content: %s", err.response.text)
             return None

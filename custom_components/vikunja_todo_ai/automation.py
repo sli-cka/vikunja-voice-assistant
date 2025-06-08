@@ -60,7 +60,6 @@ async def setup_automation(hass: HomeAssistant, config: ConfigType) -> bool:
         """Process the task with OpenAI API directly."""
         project_names = [{"id": p.get("id"), "name": p.get("title")} for p in projects]
         
-        # Create system prompt with project info
         system_message = {
             "role": "system",
             "content": f"""
@@ -70,14 +69,14 @@ async def setup_automation(hass: HomeAssistant, config: ConfigType) -> bool:
             Available projects: {json.dumps(project_names)}
             
             If a project is mentioned in the task description, use its project ID.
-            If no project is mentioned, use project ID {DEFAULT_PROJECT_ID}.
+            If no project is mentioned, use project ID 0.
             
             If a date or time is mentioned, add it to the 'due_date' field in ISO format (YYYY-MM-DDTHH:MM:SS).
             
             Output only valid JSON that can be sent to the Vikunja API, with these fields:
             - title (string): The main task title
             - description (string): Any details about the task
-            - project_id (number): The project ID
+            - project_id (number): The project ID (always required, use 1 if no project specified)
             - due_date (string, optional): The due date if specified
             """
         }
