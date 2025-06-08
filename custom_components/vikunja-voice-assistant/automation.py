@@ -141,5 +141,6 @@ async def setup_automation(hass: HomeAssistant, config: ConfigType) -> bool:
             
     # Subscribe to the intent recognition event
     hass.bus.async_listen("intent_speech", handle_task_trigger)
+    hass.bus.async_listen("conversation_processing", handle_task_trigger)
     
     return True
