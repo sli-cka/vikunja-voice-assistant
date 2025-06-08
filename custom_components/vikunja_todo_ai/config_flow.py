@@ -1,4 +1,4 @@
-"""Config flow for Vikunja Todo AI integration."""
+"""Config flow for Vikunja voice assistant integration."""
 import logging
 import voluptuous as vol
 
@@ -12,7 +12,7 @@ from .vikunja_api import VikunjaAPI
 _LOGGER = logging.getLogger(__name__)
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Vikunja Todo AI."""
+    """Handle a config flow for Vikunja voice assistant."""
 
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL

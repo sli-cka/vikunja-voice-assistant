@@ -1,4 +1,4 @@
-"""Services for Vikunja Todo AI integration."""
+"""Services for Vikunja voice assistant integration."""
 import logging
 import json
 import voluptuous as vol
@@ -25,7 +25,7 @@ def setup_services(hass: HomeAssistant):
     api_token = domain_config.get(CONF_API_TOKEN)
     
     if not all([vikunja_url, api_token]):
-        _LOGGER.error("Missing configuration for Vikunja Todo AI")
+        _LOGGER.error("Missing configuration for Vikunja voice assistant")
         return
         
     vikunja_api = VikunjaAPI(vikunja_url, api_token)

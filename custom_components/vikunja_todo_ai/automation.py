@@ -1,4 +1,4 @@
-"""Automation for Vikunja Todo AI."""
+"""Automation for Vikunja voice assistant."""
 import logging
 import json
 import voluptuous as vol
@@ -17,7 +17,7 @@ _LOGGER = logging.getLogger(__name__)
 
 # Create a function to set up the automation
 async def setup_automation(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Set up the Vikunja Todo automation."""
+    """Set up the Vikunja voice automation."""
     domain_config = hass.data.get(DOMAIN, {})
     vikunja_url = domain_config.get(CONF_URL)
     api_token = domain_config.get(CONF_API_TOKEN)
@@ -25,21 +25,22 @@ async def setup_automation(hass: HomeAssistant, config: ConfigType) -> bool:
     openai_model = domain_config.get(CONF_OPENAI_MODEL)
     
     if not all([vikunja_url, api_token, openai_api_key]):
-        _LOGGER.error("Missing configuration for Vikunja Todo AI automation")
+        _LOGGER.error("Missing configuration for Vikunja voice assistant automation")
         return False
         
     vikunja_api = VikunjaAPI(vikunja_url, api_token)
     
-    async def handle_todo_trigger(event: Event, context: Context = None) -> None:
-        """Handle the todo voice trigger."""
+    async def handle_task_trigger(event: Event, context: Context = None) -> None:
+        """Handle the add task voice trigger."""
         # Extract the voice command
         voice_command = event.data.get("text", "")
         
-        if not voice_command.lower().startswith("todo"):
+        if not voice_command.lower().includes("task") and not voice_command.lower().includes("add"):
+            _LOGGER.info("Voice command does not match task trigger")
             return
             
-        # Remove the "todo" keyword
-        task_description = voice_command[4:].strip(": ")
+        # Remove the "add" and "task" keywords
+        task_description = voice_command.lower().replace("add", "").replace("task", "").strip()
         
         # Get all projects from Vikunja
         projects = await hass.async_add_executor_job(vikunja_api.get_projects)
@@ -137,6 +138,6 @@ async def setup_automation(hass: HomeAssistant, config: ConfigType) -> bool:
             return None
             
     # Subscribe to the intent recognition event
-    hass.bus.async_listen("intent_speech", handle_todo_trigger)
+    hass.bus.async_listen("intent_speech", handle_task_trigger)
     
     return True

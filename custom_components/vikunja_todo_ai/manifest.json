@@ -1,7 +1,7 @@
 {
-  "domain": "vikunja_todo_ai",
-  "name": "Vikunja Todo AI",
-  "documentation": "https://github.com/your-username/vikunja-todo-ai-homeassistant",
+  "domain": "vikunja_voice_assistant",
+  "name": "Vikunja voice assistant",
+  "documentation": "https://github.com/NeoHuncho/vikunja-voice-assistant",
   "dependencies": [],
   "codeowners": ["@your-username"],
   "requirements": ["requests", "aiohttp"],

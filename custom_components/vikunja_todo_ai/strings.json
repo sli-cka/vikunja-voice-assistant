@@ -1,10 +1,10 @@
 {
-  "title": "Vikunja Todo AI",
+  "title": "Vikunja voice assistant",
   "config": {
     "step": {
       "user": {
         "title": "Connect to Vikunja",
-        "description": "Set up Vikunja Todo AI Integration",
+        "description": "Set up Vikunja voice assistant integration",
         "data": {
           "url": "Vikunja base URL (e.g. https://vikunja.example.com)",
           "api_token": "Vikunja API Token",

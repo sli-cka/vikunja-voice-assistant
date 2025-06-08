@@ -1,4 +1,4 @@
-"""The Vikunja Todo AI integration."""
+"""The Vikunja voice assistant integration."""
 import logging
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
@@ -14,7 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
-    """Set up the Vikunja Todo AI component from yaml configuration."""
+    """Set up the Vikunja voice assistant component from yaml configuration."""
     hass.data.setdefault(DOMAIN, {})
     
     if DOMAIN in config:
@@ -35,7 +35,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     return True
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up Vikunja Todo AI from a config entry."""
+    """Set up Vikunja voice assistant from a config entry."""
     # Store config entry data
     hass.data.setdefault(DOMAIN, {}).update({
         CONF_URL: entry.data.get(CONF_URL),
