@@ -108,6 +108,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     class VikunjaAddTaskIntentHandler(intent.IntentHandler):
         """Handle VikunjaAddTask intents."""
         
+        intent_type = "VikunjaAddTask" 
+        
         async def async_handle(self, call: intent.Intent):
             """Handle the intent."""
             slots = call.slots
@@ -118,8 +120,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             
             response = intent.IntentResponse(language=call.language)
             response.async_set_speech(f"Adding task: {task_description}")
-            return response
-            
+            return response   
     # Register the intent handler
     intent.async_register(hass, VikunjaAddTaskIntentHandler())
     
