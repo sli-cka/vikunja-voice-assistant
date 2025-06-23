@@ -5,13 +5,9 @@ intents:
   VikunjaAddTask:
     data:
       - sentences:
-          - "{extra_words} (add | create | and) {extra_words_2} task {task_description}"
+          - "(at | add | create | and) [a | an ] [new | upcoming] task {task_description}"
           
           
 lists:
-  extra_words:
-    wildcard: true
-  extra_words_2:
-    wildcard: true
   task_description:
     wildcard: true
