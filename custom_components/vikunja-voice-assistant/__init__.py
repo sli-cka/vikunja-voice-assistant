@@ -84,7 +84,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         openai_api_key = domain_config.get(CONF_OPENAI_API_KEY)
         openai_model = domain_config.get(CONF_OPENAI_MODEL)
         default_due_date = domain_config.get(CONF_DUE_DATE, "none")
-        voice_correction = domain_config.get(CONF_VOICE_CORRECTION, False)
+        voice_correction = domain_config.get(CONF_VOICE_CORRECTION, True)
         
         if not all([vikunja_url, vikunja_api_token, openai_api_key]):
             _LOGGER.error("Missing configuration for Vikunja voice assistant")

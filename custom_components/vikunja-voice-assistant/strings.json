@@ -9,9 +9,9 @@
           "url": "Vikunja base URL (e.g. https://vikunja.example.com)",
           "vikunja_api_token": "Vikunja API Token",
           "openai_api_key": "OpenAI API Key",
-          "openai_model": "OpenAI Model (gpt-4.1-mini is more economical)",
-          "default_due_date": "Recommended to not lose track of task: default due date if none specified (applies only when no project is mentioned). ",
-          "voice_correction": "Enable speech recognition correction (recommended when using small speech-to-text models like Whisper Tiny/Small)"
+          "openai_model": "OpenAI Model - RECOMMENDED: gpt-4.1-mini",
+          "voice_correction": "Enable speech recognition text correction (HIGHLY RECOMMENDED, especially when using small speech-to-text models like Whisper Tiny/Small)",
+          "default_due_date": "default due date if none specified (applies only when no project is mentioned)"
         }
       }
     },

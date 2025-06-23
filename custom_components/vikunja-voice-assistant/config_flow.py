@@ -69,8 +69,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_VIKUNJA_API_TOKEN): str,
                     vol.Required(CONF_OPENAI_API_KEY): str,
                     vol.Required(CONF_OPENAI_MODEL, default=DEFAULT_MODEL): vol.In(MODEL_OPTIONS),
-                    vol.Required(CONF_DUE_DATE, default="none"): vol.In(DUE_DATE_OPTIONS),
                     vol.Required(CONF_VOICE_CORRECTION, default=True): cv.boolean,
+                    vol.Required(CONF_DUE_DATE, default="tomorrow"): vol.In(DUE_DATE_OPTIONS),
                 }
             ),
             errors=errors,
