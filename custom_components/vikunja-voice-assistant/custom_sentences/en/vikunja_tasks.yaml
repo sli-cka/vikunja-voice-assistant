@@ -1,12 +1,17 @@
+# syntax documentation : 
+# https://developers.home-assistant.io/docs/voice/intent-recognition/template-sentence-syntax/#sentence-templates-syntax
 language: "en"
 intents:
   VikunjaAddTask:
     data:
       - sentences:
-          - "add (a) task {task_description}"
-          - "create (a) task {task_description}"
-          - "great (a) task {task_description}"
+          - "{extra_words} (add | create | and) {extra_words_2} task {task_description}"
+          
           
 lists:
+  extra_words:
+    wildcard: true
+  extra_words_2:
+    wildcard: true
   task_description:
     wildcard: true

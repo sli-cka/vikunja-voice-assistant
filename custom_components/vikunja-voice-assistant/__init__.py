@@ -13,6 +13,7 @@ from .const import (
     CONF_OPENAI_MODEL,
     CONF_VIKUNJA_URL,
     CONF_DUE_DATE,
+    CONF_VOICE_CORRECTION, 
 )
 from .vikunja_api import VikunjaAPI
 from .process_with_openai import process_with_openai
@@ -68,7 +69,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         CONF_VIKUNJA_API_TOKEN: entry.data[CONF_VIKUNJA_API_TOKEN],
         CONF_OPENAI_API_KEY: entry.data[CONF_OPENAI_API_KEY],
         CONF_OPENAI_MODEL: entry.data[CONF_OPENAI_MODEL],
-        CONF_DUE_DATE: entry.data[CONF_DUE_DATE]
+        CONF_DUE_DATE: entry.data[CONF_DUE_DATE],
+        CONF_VOICE_CORRECTION: entry.data[CONF_VOICE_CORRECTION]
     }
     
     # Copy custom sentences
@@ -82,6 +84,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         openai_api_key = domain_config.get(CONF_OPENAI_API_KEY)
         openai_model = domain_config.get(CONF_OPENAI_MODEL)
         default_due_date = domain_config.get(CONF_DUE_DATE, "none")
+        voice_correction = domain_config.get(CONF_VOICE_CORRECTION, False)
         
         if not all([vikunja_url, vikunja_api_token, openai_api_key]):
             _LOGGER.error("Missing configuration for Vikunja voice assistant")
@@ -98,7 +101,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             projects, 
             openai_api_key, 
             openai_model, 
-            default_due_date
+            default_due_date,
+            voice_correction
         )
         
         if not openai_response:

@@ -13,7 +13,8 @@ from .const import (
     CONF_VIKUNJA_URL,
     CONF_VIKUNJA_API_TOKEN,
     CONF_DUE_DATE,  
-    DUE_DATE_OPTIONS
+    DUE_DATE_OPTIONS,
+    CONF_VOICE_CORRECTION,  # Add the new constant
 )
 from .vikunja_api import VikunjaAPI
 
@@ -59,7 +60,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             else:
                 errors["base"] = "cannot_connect"
 
-        # Show form
+        # Show form with the new voice correction option
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
@@ -69,6 +70,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_OPENAI_API_KEY): str,
                     vol.Required(CONF_OPENAI_MODEL, default=DEFAULT_MODEL): vol.In(MODEL_OPTIONS),
                     vol.Required(CONF_DUE_DATE, default="none"): vol.In(DUE_DATE_OPTIONS),
+                    vol.Required(CONF_VOICE_CORRECTION, default=True): cv.boolean,
                 }
             ),
             errors=errors,

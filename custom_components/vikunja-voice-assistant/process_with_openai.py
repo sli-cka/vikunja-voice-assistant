@@ -2,19 +2,8 @@ import logging
 import json
 import aiohttp
 from datetime import datetime, timezone
-from typing import Optional
-
-from homeassistant.core import HomeAssistant, Context, Event
-from homeassistant.helpers.typing import ConfigType
-
-from .const import (
-    DOMAIN, 
-    CONF_VIKUNJA_API_TOKEN, 
-    CONF_OPENAI_API_KEY, 
-    CONF_OPENAI_MODEL, 
-    CONF_VIKUNJA_URL
-)
-from .vikunja_api import VikunjaAPI
+import socket
+import asyncio
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,7 +14,7 @@ import aiohttp
 from datetime import datetime, timezone, timedelta
 
 
-async def process_with_openai(task_description, projects, api_key, model, default_due_date="none"):
+async def process_with_openai(task_description, projects, api_key, model, default_due_date="none", voice_correction=False):
     """Process the task with OpenAI API directly."""
     project_names = [{"id": p.get("id"), "name": p.get("title")} for p in projects]
     
@@ -56,6 +45,20 @@ async def process_with_openai(task_description, projects, api_key, model, defaul
         - If a specific due date is mentioned by the user, always use that instead of the default
         """
     
+    # Add voice correction instructions if enabled
+    voice_correction_instructions = ""
+    if voice_correction:
+        voice_correction_instructions = """
+        CRITICAL SPEECH RECOGNITION CORRECTION:
+        - The task description came from a voice command that may have speech recognition errors
+        - Make informed predictions about what the user actually meant to say, especially for:
+          * Project names that might be slightly misspelled or misheard
+          * Date/time references that might be unclear or incorrectly transcribed
+          * Common speech-to-text errors like "to do" vs "todo", or misheard prepositions
+        - Use contextual clues to understand the user's true intent
+        - If something seems like a speech recognition error, use your judgment to correct it
+        """
+    
     system_message = {
         "role": "system",
         "content": f"""
@@ -67,11 +70,17 @@ async def process_with_openai(task_description, projects, api_key, model, defaul
         If a project is mentioned in the task description, use its project ID.
         If no project is mentioned, use project ID 1.
         
+        {voice_correction_instructions}
+        
         CRITICAL TASK FORMATTING INSTRUCTIONS:
         - ALWAYS extract a clear, concise title from the task description
         - The title MUST NOT be empty - this is required
-        - If the task is described vaguely, create a reasonable title based on context
-        - Move details to the description field
+        - If details are provided, include them in the description field
+        
+        TASK TITLE OPTIMIZATION:
+        - Avoid unnecessary and obvious words that are already implied by the project context
+        - For example, if the project is "Groceries", don't include words like "buy", "purchase", or "groceries" in the title
+        - Keep titles concise, relevant, and without redundant context already provided by the project
         
         CRITICAL DATE HANDLING INSTRUCTIONS:
         - Current date and time: {current_timestamp}
@@ -82,6 +91,7 @@ async def process_with_openai(task_description, projects, api_key, model, defaul
         - Always use the future for ambiguous references (e.g., "Friday" should be the next Friday, not a past one)
         - NEVER set due dates in the past - all dates should be future dates.
         - Always include the 'Z' timezone designator at the end of date-time strings.
+        - REMOVE date information from the title, it should only be in the 'due_date' field if specified.
         
         {default_due_date_instructions}
         
@@ -99,6 +109,7 @@ async def process_with_openai(task_description, projects, api_key, model, defaul
         Output: {{"title": "Finish work report", "description": "Complete and submit the report", "project_id": 1, "due_date": "2023-06-09T17:00:00Z"}}
         """
     }
+    
 
     user_message = {
         "role": "user",
@@ -115,48 +126,79 @@ async def process_with_openai(task_description, projects, api_key, model, defaul
         "Authorization": f"Bearer {api_key}"
     }
     
+    # Define timeouts to prevent hanging
+    timeout = aiohttp.ClientTimeout(total=30, connect=10, sock_read=20, sock_connect=10)
+    _LOGGER.info(f"Attempting to connect to OpenAI API to process task: '{task_description[:50]}...'")
+    
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers=headers,
-                json=payload
-            ) as response:
-                if response.status != 200:
-                    error_text = await response.text()
-                    _LOGGER.error(f"OpenAI API error: {response.status} - {error_text}")
-                    return None
-                
-                result = await response.json()
-                
-                # Extract the JSON from the response
-                raw_response = result.get("choices", [{}])[0].get("message", {}).get("content", "")
-                
-                try:
-                    # Find JSON in the response if it's wrapped in other text
-                    start_idx = raw_response.find('{')
-                    end_idx = raw_response.rfind('}') + 1
-                    if start_idx >= 0 and end_idx > start_idx:
-                        json_str = raw_response[start_idx:end_idx]
-                        # Validate the JSON
-                        task_data = json.loads(json_str)
-                        
-                        # Ensure required fields are present
-                        if "title" not in task_data or not task_data["title"]:
-                            _LOGGER.error("OpenAI response missing required 'title' field")
+        # Check DNS resolution before attempting the request
+        try:
+            _LOGGER.debug("Resolving DNS for api.openai.com")
+            await asyncio.get_event_loop().getaddrinfo('api.openai.com', 443)
+            _LOGGER.debug("DNS resolution successful for api.openai.com")
+        except socket.gaierror as dns_err:
+            _LOGGER.error(f"DNS resolution failed for api.openai.com: {dns_err}")
+            return None
+        
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            _LOGGER.debug("Sending request to OpenAI API")
+            try:
+                async with session.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers=headers,
+                    json=payload,
+                    timeout=timeout
+                ) as response:
+                    if response.status != 200:
+                        error_text = await response.text()
+                        _LOGGER.error(f"OpenAI API error: {response.status} - {error_text}")
+                        return None
+                    
+                    result = await response.json()
+                    _LOGGER.debug("Successfully received response from OpenAI API")
+                    
+                    # Extract the JSON from the response
+                    raw_response = result.get("choices", [{}])[0].get("message", {}).get("content", "")
+                    
+                    try:
+                        # Find JSON in the response if it's wrapped in other text
+                        start_idx = raw_response.find('{')
+                        end_idx = raw_response.rfind('}') + 1
+                        if start_idx >= 0 and end_idx > start_idx:
+                            json_str = raw_response[start_idx:end_idx]
+                            # Validate the JSON
+                            task_data = json.loads(json_str)
+                            
+                            # Ensure required fields are present
+                            if "title" not in task_data or not task_data["title"]:
+                                _LOGGER.error("OpenAI response missing required 'title' field")
+                                _LOGGER.debug("Raw OpenAI response: %s", raw_response)
+                                return None
+                                
+                            _LOGGER.info(f"Successfully processed task: '{task_data.get('title', 'Unknown')}'")
+                            return json_str
+                        else:
+                            _LOGGER.error("No JSON found in OpenAI response")
                             _LOGGER.debug("Raw OpenAI response: %s", raw_response)
                             return None
-                            
-                        return json_str
-                    else:
-                        _LOGGER.error("No JSON found in OpenAI response")
+                    except (json.JSONDecodeError, ValueError) as err:
+                        _LOGGER.error("Failed to parse JSON from OpenAI response: %s", err)
                         _LOGGER.debug("Raw OpenAI response: %s", raw_response)
                         return None
-                except (json.JSONDecodeError, ValueError) as err:
-                    _LOGGER.error("Failed to parse JSON from OpenAI response: %s", err)
-                    _LOGGER.debug("Raw OpenAI response: %s", raw_response)
-                    return None
+            
+            except asyncio.TimeoutError as timeout_err:
+                _LOGGER.error(f"Timeout while connecting to OpenAI API: {timeout_err}")
+                return None
+            except aiohttp.ClientConnectorError as conn_err:
+                _LOGGER.error(f"Connection error to OpenAI API: {conn_err}")
+                return None
                 
+    except aiohttp.ClientError as client_err:
+        _LOGGER.error(f"HTTP client error with OpenAI: {client_err}")
+        return None
+    except asyncio.TimeoutError as timeout_err:
+        _LOGGER.error(f"Timeout error with OpenAI: {timeout_err}")
+        return None
     except Exception as err:
-        _LOGGER.error("Error processing with OpenAI: %s", err)
+        _LOGGER.error(f"Error processing with OpenAI: {err}", exc_info=True)
         return None
