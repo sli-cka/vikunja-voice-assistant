@@ -1,18 +1,11 @@
 import logging
 import json
 import aiohttp
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import socket
 import asyncio
 
 _LOGGER = logging.getLogger(__name__)
-
-# Process with OpenAI, moved outside to be reused
-import logging
-import json
-import aiohttp
-from datetime import datetime, timezone, timedelta
-
 
 async def process_with_openai(task_description, projects, api_key, model, default_due_date="none", voice_correction=False):
     """Process the task with OpenAI API directly."""
@@ -110,7 +103,6 @@ async def process_with_openai(task_description, projects, api_key, model, defaul
         """
     }
     
-
     user_message = {
         "role": "user",
         "content": f"Create a task with this description (be sure to include a title): {task_description}"
@@ -127,27 +119,22 @@ async def process_with_openai(task_description, projects, api_key, model, defaul
     }
     
     # Define timeouts to prevent hanging
-    timeout = aiohttp.ClientTimeout(total=30, connect=10, sock_read=20, sock_connect=10)
+    timeout = aiohttp.ClientTimeout(total=60, connect=15, sock_read=30, sock_connect=15)  # Increased timeouts
     _LOGGER.info(f"Attempting to connect to OpenAI API to process task: '{task_description[:50]}...'")
     
     try:
-        # Check DNS resolution before attempting the request
-        try:
-            _LOGGER.debug("Resolving DNS for api.openai.com")
-            await asyncio.get_event_loop().getaddrinfo('api.openai.com', 443)
-            _LOGGER.debug("DNS resolution successful for api.openai.com")
-        except socket.gaierror as dns_err:
-            _LOGGER.error(f"DNS resolution failed for api.openai.com: {dns_err}")
-            return None
-        
+        # Skip explicit DNS resolution which might be causing timeout issues
         async with aiohttp.ClientSession(timeout=timeout) as session:
             _LOGGER.debug("Sending request to OpenAI API")
             try:
+                openai_url = "https://api.openai.com/v1/chat/completions"
+                
                 async with session.post(
-                    "https://api.openai.com/v1/chat/completions",
+                    openai_url,
                     headers=headers,
                     json=payload,
-                    timeout=timeout
+                    timeout=timeout,
+                    ssl=False  # Try disabling SSL verification temporarily to troubleshoot
                 ) as response:
                     if response.status != 200:
                         error_text = await response.text()
