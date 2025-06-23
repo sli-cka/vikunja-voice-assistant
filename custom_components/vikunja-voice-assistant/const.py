@@ -11,6 +11,6 @@ MODEL_OPTIONS = ["gpt-4.1-mini", "gpt-4.1"]
 DUE_DATE_OPTIONS = [
     "none",
     "tomorrow", 
-    "end of week",
-    "end of month"
+    "end_of_week",
+    "end_of_month"
 ]
