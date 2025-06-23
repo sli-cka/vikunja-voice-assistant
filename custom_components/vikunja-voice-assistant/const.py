@@ -1,5 +1,5 @@
 DOMAIN = "vikunja_voice_assistant"
-CONF_VIKUNJA_URL= "https://vikunja.example.com"
+CONF_VIKUNJA_URL= "vikunja_url"
 CONF_VIKUNJA_API_TOKEN = "vikunja_api_token"
 CONF_OPENAI_API_KEY = "openai_api_key"
 CONF_OPENAI_MODEL = "openai_model"
@@ -11,6 +11,6 @@ MODEL_OPTIONS = ["gpt-4.1-mini", "gpt-4.1"]
 DUE_DATE_OPTIONS = [
     "none",
     "tomorrow", 
-    "end_of_week",
-    "end_of_month"
+    "end of week",
+    "end of month"
 ]

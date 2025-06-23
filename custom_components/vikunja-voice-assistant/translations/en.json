@@ -5,10 +5,10 @@
         "title": "Connect to Vikunja",
         "description": "Set up Vikunja voice assistant integration",
         "data": {
-          "url": "Vikunja base URL (e.g. https://vikunja.example.com)",
+          "vikunja_url": "Vikunja base URL (e.g. https://vikunja.example.com)",
           "vikunja_api_token": "Vikunja API Token",
           "openai_api_key": "OpenAI API Key",
-          "openai_model": "OpenAI Model",
+          "openai_model": "OpenAI Model - RECOMMENDED: gpt-4.1-mini",
           "voice_correction": "Enable speech recognition text correction (HIGHLY RECOMMENDED, especially when using small speech-to-text models like Whisper Tiny/Small)",
           "default_due_date": "default due date if none specified (applies only when no project is mentioned)"
         }
