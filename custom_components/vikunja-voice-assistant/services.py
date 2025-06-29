@@ -37,9 +37,15 @@ def setup_services(hass: HomeAssistant):
         """Create a task in Vikunja."""
         task_data = call.data.copy()
         
-        await hass.async_add_executor_job(
+        result = await hass.async_add_executor_job(
             lambda: vikunja_api.add_task(task_data)
         )
+        
+        if result:
+            _LOGGER.info("Successfully created task via service: %s", task_data.get("title", "Unknown"))
+        else:
+            _LOGGER.error("Failed to create task via service: %s", task_data.get("title", "Unknown"))
+            raise Exception("Failed to create task in Vikunja")
     
     # Register services
     hass.services.async_register(

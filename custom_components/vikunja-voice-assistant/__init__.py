@@ -78,6 +78,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     
     # Create the task handling function that both conversation and voice can use
     async def handle_vikunja_task(task_description: str):
+        """
+        Handle creating a Vikunja task from a description.
+        Returns: tuple (success: bool, message: str, task_title: str)
+        """
         domain_config = hass.data.get(DOMAIN, {})
         vikunja_url = domain_config.get(CONF_VIKUNJA_URL)
         vikunja_api_token = domain_config.get(CONF_VIKUNJA_API_TOKEN)
@@ -88,7 +92,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         
         if not all([vikunja_url, vikunja_api_token, openai_api_key]):
             _LOGGER.error("Missing configuration for Vikunja voice assistant")
-            return
+            return False, "Configuration error. Please check your Vikunja and OpenAI settings.", ""
             
         vikunja_api = VikunjaAPI(vikunja_url, vikunja_api_token)
         
@@ -107,7 +111,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         
         if not openai_response:
             _LOGGER.error("Failed to process with OpenAI")
-            return
+            return False, "Sorry, I couldn't process your task due to a connection error. Please try again later.", ""
         
         # Log the response for debugging
         _LOGGER.debug("OpenAI response: %s", openai_response)
@@ -119,7 +123,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             # Validate required fields
             if not task_data.get("title"):
                 _LOGGER.error("Missing required 'title' field in task data")
-                return
+                return False, "Sorry, I couldn't understand what task you wanted to create. Please try again.", ""
             
             # Send request to Vikunja
             result = await hass.async_add_executor_job(
@@ -127,14 +131,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             )
             
             if result:
-                _LOGGER.info("Successfully created task: %s", task_data.get("title"))
+                task_title = task_data.get("title")
+                _LOGGER.info("Successfully created task: %s", task_title)
+                return True, f"Successfully added task: {task_title}", task_title
             else:
                 _LOGGER.error("Failed to create task in Vikunja")
+                return False, "Sorry, I couldn't add the task to Vikunja. Please check your Vikunja connection.", ""
                 
         except json.JSONDecodeError as err:
             _LOGGER.error("Failed to parse OpenAI response as JSON: %s", err)
+            return False, "Sorry, there was an error processing your task. Please try again.", ""
         except Exception as err:
             _LOGGER.error("Unexpected error creating task: %s", err)
+            return False, "Sorry, an unexpected error occurred. Please try again.", ""
 
     # Create a proper intent handler class
     class VikunjaAddTaskIntentHandler(intent.IntentHandler):
@@ -151,13 +160,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             response = intent.IntentResponse(language=call.language)
             
             if not task_description.strip():
-                response.async_set_speech("Tell the user that the task could not be added")
+                response.async_set_speech("I couldn't understand what task you wanted to add. Please try again.")
                 return response
             
-            # Process the task
-            await handle_vikunja_task(task_description)
+            # Process the task and get the result
+            success, message, task_title = await handle_vikunja_task(task_description)
             
-            response.async_set_speech(f"Adding task: {task_description}")
+            if success:
+                response.async_set_speech(message)
+            else:
+                response.async_set_speech(message)
+                
             return response   
     
     # Register the intent handler
