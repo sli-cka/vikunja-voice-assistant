@@ -5,7 +5,7 @@ intents:
   VikunjaAddTask:
     data:
       - sentences:
-          - "[I] (at | add | and | had | have | create | great) [a | an] [new | upcoming] (task | tasks) {task_description}"
+          - "[I] (at | add | and | had | have | create | great) [a | an | the] [new | upcoming] (task | tasks) {task_description}"
               
 lists:
   task_description:
