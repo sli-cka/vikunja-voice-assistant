@@ -36,6 +36,7 @@ async def process_with_openai(task_description, projects, api_key, model, defaul
         - If no specific project or due date is mentioned in the task, use this default due date: {default_due_date_value}
         - If a specific project is mentioned, do not set any due date unless the user explicitly mentions one
         - If a specific due date is mentioned by the user, always use that instead of the default
+        - Even if a recurring task instruction is given, if no due date is mentioned, set it to {default_due_date_value}
         """
     
     # Add voice correction instructions if enabled
