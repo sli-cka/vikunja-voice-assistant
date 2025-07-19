@@ -57,6 +57,18 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
         errors = {}
+        
+        # Default values to show in the form
+        data_schema = vol.Schema(
+            {
+                vol.Required(CONF_VIKUNJA_URL, default=""): str,
+                vol.Required(CONF_VIKUNJA_API_TOKEN, default=""): str,
+                vol.Required(CONF_OPENAI_API_KEY, default=""): str,
+                vol.Required(CONF_OPENAI_MODEL, default=DEFAULT_MODEL): vol.In(MODEL_OPTIONS),
+                vol.Required(CONF_VOICE_CORRECTION, default=True): cv.boolean,
+                vol.Required(CONF_DUE_DATE, default="tomorrow"): vol.In(DUE_DATE_OPTIONS),
+            }
+        )
 
         if user_input is not None:
             # Strip spaces from API keys and tokens
@@ -97,18 +109,21 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         title=f"Vikunja ({api_url})",
                         data=user_input
                     )
+            
+            # If there are errors, update the schema with the user's input as defaults
+            data_schema = vol.Schema(
+                {
+                    vol.Required(CONF_VIKUNJA_URL, default=user_input.get(CONF_VIKUNJA_URL, "")): str,
+                    vol.Required(CONF_VIKUNJA_API_TOKEN, default=user_input.get(CONF_VIKUNJA_API_TOKEN, "")): str,
+                    vol.Required(CONF_OPENAI_API_KEY, default=user_input.get(CONF_OPENAI_API_KEY, "")): str,
+                    vol.Required(CONF_OPENAI_MODEL, default=user_input.get(CONF_OPENAI_MODEL, DEFAULT_MODEL)): vol.In(MODEL_OPTIONS),
+                    vol.Required(CONF_VOICE_CORRECTION, default=user_input.get(CONF_VOICE_CORRECTION, True)): cv.boolean,
+                    vol.Required(CONF_DUE_DATE, default=user_input.get(CONF_DUE_DATE, "tomorrow")): vol.In(DUE_DATE_OPTIONS),
+                }
+            )
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_VIKUNJA_URL): str,
-                    vol.Required(CONF_VIKUNJA_API_TOKEN): str,
-                    vol.Required(CONF_OPENAI_API_KEY): str,
-                    vol.Required(CONF_OPENAI_MODEL, default=DEFAULT_MODEL): vol.In(MODEL_OPTIONS),
-                    vol.Required(CONF_VOICE_CORRECTION, default=True): cv.boolean,
-                    vol.Required(CONF_DUE_DATE, default="tomorrow"): vol.In(DUE_DATE_OPTIONS),
-                }
-            ),
+            data_schema=data_schema,
             errors=errors,
         )
