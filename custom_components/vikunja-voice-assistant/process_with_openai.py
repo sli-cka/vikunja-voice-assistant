@@ -86,6 +86,27 @@ async def process_with_openai(task_description, projects, api_key, model, defaul
         - Always include the 'Z' timezone designator at the end of date-time strings.
         - REMOVE date information from the title, it should only be in the 'due_date' field if specified.
         
+        PRIORITY HANDLING INSTRUCTIONS:
+        - Priority scale: 1 (lowest) to 5 (highest priority)
+        - Only include priority when explicitly mentioned or strongly implied
+        - Examples of keywords indicating priority levels:
+          * Priority 5 (urgent/critical): "urgent", "critical", "emergency", "ASAP", "immediately", "high priority"
+          * Priority 4 (important): "important", "soon", "priority", "needs attention"
+          * Priority 3 (medium): "medium priority", "when possible", "moderately important"
+          * Priority 2 (low): "low priority", "when you have time", "not urgent"
+          * Priority 1 (minimal): "sometime", "eventually", "no rush"
+        - If no priority indicators are present, do not include the priority field
+        
+        REPEAT/RECURRING TASK INSTRUCTIONS:
+        - Only include repeat_after when recurring/repeating tasks are explicitly or implicitly mentioned
+        - Convert time periods to seconds:
+          * Daily: 86400 seconds
+          * Weekly: 604800 seconds  
+          * Monthly: 2592000 seconds (30 days)
+          * Yearly: 31536000 seconds (365 days)
+        - Examples of keywords indicating recurring tasks: "daily", "weekly", "monthly", "yearly", "every day", "every week", "recurring", "repeat"
+        - If no recurring indicators are present, do not include the repeat_after field
+        
         {default_due_date_instructions}
         
         Output only valid JSON that can be sent to the Vikunja API, with these fields:
@@ -93,13 +114,21 @@ async def process_with_openai(task_description, projects, api_key, model, defaul
         - description (string): Any details about the task
         - project_id (number): The project ID (always required, use 1 if no project specified)
         - due_date (string, optional): The due date if specified, always in format YYYY-MM-DDTHH:MM:SSZ
+        - priority (number, optional): Priority level 1-5, only when explicitly or implicitly mentioned
+        - repeat_after (number, optional): Repeat interval in seconds, only for recurring tasks
         
         EXAMPLES:
         Input: "Reminder to pick up groceries tomorrow"
         Output: {{"title": "Pick up groceries", "description": "", "project_id": 1, "due_date": "2023-06-09T12:00:00Z"}}
         
-        Input: "I need to finish the report for work by Friday at 5pm"
-        Output: {{"title": "Finish work report", "description": "Complete and submit the report", "project_id": 1, "due_date": "2023-06-09T17:00:00Z"}}
+        Input: "URGENT: I need to finish the report for work by Friday at 5pm"
+        Output: {{"title": "Finish work report", "description": "Complete and submit the report", "project_id": 1, "due_date": "2023-06-09T17:00:00Z", "priority": 5}}
+        
+        Input: "Take vitamins daily"
+        Output: {{"title": "Take vitamins", "description": "", "project_id": 1, "repeat_after": 86400}}
+        
+        Input: "Weekly team meeting every Monday at 10am"
+        Output: {{"title": "Team meeting", "description": "", "project_id": 1, "due_date": "2023-06-12T10:00:00Z", "repeat_after": 604800}}
         """
     }
     
