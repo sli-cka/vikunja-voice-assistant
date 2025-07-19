@@ -16,7 +16,8 @@
       }
     },
     "error": {
-      "cannot_connect": "Failed to connect to Vikunja API, please check your URL and API token."
+      "cannot_connect": "Failed to connect to Vikunja API, please check your URL and API token.",
+      "invalid_openai_key": "Invalid OpenAI API key. Please check your OpenAI API key."
     },
     "abort": {
       "already_configured": "This Vikunja account is already configured."
