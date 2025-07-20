@@ -43,14 +43,10 @@ async def process_with_openai(task_description, projects, api_key, model, defaul
     voice_correction_instructions = ""
     if voice_correction:
         voice_correction_instructions = """
-        CRITICAL SPEECH RECOGNITION CORRECTION:
-        - The task description came from a voice command that may have speech recognition errors
-        - Make informed predictions about what the user actually meant to say, especially for:
-          * Project names that might be slightly misspelled or misheard
-          * Date/time references that might be unclear or incorrectly transcribed
-          * Common speech-to-text errors like "to do" vs "todo", or misheard prepositions
-        - Use contextual clues to understand the user's true intent
-        - If something seems like a speech recognition error, use your judgment to correct it
+        SPEECH RECOGNITION CORRECTION:
+        - Task came from voice command - expect speech recognition errors
+        - Correct misheard project names, dates, and common speech-to-text errors
+        - Use context to understand user's true intent
         """
     
     system_message = {
@@ -61,62 +57,43 @@ async def process_with_openai(task_description, projects, api_key, model, defaul
         
         Available projects: {json.dumps(project_names)}
         
-        If a project is mentioned in the task description, use its project ID.
-        If no project is mentioned, use project ID 1.
+        DEFAULT DUE DATE RULE:
+        {default_due_date_instructions.strip() if default_due_date_instructions else "- No default due date configured"}
         
-        {voice_correction_instructions}
+        {voice_correction_instructions.strip() if voice_correction_instructions else ""}
         
-        CRITICAL TASK FORMATTING INSTRUCTIONS:
-        - ALWAYS extract a clear, concise title from the task description
-        - The title MUST NOT be empty - this is required
-        - If details are provided, include them in the description field
+        CORE OUTPUT REQUIREMENTS:
+        - Output only valid JSON with these fields (only include optional fields when applicable):
+          * title (string): Main task title (REQUIRED, MUST NOT BE EMPTY)
+          * description (string): Task details (always include, use empty string if none)
+          * project_id (number): Project ID (always required, use 1 if no project specified)
+          * due_date (string, optional): Due date in YYYY-MM-DDTHH:MM:SSZ format
+          * priority (number, optional): Priority level 1-5, only when explicitly mentioned
+          * repeat_after (number, optional): Repeat interval in seconds, only for recurring tasks
         
-        TASK TITLE OPTIMIZATION:
-        - Avoid unnecessary and obvious words that are already implied by the project context
-        - For example, if the project is "Groceries", don't include words like "buy", "purchase", or "groceries" in the title
-        - Keep titles concise, relevant, and without redundant context already provided by the project
+        TASK FORMATTING:
+        - Extract clear, concise titles from task descriptions
+        - Avoid redundant words already implied by project context
+        - Remove date/time information from titles (put in due_date field instead)
+        - Include relevant details in description field
         
-        CRITICAL DATE HANDLING INSTRUCTIONS:
-        - Current date and time: {current_timestamp}
-        - Today's date is: {current_date}
-        - When a date or time is mentioned (like "tomorrow", "next week", "Friday", "in 3 days", etc.), calculate the correct future date based on current date above.
-        - For the 'due_date' field, use ISO format with timezone: YYYY-MM-DDTHH:MM:SSZ
-        - For time-of-day references like "3pm", set the time accordingly; otherwise default to 12:00:00.
-        - Always use the future for ambiguous references (e.g., "Friday" should be the next Friday, not a past one)
-        - NEVER set due dates in the past - all dates should be future dates.
-        - Always include the 'Z' timezone designator at the end of date-time strings.
-        - REMOVE date information from the title, it should only be in the 'due_date' field if specified.
+        DATE HANDLING (Current: {current_timestamp}):
+        - Calculate future dates based on current date: {current_date}
+        - Use ISO format with 'Z' timezone: YYYY-MM-DDTHH:MM:SSZ
+        - Default time: 12:00:00 (unless specific time mentioned)
+        - NEVER set past dates - always use future dates for ambiguous references
         
-        PRIORITY HANDLING INSTRUCTIONS:
-        - Priority scale: 1 (lowest) to 5 (highest priority)
-        - Only include priority when explicitly mentioned or strongly implied
-        - Examples of keywords indicating priority levels:
-          * Priority 5 (urgent/critical): "urgent", "critical", "emergency", "ASAP", "immediately", "high priority"
-          * Priority 4 (important): "important", "soon", "priority", "needs attention"
-          * Priority 3 (medium): "medium priority", "when possible", "moderately important"
-          * Priority 2 (low): "low priority", "when you have time", "not urgent"
-          * Priority 1 (minimal): "sometime", "eventually", "no rush"
-        - If no priority indicators are present, do not include the priority field
+        PRIORITY LEVELS (only when explicitly mentioned):
+        - 5: urgent, critical, emergency, ASAP, immediately
+        - 4: important, soon, priority, needs attention
+        - 3: medium priority, when possible, moderately important
+        - 2: low priority, when you have time, not urgent
+        - 1: sometime, eventually, no rush
         
-        REPEAT/RECURRING TASK INSTRUCTIONS:
-        - Only include repeat_after when recurring/repeating tasks are explicitly or implicitly mentioned
-        - Convert time periods to seconds:
-          * Daily: 86400 seconds
-          * Weekly: 604800 seconds  
-          * Monthly: 2592000 seconds (30 days)
-          * Yearly: 31536000 seconds (365 days)
-        - Examples of keywords indicating recurring tasks: "daily", "weekly", "monthly", "yearly", "every day", "every week", "recurring", "repeat"
-        - If no recurring indicators are present, do not include the repeat_after field
-        
-        {default_due_date_instructions}
-        
-        Output only valid JSON that can be sent to the Vikunja API, with these fields:
-        - title (string): The main task title (REQUIRED, MUST NOT BE EMPTY)
-        - description (string): Any details about the task
-        - project_id (number): The project ID (always required, use 1 if no project specified)
-        - due_date (string, optional): The due date if specified, always in format YYYY-MM-DDTHH:MM:SSZ
-        - priority (number, optional): Priority level 1-5, only when explicitly or implicitly mentioned
-        - repeat_after (number, optional): Repeat interval in seconds, only for recurring tasks
+        RECURRING TASKS (only when explicitly mentioned):
+        - Daily: 86400 seconds | Weekly: 604800 seconds
+        - Monthly: 2592000 seconds | Yearly: 31536000 seconds
+        - Keywords: daily, weekly, monthly, yearly, every day/week, recurring, repeat
         
         EXAMPLES:
         Input: "Reminder to pick up groceries tomorrow"
@@ -130,6 +107,15 @@ async def process_with_openai(task_description, projects, api_key, model, defaul
         
         Input: "Weekly team meeting every Monday at 10am"
         Output: {{"title": "Team meeting", "description": "", "project_id": 1, "due_date": "2023-06-12T10:00:00Z", "repeat_after": 604800}}
+        
+        Input: "Call the dentist next Tuesday" (misheard as "dentiest")
+        Output: {{"title": "Call the dentist", "description": "", "project_id": 1, "due_date": "2023-06-13T12:00:00Z"}}
+        
+        Input: "Buy milk for the grocery project tomorrow at 3" (unclear time)
+        Output: {{"title": "Buy milk", "description": "", "project_id": 2, "due_date": "2023-06-09T15:00:00Z"}}
+        
+        Input: "Schedule meeting with client for next Friday" (no specific time)
+        Output: {{"title": "Schedule meeting with client", "description": "", "project_id": 1, "due_date": "2023-06-16T12:00:00Z"}}
         """
     }
     
