@@ -44,7 +44,40 @@ class VikunjaAPI:
             if hasattr(err, 'response') and err.response is not None:
                 _LOGGER.error("Response content: %s", err.response.text)
             return []
-            
+
+    def get_labels(self):
+        labels_url = f"{self.url}/labels"
+        
+        try:
+            response = requests.get(labels_url, headers=self.headers)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as err:
+            _LOGGER.error("Failed to get labels: %s", err)
+            if hasattr(err, 'response') and err.response is not None:
+                _LOGGER.error("Response content: %s", err.response.text)
+            return []
+
+    def create_label(self, label_data):
+        """Create a new label in Vikunja."""
+        labels_url = f"{self.url}/labels"
+        
+        # Validate required fields
+        if not label_data.get("title"):
+            _LOGGER.error("Cannot create label: missing 'title' field in label data")
+            return None
+        
+        try:
+            _LOGGER.debug("Creating label with data: %s", json.dumps(label_data))
+            response = requests.put(labels_url, headers=self.headers, json=label_data)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as err:
+            _LOGGER.error("Failed to create label: %s", err)
+            if hasattr(err, 'response') and err.response is not None:
+                _LOGGER.error("Response content: %s", err.response.text)
+            return None
+
     def add_task(self, task_data):
         """Create a new task in a Vikunja project."""
         project_id = task_data.get("project_id", 1)

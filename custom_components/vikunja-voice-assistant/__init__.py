@@ -99,10 +99,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         # Get all projects from Vikunja
         projects = await hass.async_add_executor_job(vikunja_api.get_projects)
         
-        # Process with OpenAI
+        # Get all labels from Vikunja
+        labels = await hass.async_add_executor_job(vikunja_api.get_labels)
+        
+        
+            # Process with OpenAI
         openai_response = await process_with_openai(
             task_description, 
             projects, 
+            labels,
             openai_api_key, 
             openai_model, 
             default_due_date,
@@ -118,12 +123,49 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         
         try:
             # Parse the response
-            task_data = json.loads(openai_response)
+            response_data = json.loads(openai_response)
+            task_data = response_data.get("task_data", {})
+            labels_to_create = response_data.get("labels_to_create", [])
             
             # Validate required fields
             if not task_data.get("title"):
                 _LOGGER.error("Missing required 'title' field in task data")
                 return False, "Sorry, I couldn't understand what task you wanted to create. Please try again.", ""
+            
+            # Create any new labels that are needed
+            created_label_ids = []
+            if labels_to_create:
+                for label_name in labels_to_create:
+                    # Check if label already exists (case-insensitive)
+                    existing_label = None
+                    for label in labels:
+                        if label.get("title", "").lower() == label_name.lower():
+                            existing_label = label
+                            break
+                    
+                    if existing_label:
+                        created_label_ids.append(existing_label["id"])
+                        _LOGGER.info(f"Using existing label: {label_name} (ID: {existing_label['id']})")
+                    else:
+                        # Create new label
+                        new_label = await hass.async_add_executor_job(
+                            lambda name=label_name: vikunja_api.create_label({"title": name})
+                        )
+                        if new_label:
+                            created_label_ids.append(new_label["id"])
+                            _LOGGER.info(f"Created new label: {label_name} (ID: {new_label['id']})")
+                        else:
+                            _LOGGER.warning(f"Failed to create label: {label_name}")
+            
+            # Add created label IDs to existing label_ids
+            existing_label_ids = task_data.get("label_ids", [])
+            all_label_ids = existing_label_ids + created_label_ids
+            
+            if all_label_ids:
+                task_data["label_ids"] = all_label_ids
+            
+            # Remove labels_to_create from task_data as it's not needed for Vikunja API
+            task_data.pop("labels_to_create", None)
             
             # Send request to Vikunja
             result = await hass.async_add_executor_job(
@@ -132,8 +174,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             
             if result:
                 task_title = task_data.get("title")
-                _LOGGER.info("Successfully created task: %s", task_title)
-                return True, f"Successfully added task: {task_title}", task_title
+                labels_msg = ""
+                if all_label_ids:
+                    labels_msg = f" with {len(all_label_ids)} label(s)"
+                _LOGGER.info("Successfully created task: %s%s", task_title, labels_msg)
+                return True, f"Successfully added task: {task_title}{labels_msg}", task_title
             else:
                 _LOGGER.error("Failed to create task in Vikunja")
                 return False, "Sorry, I couldn't add the task to Vikunja. Please check your Vikunja connection.", ""
