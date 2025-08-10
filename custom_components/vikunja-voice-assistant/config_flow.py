@@ -8,9 +8,6 @@ from homeassistant.helpers import config_validation as cv
 from .const import (
     DOMAIN, 
     CONF_OPENAI_API_KEY, 
-    CONF_OPENAI_MODEL, 
-    DEFAULT_MODEL, 
-    MODEL_OPTIONS,
     CONF_VIKUNJA_URL,
     CONF_VIKUNJA_API_TOKEN,
     CONF_DUE_DATE,  
@@ -34,7 +31,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         
         # Simple test payload to validate API key
         payload = {
-            "model": "gpt-3.5-turbo",
+            "model": "gpt-5-nano",
             "messages": [{"role": "user", "content": "test"}],
             "max_tokens": 1
         }
@@ -64,7 +61,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_VIKUNJA_URL, default=""): str,
                 vol.Required(CONF_VIKUNJA_API_TOKEN, default=""): str,
                 vol.Required(CONF_OPENAI_API_KEY, default=""): str,
-                vol.Required(CONF_OPENAI_MODEL, default=DEFAULT_MODEL): vol.In(MODEL_OPTIONS),
                 vol.Required(CONF_VOICE_CORRECTION, default=True): cv.boolean,
                 vol.Required(CONF_DUE_DATE, default="tomorrow"): vol.In(DUE_DATE_OPTIONS),
             }
@@ -116,7 +112,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_VIKUNJA_URL, default=user_input.get(CONF_VIKUNJA_URL, "")): str,
                     vol.Required(CONF_VIKUNJA_API_TOKEN, default=user_input.get(CONF_VIKUNJA_API_TOKEN, "")): str,
                     vol.Required(CONF_OPENAI_API_KEY, default=user_input.get(CONF_OPENAI_API_KEY, "")): str,
-                    vol.Required(CONF_OPENAI_MODEL, default=user_input.get(CONF_OPENAI_MODEL, DEFAULT_MODEL)): vol.In(MODEL_OPTIONS),
                     vol.Required(CONF_VOICE_CORRECTION, default=user_input.get(CONF_VOICE_CORRECTION, True)): cv.boolean,
                     vol.Required(CONF_DUE_DATE, default=user_input.get(CONF_DUE_DATE, "tomorrow")): vol.In(DUE_DATE_OPTIONS),
                 }

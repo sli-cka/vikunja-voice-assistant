@@ -6,7 +6,7 @@ This integration allows you to create tasks in your Vikunja instance using voice
 - Trigger task creation by voice using the keyword "add" and "task"
 - Automatically detect mentioned projects and assign tasks accordingly
 - Extract date and time information for task scheduling
-- Choose between GPT-4.1-mini (default, more economical) or GPT-4.1 models
+- Uses OpenAI GPT 5 nano for maximum speed and efficiency
 
 ## Requirements
 - Home Assistant 
