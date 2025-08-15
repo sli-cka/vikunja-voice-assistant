@@ -2,6 +2,8 @@
 import logging
 import os
 import json
+import asyncio
+import time
 from homeassistant.helpers import intent
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
@@ -92,15 +94,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             return False, "Configuration error. Please check your Vikunja and OpenAI settings.", ""
             
         vikunja_api = VikunjaAPI(vikunja_url, vikunja_api_token)
+
+        total_start = time.monotonic()
+        vikunja_get_start = time.monotonic()
+        projects, labels = await asyncio.gather(
+            hass.async_add_executor_job(vikunja_api.get_projects),
+            hass.async_add_executor_job(vikunja_api.get_labels)
+        )
+        vikunja_get_duration = (time.monotonic() - vikunja_get_start) * 1000.0  # ms
         
-        # Get all projects from Vikunja
-        projects = await hass.async_add_executor_job(vikunja_api.get_projects)
-        
-        # Get all labels from Vikunja
-        labels = await hass.async_add_executor_job(vikunja_api.get_labels)
-        
-        
-            # Process with OpenAI
+        # Process with OpenAI
+        openai_start = time.monotonic()
         openai_response = await process_with_openai(
             task_description, 
             projects, 
@@ -108,9 +112,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             default_due_date,
             voice_correction
         )
+        openai_duration = (time.monotonic() - openai_start) * 1000.0  # ms
         
         if not openai_response:
             _LOGGER.error("Failed to process with OpenAI")
+            total_duration = (time.monotonic() - total_start) * 1000.0  # ms
+            _LOGGER.info(
+                "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=FAILED | VikunjaPOST=SKIPPED(OPENAI_FAIL) | Total=%.1fms | TaskCreation=FAILED",
+                vikunja_get_duration,
+                total_duration,
+            )
             return False, "Sorry, I couldn't process your task due to a connection error. Please try again later.", ""
         
         # Log the response for debugging
@@ -124,25 +135,63 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             # Validate required fields
             if not task_data.get("title"):
                 _LOGGER.error("Missing required 'title' field in task data")
+                total_duration = (time.monotonic() - total_start) * 1000.0  # ms
+                _LOGGER.info(
+                    "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=%.1fms | VikunjaPOST=SKIPPED(MISSING_TITLE) | Total=%.1fms | TaskCreation=FAILED",
+                    vikunja_get_duration,
+                    openai_duration,
+                    total_duration,
+                )
                 return False, "Sorry, I couldn't understand what task you wanted to create. Please try again.", ""
         
             # Send request to Vikunja
+            vikunja_post_start = time.monotonic()
             result = await hass.async_add_executor_job(
                 lambda: vikunja_api.add_task(task_data)
             )
-            
+            vikunja_post_duration = (time.monotonic() - vikunja_post_start) * 1000.0  # ms
+            total_duration = (time.monotonic() - total_start) * 1000.0  # ms
+
             if result:
                 task_title = task_data.get("title")
+                _LOGGER.info(
+                    "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=%.1fms | VikunjaPOST=%.1fms | Total=%.1fms | Task='%s'",
+                    vikunja_get_duration,
+                    openai_duration,
+                    vikunja_post_duration,
+                    total_duration,
+                    task_title,
+                )
                 return True, f"Successfully added task: {task_title}", task_title
             else:
                 _LOGGER.error("Failed to create task in Vikunja")
+                _LOGGER.info(
+                    "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=%.1fms | VikunjaPOST=FAILED | Total=%.1fms | TaskCreation=FAILED",
+                    vikunja_get_duration,
+                    openai_duration,
+                    total_duration,
+                )
                 return False, "Sorry, I couldn't add the task to Vikunja. Please check your Vikunja connection.", ""
                 
         except json.JSONDecodeError as err:
             _LOGGER.error("Failed to parse OpenAI response as JSON: %s", err)
+            total_duration = (time.monotonic() - total_start) * 1000.0  # ms
+            _LOGGER.info(
+                "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=%.1fms | VikunjaPOST=SKIPPED(JSON_ERROR) | Total=%.1fms | TaskCreation=FAILED",
+                vikunja_get_duration,
+                openai_duration,
+                total_duration,
+            )
             return False, "Sorry, there was an error processing your task. Please try again.", ""
         except Exception as err:
             _LOGGER.error("Unexpected error creating task: %s", err)
+            total_duration = (time.monotonic() - total_start) * 1000.0  # ms
+            _LOGGER.info(
+                "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=%.1fms | VikunjaPOST=SKIPPED(EXCEPTION) | Total=%.1fms | TaskCreation=FAILED",
+                vikunja_get_duration,
+                openai_duration,
+                total_duration,
+            )
             return False, "Sorry, an unexpected error occurred. Please try again.", ""
 
     # Create a proper intent handler class
