@@ -115,7 +115,7 @@ async def process_with_openai(task_description, projects, api_key,  default_due_
         "content": f"Create a task with this description (be sure to include a title): {task_description}"
     }
     payload = {
-        "model": 'gpt-5-nano',
+        "model": 'gpt-4.1-nano',
         "messages": [system_message, user_message],
     }
     
