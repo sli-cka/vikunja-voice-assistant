@@ -117,7 +117,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         if not openai_response:
             _LOGGER.error("Failed to process with OpenAI")
             total_duration = (time.monotonic() - total_start) * 1000.0  # ms
-            _LOGGER.info(
+            _LOGGER.warning(
                 "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=FAILED | VikunjaPOST=SKIPPED(OPENAI_FAIL) | Total=%.1fms | TaskCreation=FAILED",
                 vikunja_get_duration,
                 total_duration,
@@ -136,7 +136,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             if not task_data.get("title"):
                 _LOGGER.error("Missing required 'title' field in task data")
                 total_duration = (time.monotonic() - total_start) * 1000.0  # ms
-                _LOGGER.info(
+                _LOGGER.warning(
                     "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=%.1fms | VikunjaPOST=SKIPPED(MISSING_TITLE) | Total=%.1fms | TaskCreation=FAILED",
                     vikunja_get_duration,
                     openai_duration,
@@ -154,7 +154,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
             if result:
                 task_title = task_data.get("title")
-                _LOGGER.info(
+                _LOGGER.warning(
                     "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=%.1fms | VikunjaPOST=%.1fms | Total=%.1fms | Task='%s'",
                     vikunja_get_duration,
                     openai_duration,
@@ -165,7 +165,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 return True, f"Successfully added task: {task_title}", task_title
             else:
                 _LOGGER.error("Failed to create task in Vikunja")
-                _LOGGER.info(
+                _LOGGER.warning(
                     "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=%.1fms | VikunjaPOST=FAILED | Total=%.1fms | TaskCreation=FAILED",
                     vikunja_get_duration,
                     openai_duration,
@@ -176,7 +176,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         except json.JSONDecodeError as err:
             _LOGGER.error("Failed to parse OpenAI response as JSON: %s", err)
             total_duration = (time.monotonic() - total_start) * 1000.0  # ms
-            _LOGGER.info(
+            _LOGGER.warning(
                 "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=%.1fms | VikunjaPOST=SKIPPED(JSON_ERROR) | Total=%.1fms | TaskCreation=FAILED",
                 vikunja_get_duration,
                 openai_duration,
@@ -186,7 +186,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         except Exception as err:
             _LOGGER.error("Unexpected error creating task: %s", err)
             total_duration = (time.monotonic() - total_start) * 1000.0  # ms
-            _LOGGER.info(
+            _LOGGER.warning(
                 "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=%.1fms | VikunjaPOST=SKIPPED(EXCEPTION) | Total=%.1fms | TaskCreation=FAILED",
                 vikunja_get_duration,
                 openai_duration,
