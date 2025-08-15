@@ -105,12 +105,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         
         # Process with OpenAI
         openai_start = time.monotonic()
-        openai_response = await process_with_openai(
-            task_description, 
-            projects, 
-            openai_api_key, 
+        openai_response = await hass.async_add_executor_job(
+            process_with_openai,
+            task_description,
+            projects,
+            openai_api_key,
             default_due_date,
-            voice_correction
+            voice_correction,
         )
         openai_duration = (time.monotonic() - openai_start) * 1000.0  # ms
         

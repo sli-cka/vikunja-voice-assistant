@@ -3,12 +3,15 @@ import json
 import requests
 from datetime import datetime, timezone, timedelta
 import socket
-import asyncio
 
 _LOGGER = logging.getLogger(__name__)
 
-async def process_with_openai(task_description, projects, api_key,  default_due_date="none", voice_correction=False):
-    """Process the task with OpenAI API directly."""
+def process_with_openai(task_description, projects, api_key,  default_due_date="none", voice_correction=False):
+    """Process the task with OpenAI API using a synchronous requests call.
+
+    This function is synchronous by design so it must be run in an executor
+    when called from Home Assistant's event loop.
+    """
     project_names = [{"id": p.get("id"), "name": p.get("title")} for p in projects]
     
     # Get current date and time in ISO format to provide context
@@ -127,15 +130,12 @@ async def process_with_openai(task_description, projects, api_key,  default_due_
     _LOGGER.info(f"Attempting to connect to OpenAI API to process task: '{task_description[:50]}...'")
     
     try:
-        _LOGGER.debug("Sending request to OpenAI API")
-        
-        # Make the request in a separate thread
-        response = await asyncio.to_thread(
-            requests.post,
+        _LOGGER.debug("Sending request to OpenAI API (sync call)")
+        response = requests.post(
             "https://api.openai.com/v1/chat/completions",
             headers=headers,
             json=payload,
-            timeout=60
+            timeout=60,
         )
         
         if response.status_code != 200:
