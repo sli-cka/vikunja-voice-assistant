@@ -120,9 +120,7 @@ def process_with_openai(task_description, projects, api_key,  default_due_date="
     payload = {
         "model": 'gpt-5-nano',
         "messages": [system_message, user_message],
-        "reasoning": {
-            "effort": 'minimal'
-        }
+        "reasoning_effort": "minimal"
     }
     
     headers = {
