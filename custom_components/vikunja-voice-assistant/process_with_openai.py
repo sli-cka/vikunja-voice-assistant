@@ -99,7 +99,7 @@ def process_with_openai(task_description, projects, api_key,  default_due_date="
         RECURRING TASKS (only when explicitly mentioned):
         - Daily: 86400 seconds | Weekly: 604800 seconds
         - Monthly: 2592000 seconds | Yearly: 31536000 seconds
-        - Keywords: daily, weekly, monthly, yearly, every day/week, recurring, repeat
+        - Keywords: daily, weekly, monthly, yearly, every day/week, recurring, repeat...
         
         EXAMPLES:
         Input: "Reminder to pick up groceries tomorrow"
@@ -115,11 +115,14 @@ def process_with_openai(task_description, projects, api_key,  default_due_date="
     
     user_message = {
         "role": "user",
-        "content": f"Create a task with this description (be sure to include a title): {task_description}"
+        "content": f"Create task: {task_description}"
     }
     payload = {
-        "model": 'gpt-4.1-nano',
+        "model": 'gpt-5-nano',
         "messages": [system_message, user_message],
+        "reasoning": {
+            "effort": 'minimal'
+        }
     }
     
     headers = {
