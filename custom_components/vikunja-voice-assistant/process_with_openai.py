@@ -118,7 +118,7 @@ def process_with_openai(task_description, projects, api_key,  default_due_date="
         "content": f"Create task: {task_description}"
     }
     payload = {
-        "model": 'gpt-5-nano',
+        "model": 'gpt-5-mini',
         "messages": [system_message, user_message],
         "reasoning_effort": "minimal"
     }
