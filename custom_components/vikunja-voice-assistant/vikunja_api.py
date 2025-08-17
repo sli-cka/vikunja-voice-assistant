@@ -63,7 +63,7 @@ class VikunjaAPI:
         """Create a new label in Vikunja."""
         labels_url = f"{self.url}/labels"
         hex_color = secrets.token_hex(3)  # 
-        payload = {"name": label_name, "hex_color": hex_color}
+        payload = {"title": label_name, "hex_color": hex_color}
         
         try:
             response = requests.put(labels_url, headers=self.headers, json=payload)

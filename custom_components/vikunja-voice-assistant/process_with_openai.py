@@ -119,10 +119,13 @@ def process_with_openai(task_description, projects, api_key,  default_due_date="
                 Output: {{"title": "Finish work report", "description": "", "project_id": 1, "due_date": "2023-06-09T17:00:00Z", "priority": 5}}
         
                 Input: "Prepare quarterly financial analysis with notes: include variance vs last year and highlight risks"
-                Output: {{"title": "Prepare quarterly financial analysis", "description": "Include variance vs last year and highlight risks", "project_id": 1}}
+                Output: {{"title": "Prepare quarterly financial analysis", "description": "Include variance vs last year and highlight risks", "project_id": 1, "due_date": "default due date provided above"}}
         
-                Input: "Take vitamins daily with health label"
-                Output: {{"title": "Take vitamins", "description": "", "project_id": 1, "repeat_after": 86400}}
+                Input: "Take vitamins daily with health"
+                Output: {{"title": "Take vitamins", "description": "", "project_id": 1, "repeat_after": 86400, due_date": "default due date provided above"}}
+
+                Input: "Debug the voice assistant project to the computer project"
+                Output: {{"title": "Debug the voice assistant project", "description": "", "project_id": 2"}}
                 """
         }
     
