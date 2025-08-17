@@ -34,7 +34,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         payload = {
             "model": "gpt-5-nano",
             "messages": [{"role": "user", "content": "test"}],
-            "max_tokens": 1
+            "max_tokens": 1,
+            "reasoning_effort": "minimal"
         }
         
         try:

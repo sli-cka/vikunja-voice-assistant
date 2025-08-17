@@ -3,15 +3,15 @@
   "config": {
     "step": {
       "user": {
-        "title": "Connect to Vikunja",
+        "title": "Vikunja voice assistant",
         "description": "Set up Vikunja voice assistant integration",
         "data": {
           "url": "Vikunja base URL (e.g. https://vikunja.example.com)",
           "vikunja_api_token": "Vikunja API Token",
           "openai_api_key": "OpenAI API Key",
-          "voice_correction": "Enable speech recognition text correction (HIGHLY RECOMMENDED, especially when using small speech-to-text models like Whisper Tiny/Small)",
+          "voice_correction": "Enable speech recognition text correction (highly recommended for all current speech-to-text models)",
           "default_due_date": "Default due date if none specified (applies only when no project is mentioned)",
-          "auto_voice_label": "Automatically add a 'voice' label to tasks created via voice"
+          "auto_voice_label": "Automatically add a 'voice' label to tasks created via this integration"
         }
       }
     },
