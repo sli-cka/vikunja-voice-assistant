@@ -1,7 +1,7 @@
 import logging
 import requests
 import json
-import random
+import secrets
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -62,12 +62,8 @@ class VikunjaAPI:
     def create_label(self, label_name):
         """Create a new label in Vikunja."""
         labels_url = f"{self.url}/labels"
-        # add a random hex 7 digit string to the label name to avoid duplicates
-        
-        random_suffix = ''.join(random.choices('0123456789abcdef', k=7
-        ))
-
-        payload = {"name": label_name, 'hex_color': random_suffix}
+        hex_color = secrets.token_hex(3)  # 
+        payload = {"name": label_name, "hex_color": hex_color}
         
         try:
             response = requests.put(labels_url, headers=self.headers, json=payload)
