@@ -9,7 +9,8 @@
           "vikunja_api_token": "Vikunja API Token",
           "openai_api_key": "OpenAI API Key",
           "voice_correction": "Enable speech recognition text correction (HIGHLY RECOMMENDED, especially when using small speech-to-text models like Whisper small/medium)",
-          "default_due_date": "Default due date if none specified (applies only when no project is mentioned)"
+          "default_due_date": "Default due date if none specified (applies only when no project is mentioned)",
+          "auto_voice_label": "Automatically add a 'voice' label to tasks created via voice"
         }
       }
     },

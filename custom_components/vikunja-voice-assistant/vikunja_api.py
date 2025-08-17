@@ -1,6 +1,7 @@
 import logging
 import requests
 import json
+import random
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,6 +58,43 @@ class VikunjaAPI:
             if hasattr(err, 'response') and err.response is not None:
                 _LOGGER.error("Response content: %s", err.response.text)
             return []
+
+    def create_label(self, label_name):
+        """Create a new label in Vikunja."""
+        labels_url = f"{self.url}/labels"
+        # add a random hex 7 digit string to the label name to avoid duplicates
+        
+        random_suffix = ''.join(random.choices('0123456789abcdef', k=7
+        ))
+
+        payload = {"name": label_name, 'hex_color': random_suffix}
+        
+        try:
+            response = requests.post(labels_url, headers=self.headers, json=payload)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as err:
+            _LOGGER.error("Failed to create label '%s': %s", label_name, err)
+            if hasattr(err, 'response') and err.response is not None:
+                _LOGGER.error("Response content: %s", err.response.text)
+            return None
+
+    def add_label_to_task(self, task_id: int, label_id: int):
+        """Attach an existing label to a task via PUT /tasks/{task}/labels.
+
+        Returns True on success, False otherwise.
+        """
+        url = f"{self.url}/tasks/{task_id}/labels"
+        payload = {"label_id": label_id}
+        try:
+            response = requests.put(url, headers=self.headers, json=payload)
+            response.raise_for_status()
+            return True
+        except requests.exceptions.RequestException as err:
+            _LOGGER.error("Failed to attach label %s to task %s: %s", label_id, task_id, err)
+            if hasattr(err, 'response') and err.response is not None:
+                _LOGGER.error("Response content: %s", err.response.text)
+            return False
 
     def add_task(self, task_data):
         """Create a new task in a Vikunja project."""

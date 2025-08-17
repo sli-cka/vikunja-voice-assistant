@@ -13,6 +13,7 @@ from .const import (
     CONF_DUE_DATE,  
     DUE_DATE_OPTIONS,
     CONF_VOICE_CORRECTION, 
+    CONF_AUTO_VOICE_LABEL,
 )
 from .vikunja_api import VikunjaAPI
 
@@ -62,6 +63,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_VIKUNJA_API_TOKEN, default=""): str,
                 vol.Required(CONF_OPENAI_API_KEY, default=""): str,
                 vol.Required(CONF_VOICE_CORRECTION, default=True): cv.boolean,
+                vol.Required(CONF_AUTO_VOICE_LABEL, default=True): cv.boolean,
                 vol.Required(CONF_DUE_DATE, default="tomorrow"): vol.In(DUE_DATE_OPTIONS),
             }
         )
@@ -113,6 +115,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_VIKUNJA_API_TOKEN, default=user_input.get(CONF_VIKUNJA_API_TOKEN, "")): str,
                     vol.Required(CONF_OPENAI_API_KEY, default=user_input.get(CONF_OPENAI_API_KEY, "")): str,
                     vol.Required(CONF_VOICE_CORRECTION, default=user_input.get(CONF_VOICE_CORRECTION, True)): cv.boolean,
+                    vol.Required(CONF_AUTO_VOICE_LABEL, default=user_input.get(CONF_AUTO_VOICE_LABEL, True)): cv.boolean,
                     vol.Required(CONF_DUE_DATE, default=user_input.get(CONF_DUE_DATE, "tomorrow")): vol.In(DUE_DATE_OPTIONS),
                 }
             )

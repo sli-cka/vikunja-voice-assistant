@@ -15,6 +15,7 @@ from .const import (
     CONF_VIKUNJA_URL,
     CONF_DUE_DATE,
     CONF_VOICE_CORRECTION, 
+    CONF_AUTO_VOICE_LABEL,
 )
 from .vikunja_api import VikunjaAPI
 from .process_with_openai import process_with_openai
@@ -70,7 +71,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         CONF_VIKUNJA_API_TOKEN: entry.data[CONF_VIKUNJA_API_TOKEN],
         CONF_OPENAI_API_KEY: entry.data[CONF_OPENAI_API_KEY],
         CONF_DUE_DATE: entry.data[CONF_DUE_DATE],
-        CONF_VOICE_CORRECTION: entry.data[CONF_VOICE_CORRECTION]
+        CONF_VOICE_CORRECTION: entry.data[CONF_VOICE_CORRECTION],
+        CONF_AUTO_VOICE_LABEL: entry.data.get(CONF_AUTO_VOICE_LABEL, True)
     }
     
     # Copy custom sentences
@@ -88,6 +90,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         openai_api_key = domain_config.get(CONF_OPENAI_API_KEY)
         default_due_date = domain_config.get(CONF_DUE_DATE, "none")
         voice_correction = domain_config.get(CONF_VOICE_CORRECTION, True)
+        auto_voice_label = domain_config.get(CONF_AUTO_VOICE_LABEL, True)
         
         if not all([vikunja_url, vikunja_api_token, openai_api_key]):
             _LOGGER.error("Missing configuration for Vikunja voice assistant")
@@ -101,6 +104,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             hass.async_add_executor_job(vikunja_api.get_projects),
             hass.async_add_executor_job(vikunja_api.get_labels)
         )
+
+        # Ensure a 'voice' label exists if auto label is enabled
+        voice_label_id = None
+        if auto_voice_label:
+            try:
+                for lbl in labels or []:
+                    if isinstance(lbl, dict) and lbl.get("title", "").lower() == "voice":
+                        voice_label_id = lbl.get("id")
+                        break
+                if voice_label_id is None:
+                    # Create label
+                    voice_label = await hass.async_add_executor_job(
+                        vikunja_api.create_label, "voice"
+                    )
+
+                    if voice_label:
+                        voice_label_id = voice_label.get("id")
+            except Exception as label_err:
+                _LOGGER.warning("Could not ensure 'voice' label exists: %s", label_err)
         vikunja_get_duration = (time.monotonic() - vikunja_get_start) * 1000.0  # ms
         
         # Process with OpenAI
@@ -150,6 +172,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             result = await hass.async_add_executor_job(
                 lambda: vikunja_api.add_task(task_data)
             )
+
+            # After task creation, if successful and we have a voice label id, attach it
+            if result and auto_voice_label and voice_label_id:
+                try:
+                    task_id = result.get("id") if isinstance(result, dict) else None
+                    if task_id:
+                        attach_success = await hass.async_add_executor_job(
+                            vikunja_api.add_label_to_task, task_id, voice_label_id
+                        )
+                        if not attach_success:
+                            _LOGGER.warning("Failed to attach 'voice' label to task %s", task_id)
+                except Exception as attach_err:
+                    _LOGGER.warning("Error attaching 'voice' label: %s", attach_err)
             vikunja_post_duration = (time.monotonic() - vikunja_post_start) * 1000.0  # ms
             total_duration = (time.monotonic() - total_start) * 1000.0  # ms
 

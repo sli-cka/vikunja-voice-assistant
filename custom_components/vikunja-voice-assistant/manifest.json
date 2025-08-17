@@ -6,6 +6,6 @@
   "codeowners": ["@NeoHuncho"],
   "requirements": ["requests", "aiohttp"],
   "iot_class": "cloud_polling",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "config_flow": true
 }
