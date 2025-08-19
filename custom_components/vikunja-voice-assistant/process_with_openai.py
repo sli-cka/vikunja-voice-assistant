@@ -6,13 +6,14 @@ import socket
 
 _LOGGER = logging.getLogger(__name__)
 
-def process_with_openai(task_description, projects, api_key,  default_due_date="none", voice_correction=False):
+def process_with_openai(task_description, projects, labels, api_key,  default_due_date="none", voice_correction=False):
     """Process the task with OpenAI API using a synchronous requests call.
 
     This function is synchronous by design so it must be run in an executor
     when called from Home Assistant's event loop.
     """
     project_names = [{"id": p.get("id"), "name": p.get("title")} for p in projects]
+    label_names = [{"id": l.get("id"), "name": l.get("title")} for l in (labels or []) if isinstance(l, dict) and l.get("id") is not None]
     
     # Get current date and time in ISO format to provide context
     current_timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -41,93 +42,90 @@ def process_with_openai(task_description, projects, api_key,  default_due_date="
         - If a specific due date is mentioned by the user, always use that instead of the default
         - Even if a recurring task instruction is given, if no due date is mentioned, set it to {default_due_date_value}
         """
-    
-    # Add voice correction instructions if enabled
+
     voice_correction_instructions = ""
     if voice_correction:
         voice_correction_instructions = """
         SPEECH RECOGNITION CORRECTION:
         - Task came from voice command - expect speech recognition errors
-        - Correct misheard project names, dates, and common speech-to-text errors
+        - Correct misheard project names, label names, dates, and common speech-to-text errors
         - Use context to understand user's true intent
         """
 
-    
-        system_message = {
-                "role": "system",
-                "content": f"""
-                You are an assistant that helps create tasks in Vikunja. 
-                Given a task description, you will create a JSON payload for the Vikunja API.
-        
-                Available projects: {json.dumps(project_names)}
-        
-                DEFAULT DUE DATE RULE:
-                {default_due_date_instructions.strip() if default_due_date_instructions else "- No default due date configured"}
-        
-                {voice_correction_instructions.strip() if voice_correction_instructions else ""}
-        
-                CORE OUTPUT REQUIREMENTS:
-                - Output only valid JSON with these fields (only include optional fields when applicable):
-                    * title (string): Main task title (REQUIRED, MUST NOT BE EMPTY)
-                    * description (string): Secondary / extended details ONLY when needed. Use empty string otherwise.
-                    * project_id (number): Project ID (always required, use 1 if no project specified)
-                    * due_date (string, optional): Due date in YYYY-MM-DDTHH:MM:SSZ format
-                    * priority (number, optional): Priority level 1-5, only when explicitly mentioned
-                    * repeat_after (number, optional): Repeat interval in seconds, only for recurring tasks
-                    * label_ids (array, optional): Array of existing label IDs to assign to task
-        
-                TITLE VS DESCRIPTION RULES:
-                - Put ALL essential task info in the title whenever it reasonably fits (roughly up to two short lines ~160 chars)
-                - Use description ONLY for clearly secondary info: background context, rationale, optional notes, long instructions
-                - Do NOT move essential info (action, objects, key qualifiers, due context) out of the title just to shorten it
-                - If the task is simple/concise, leave description as an empty string
-                - If description would just repeat title content, leave it empty
-        
-                TASK FORMATTING:
-                - Extract clear, concise titles
-                - Avoid redundant words implied by project context
-                - Remove date/time info from title (use due_date field)
-                - Remove label references from title (handled via label_ids)
-                - Remove project names from title (handled via project_id)
-                - Remove priority references from title (handled via priority field)
-                - Remove unnecessary qualifiers (e.g. "task", "to do", "reminder")
-                - Remove recurring task keywords from title (handled via repeat_after)
+    system_message = {
+        "role": "system",
+        "content": f"""
+        You are an assistant that helps create tasks in Vikunja. 
+        Given a task description, you will create a JSON payload for the Vikunja API.
 
-                DATE HANDLING (Current: {current_timestamp}):
-                - Calculate future dates based on current date: {current_date}
-                - Use ISO format with 'Z' timezone: YYYY-MM-DDTHH:MM:SSZ
-                - Default time: 12:00:00 (unless specific time mentioned)
-                - NEVER set past dates - always use future dates for ambiguous references
+        Available projects: {json.dumps(project_names)}
+        Available labels: {json.dumps(label_names)}
 
-                PRIORITY LEVELS (only when explicitly mentioned):
-                - 5: urgent, critical, emergency, ASAP, immediately
-                - 4: important, soon, priority, needs attention
-                - 3: medium priority, when possible, moderately important
-                - 2: low priority, when you have time, not urgent
-                - 1: sometime, eventually, no rush
-        
-                RECURRING TASKS (only when explicitly mentioned):
-                - Daily: 86400 seconds | Weekly: 604800 seconds
-                - Monthly: 2592000 seconds | Yearly: 31536000 seconds
-                - Keywords: daily, weekly, monthly, yearly, every day/week, recurring, repeat...
-        
-                EXAMPLES:
-                Input: "Reminder to pick up groceries tomorrow"
-                Output: {{"title": "Pick up groceries", "description": "", "project_id": 1, "due_date": "2023-06-09T12:00:00Z"}}
-        
-                Input: "URGENT: I need to finish the report for work by Friday at 5pm tagged as urgent"
-                Output: {{"title": "Finish work report", "description": "", "project_id": 1, "due_date": "2023-06-09T17:00:00Z", "priority": 5}}
-        
-                Input: "Prepare quarterly financial analysis with notes: include variance vs last year and highlight risks"
-                Output: {{"title": "Prepare quarterly financial analysis", "description": "Include variance vs last year and highlight risks", "project_id": 1, "due_date": "default due date provided above"}}
-        
-                Input: "Take vitamins daily with health"
-                Output: {{"title": "Take vitamins", "description": "", "project_id": 1, "repeat_after": 86400, due_date": "default due date provided above"}}
+        DEFAULT DUE DATE RULE:
+        {default_due_date_instructions.strip() if default_due_date_instructions else "- No default due date configured"}
 
-                Input: "Debug the voice assistant project to the computer project"
-                Output: {{"title": "Debug the voice assistant project", "description": "", "project_id": 2"}}
-                """
-        }
+        {voice_correction_instructions.strip() if voice_correction_instructions else ""}
+
+        CORE OUTPUT REQUIREMENTS:
+        - Output ONLY valid JSON with these fields (only include optional fields when applicable):
+            * title (string): Main task title (REQUIRED, MUST NOT BE EMPTY)
+            * description (string, optional): Only include if the user explicitly asks for additional notes/context.
+            * project_id (number): Project ID (always required, use 1 if no project specified)
+            * due_date (string, optional): Due date in YYYY-MM-DDTHH:MM:SSZ format
+            * priority (number, optional): Priority level 1-5, only when explicitly mentioned
+            * repeat_after (number, optional): Repeat interval in seconds, only for recurring tasks
+            * label_ids (array, optional): Array of existing label IDs
+
+        TASK FORMATTING:
+        - Extract clear, concise titles.
+        - Avoid redundant words implied by project context
+        - Remove date/time info from title (use due_date field) if confidently parsed.
+        - Remove label references from title (handled via label_ids).
+        - Remove project names from title (handled via project_id).
+        - Remove priority references from title (handled via priority field).
+        - Remove unnecessary qualifiers (e.g. "task", "to do", "reminder")
+        - Remove recurring task keywords from title (handled via repeat_after).
+
+        DATE HANDLING (Current: {current_timestamp}):
+        - Calculate future dates based on current date: {current_date}
+        - Use ISO format with 'Z' timezone: YYYY-MM-DDTHH:MM:SSZ
+        - Default time: 12:00:00 (unless specific time mentioned)
+        - NEVER set past dates - always use future dates for ambiguous references
+
+        PRIORITY LEVELS (only when explicitly mentioned):
+        - 5: urgent, critical, emergency, ASAP, immediately
+        - 4: important, soon, priority, needs attention
+        - 3: medium priority, when possible, moderately important
+        - 2: low priority, when you have time, not urgent
+        - 1: sometime, eventually, no rush
+
+        RECURRING TASKS (only when explicitly mentioned):
+        - Daily: 86400 seconds | Weekly: 604800 seconds
+        - Monthly: 2592000 seconds | Yearly: 31536000 seconds
+        - Keywords: daily, weekly, monthly, yearly, every day/week, recurring, repeat...
+
+        EXAMPLES:
+        Input: "Reminder to pick up groceries tomorrow"
+        Output: {{"title": "Pick up groceries", "project_id": 1, "due_date": "2023-06-09T12:00:00Z"}}
+
+        Input: "URGENT: finish the report for work by Friday at 5pm tagged as urgent"
+        Output: {{"title": "Finish work report", "project_id": 1, "due_date": "2023-06-09T17:00:00Z", "priority": 5}}
+
+        Input: "Take vitamins daily with health"
+        Output: {{"title": "Take vitamins", "project_id": 1, "repeat_after": 86400}}
+
+        Input: "Add buy milk with the grocery label for next week"
+        (Assuming a label with name 'grocery' has id 7)
+        Output: {{"title": "Buy milk", "project_id": 1, "label_ids": [7], "due_date": "2023-06-16T12:00:00Z"}}
+
+        Input: "Schedule annual dentist appointment next March"
+        Output: {{"title": "Schedule dentist appointment", "project_id": 1, "due_date": "2023-03-01T12:00:00Z"}}
+
+        Input: "Finish the project report"
+        (assuming you have default due date settings set up)
+        Output: {{"title": "Finish project report", "project_id": 1, "due_date": "2023-06-10T12:00:00Z"}}
+        """
+    }
     
     user_message = {
         "role": "user",

@@ -131,6 +131,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             process_with_openai,
             task_description,
             projects,
+            labels,
             openai_api_key,
             default_due_date,
             voice_correction,
@@ -169,22 +170,37 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         
             # Send request to Vikunja
             vikunja_post_start = time.monotonic()
-            result = await hass.async_add_executor_job(
-                lambda: vikunja_api.add_task(task_data)
-            )
+            # Extract any label_ids from task_data then remove before creation (API requires task first, then labels)
+            extracted_label_ids = []
+            if isinstance(task_data, dict) and task_data.get("label_ids"):
+                # Only keep label ids that exist in fetched labels (no creation)
+                existing_label_ids = {l.get("id") for l in (labels or []) if isinstance(l, dict)}
+                for lid in task_data.get("label_ids", []):
+                    if lid in existing_label_ids:
+                        extracted_label_ids.append(lid)
+                # Remove from payload sent to add_task
+                task_data.pop("label_ids", None)
 
-            # After task creation, if successful and we have a voice label id, attach it
-            if result and auto_voice_label and voice_label_id:
+            result = await hass.async_add_executor_job(lambda: vikunja_api.add_task(task_data))
+
+            # After task creation, attach labels (GPT matched) and voice label if configured
+            if result:
                 try:
                     task_id = result.get("id") if isinstance(result, dict) else None
                     if task_id:
-                        attach_success = await hass.async_add_executor_job(
-                            vikunja_api.add_label_to_task, task_id, voice_label_id
-                        )
-                        if not attach_success:
-                            _LOGGER.warning("Failed to attach 'voice' label to task %s", task_id)
+                        # Combine unique labels: GPT + voice label (if enabled)
+                        label_ids_to_attach = list(dict.fromkeys(extracted_label_ids))  # preserve order
+                        if auto_voice_label and voice_label_id:
+                            if voice_label_id not in label_ids_to_attach:
+                                label_ids_to_attach.append(voice_label_id)
+                        for lid in label_ids_to_attach:
+                            attach_success = await hass.async_add_executor_job(
+                                vikunja_api.add_label_to_task, task_id, lid
+                            )
+                            if not attach_success:
+                                _LOGGER.warning("Failed to attach label %s to task %s", lid, task_id)
                 except Exception as attach_err:
-                    _LOGGER.warning("Error attaching 'voice' label: %s", attach_err)
+                    _LOGGER.warning("Error attaching labels to task: %s", attach_err)
             vikunja_post_duration = (time.monotonic() - vikunja_post_start) * 1000.0  # ms
             total_duration = (time.monotonic() - total_start) * 1000.0  # ms
 
