@@ -2,7 +2,6 @@ import logging
 import json
 import requests
 from datetime import datetime, timezone, timedelta
-import socket
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -142,10 +141,9 @@ def process_with_openai(task_description, projects, labels, api_key,  default_du
         "Authorization": f"Bearer {api_key}"
     }
     
-    _LOGGER.info(f"Attempting to connect to OpenAI API to process task: '{task_description[:50]}...'")
+    _LOGGER.info("Processing task via OpenAI: '%s'", task_description[:50])
     
     try:
-        _LOGGER.debug("Sending request to OpenAI API (sync call)")
         response = requests.post(
             "https://api.openai.com/v1/chat/completions",
             headers=headers,
@@ -158,7 +156,6 @@ def process_with_openai(task_description, projects, labels, api_key,  default_du
             return None
         
         result = response.json()
-        _LOGGER.debug("Successfully received response from OpenAI API")
         
         # Extract the JSON from the response
         raw_response = result.get("choices", [{}])[0].get("message", {}).get("content", "")
@@ -175,7 +172,6 @@ def process_with_openai(task_description, projects, labels, api_key,  default_du
                 # Ensure required fields are present
                 if "title" not in task_data or not task_data["title"]:
                     _LOGGER.error("OpenAI response missing required 'title' field")
-                    _LOGGER.debug("Raw OpenAI response: %s", raw_response)
                     return None
             
                 _LOGGER.info(f"Successfully processed task: '{task_data.get('title', 'Unknown')}'")
@@ -185,11 +181,9 @@ def process_with_openai(task_description, projects, labels, api_key,  default_du
                 })
             else:
                 _LOGGER.error("No JSON found in OpenAI response")
-                _LOGGER.debug("Raw OpenAI response: %s", raw_response)
                 return None
         except (json.JSONDecodeError, ValueError) as err:
             _LOGGER.error("Failed to parse JSON from OpenAI response: %s", err)
-            _LOGGER.debug("Raw OpenAI response: %s", raw_response)
             return None
                 
     except requests.exceptions.Timeout as timeout_err:

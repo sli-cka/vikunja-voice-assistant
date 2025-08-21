@@ -1,15 +1,9 @@
-"""Services for Vikunja voice assistant integration."""
+"""Service registrations for Vikunja Voice Assistant."""
 import logging
 import voluptuous as vol
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import config_validation as cv
-from .const import (
-    DOMAIN,
-    CONF_VIKUNJA_URL,  # Add these two constants
-    CONF_VIKUNJA_API_TOKEN
-)
-
-from .const import DOMAIN
+from .const import DOMAIN, CONF_VIKUNJA_URL, CONF_VIKUNJA_API_TOKEN
 from .vikunja_api import VikunjaAPI
 
 _LOGGER = logging.getLogger(__name__)
@@ -22,7 +16,7 @@ CREATE_TASK_SCHEMA = vol.Schema({
 })
 
 def setup_services(hass: HomeAssistant):
-    """Set up services for Vikunja integration."""
+    """Register the create_task service."""
     domain_config = hass.data.get(DOMAIN, {})
     vikunja_url = domain_config.get(CONF_VIKUNJA_URL)
     vikunja_api_token = domain_config.get(CONF_VIKUNJA_API_TOKEN)
@@ -47,7 +41,6 @@ def setup_services(hass: HomeAssistant):
             _LOGGER.error("Failed to create task via service: %s", task_data.get("title", "Unknown"))
             raise Exception("Failed to create task in Vikunja")
     
-    # Register services
     hass.services.async_register(
         DOMAIN, "create_task", create_task, schema=CREATE_TASK_SCHEMA
     )

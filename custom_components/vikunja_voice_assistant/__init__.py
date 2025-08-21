@@ -1,9 +1,14 @@
-"""Initialize the Vikunja voice assistant integration."""
+"""Home Assistant integration entry for Vikunja Voice Assistant.
+
+Minimal runtime logging is kept intentionally: only errors and core success
+events are logged to avoid noise. Debug/performance logging was removed for
+public release clarity and can be reintroduced locally by contributors if
+needed.
+"""
 import logging
 import os
 import json
 import asyncio
-import time
 from homeassistant.helpers import intent
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
@@ -23,40 +28,30 @@ from .services import setup_services
 
 _LOGGER = logging.getLogger(__name__)
 
-# Copy custom sentences to the correct location
-def copy_custom_sentences(hass: HomeAssistant):
-    component_path = os.path.dirname(os.path.realpath(__file__))
-    source_sentences_dir = os.path.join(component_path, "custom_sentences")
-    
-    if not os.path.exists(source_sentences_dir):
-        _LOGGER.debug("No custom sentences directory found")
+def copy_custom_sentences(hass: HomeAssistant) -> None:
+    """Copy bundled custom sentences into Home Assistant's expected directory.
+
+    Only copies when source exists and when the target file is missing or older.
+    """
+    source_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "custom_sentences")
+    if not os.path.exists(source_dir):
         return
-        
-    target_dir = os.path.join(hass.config.config_dir, "custom_sentences")
-    
-    # Create target directory if it doesn't exist
-    if not os.path.exists(target_dir):
-        os.makedirs(target_dir, exist_ok=True)
-    
-    # Copy language directories
-    for lang_dir in os.listdir(source_sentences_dir):
-        source_lang_dir = os.path.join(source_sentences_dir, lang_dir)
-        if os.path.isdir(source_lang_dir):
-            target_lang_dir = os.path.join(target_dir, lang_dir)
-            if not os.path.exists(target_lang_dir):
-                os.makedirs(target_lang_dir, exist_ok=True)
-            
-            # Copy YAML files
-            for yaml_file in os.listdir(source_lang_dir):
-                if yaml_file.endswith('.yaml'):
-                    source_file = os.path.join(source_lang_dir, yaml_file)
-                    target_file = os.path.join(target_lang_dir, yaml_file)
-                    
-                    # Only copy if target doesn't exist or is older
-                    if not os.path.exists(target_file) or os.path.getmtime(source_file) > os.path.getmtime(target_file):
-                        with open(source_file, 'r') as src, open(target_file, 'w') as dst:
-                            dst.write(src.read())
-                        _LOGGER.debug(f"Copied custom sentences: {yaml_file}")
+    target_root = os.path.join(hass.config.config_dir, "custom_sentences")
+    os.makedirs(target_root, exist_ok=True)
+    for lang in os.listdir(source_dir):
+        src_lang = os.path.join(source_dir, lang)
+        if not os.path.isdir(src_lang):
+            continue
+        dst_lang = os.path.join(target_root, lang)
+        os.makedirs(dst_lang, exist_ok=True)
+        for fname in os.listdir(src_lang):
+            if not fname.endswith(".yaml"):
+                continue
+            src_file = os.path.join(src_lang, fname)
+            dst_file = os.path.join(dst_lang, fname)
+            if not os.path.exists(dst_file) or os.path.getmtime(src_file) > os.path.getmtime(dst_file):
+                with open(src_file, "r", encoding="utf-8") as src, open(dst_file, "w", encoding="utf-8") as dst:
+                    dst.write(src.read())
 
 async def async_setup(hass: HomeAssistant, config):
     """Set up the Vikunja voice assistant component."""
@@ -65,7 +60,6 @@ async def async_setup(hass: HomeAssistant, config):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up Vikunja voice assistant from a config entry."""
-    # Store config data in hass.data
     hass.data[DOMAIN] = {
         CONF_VIKUNJA_URL: entry.data[CONF_VIKUNJA_URL],
         CONF_VIKUNJA_API_TOKEN: entry.data[CONF_VIKUNJA_API_TOKEN],
@@ -74,15 +68,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         CONF_VOICE_CORRECTION: entry.data[CONF_VOICE_CORRECTION],
         CONF_AUTO_VOICE_LABEL: entry.data.get(CONF_AUTO_VOICE_LABEL, True)
     }
-    
-    # Copy custom sentences
     await hass.async_add_executor_job(copy_custom_sentences, hass)
-    
-    # Create the task handling function that both conversation and voice can use
+
     async def handle_vikunja_task(task_description: str):
-        """
-        Handle creating a Vikunja task from a description.
-        Returns: tuple (success: bool, message: str, task_title: str)
+        """Create a Vikunja task based on natural language description.
+
+        Returns (success, user_message, created_task_title)
         """
         domain_config = hass.data.get(DOMAIN, {})
         vikunja_url = domain_config.get(CONF_VIKUNJA_URL)
@@ -97,15 +88,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             return False, "Configuration error. Please check your Vikunja and OpenAI settings.", ""
             
         vikunja_api = VikunjaAPI(vikunja_url, vikunja_api_token)
-
-        total_start = time.monotonic()
-        vikunja_get_start = time.monotonic()
         projects, labels = await asyncio.gather(
             hass.async_add_executor_job(vikunja_api.get_projects),
-            hass.async_add_executor_job(vikunja_api.get_labels)
+            hass.async_add_executor_job(vikunja_api.get_labels),
         )
 
-        # Ensure a 'voice' label exists if auto label is enabled
         voice_label_id = None
         if auto_voice_label:
             try:
@@ -114,19 +101,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                         voice_label_id = lbl.get("id")
                         break
                 if voice_label_id is None:
-                    # Create label
                     voice_label = await hass.async_add_executor_job(
                         vikunja_api.create_label, "voice"
                     )
-
                     if voice_label:
                         voice_label_id = voice_label.get("id")
             except Exception as label_err:
-                _LOGGER.warning("Could not ensure 'voice' label exists: %s", label_err)
-        vikunja_get_duration = (time.monotonic() - vikunja_get_start) * 1000.0  # ms
-        
-        # Process with OpenAI
-        openai_start = time.monotonic()
+                _LOGGER.error("Could not ensure 'voice' label exists: %s", label_err)
         openai_response = await hass.async_add_executor_job(
             process_with_openai,
             task_description,
@@ -136,59 +117,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             default_due_date,
             voice_correction,
         )
-        openai_duration = (time.monotonic() - openai_start) * 1000.0  # ms
-        
         if not openai_response:
-            _LOGGER.error("Failed to process with OpenAI")
-            total_duration = (time.monotonic() - total_start) * 1000.0  # ms
-            _LOGGER.warning(
-                "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=FAILED | VikunjaPOST=SKIPPED(OPENAI_FAIL) | Total=%.1fms | TaskCreation=FAILED",
-                vikunja_get_duration,
-                total_duration,
-            )
+            _LOGGER.error("Failed to process task with OpenAI")
             return False, "Sorry, I couldn't process your task due to a connection error. Please try again later.", ""
-        
-        # Log the response for debugging
-        _LOGGER.debug("OpenAI response: %s", openai_response)
-        
         try:
-            # Parse the response
             response_data = json.loads(openai_response)
             task_data = response_data.get("task_data", {})
-            
-            # Validate required fields
             if not task_data.get("title"):
                 _LOGGER.error("Missing required 'title' field in task data")
-                total_duration = (time.monotonic() - total_start) * 1000.0  # ms
-                _LOGGER.warning(
-                    "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=%.1fms | VikunjaPOST=SKIPPED(MISSING_TITLE) | Total=%.1fms | TaskCreation=FAILED",
-                    vikunja_get_duration,
-                    openai_duration,
-                    total_duration,
-                )
                 return False, "Sorry, I couldn't understand what task you wanted to create. Please try again.", ""
-        
-            # Send request to Vikunja
-            vikunja_post_start = time.monotonic()
-            # Extract any label_ids from task_data then remove before creation (API requires task first, then labels)
+            # Extract labels, create task, then attach labels
             extracted_label_ids = []
             if isinstance(task_data, dict) and task_data.get("label_ids"):
-                # Only keep label ids that exist in fetched labels (no creation)
                 existing_label_ids = {l.get("id") for l in (labels or []) if isinstance(l, dict)}
                 for lid in task_data.get("label_ids", []):
                     if lid in existing_label_ids:
                         extracted_label_ids.append(lid)
-                # Remove from payload sent to add_task
                 task_data.pop("label_ids", None)
-
             result = await hass.async_add_executor_job(lambda: vikunja_api.add_task(task_data))
-
-            # After task creation, attach labels (GPT matched) and voice label if configured
             if result:
                 try:
                     task_id = result.get("id") if isinstance(result, dict) else None
                     if task_id:
-                        # Combine unique labels: GPT + voice label (if enabled)
                         label_ids_to_attach = list(dict.fromkeys(extracted_label_ids))  # preserve order
                         if auto_voice_label and voice_label_id:
                             if voice_label_id not in label_ids_to_attach:
@@ -198,63 +148,32 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                                 vikunja_api.add_label_to_task, task_id, lid
                             )
                             if not attach_success:
-                                _LOGGER.warning("Failed to attach label %s to task %s", lid, task_id)
-                except Exception as attach_err:
-                    _LOGGER.warning("Error attaching labels to task: %s", attach_err)
-            vikunja_post_duration = (time.monotonic() - vikunja_post_start) * 1000.0  # ms
-            total_duration = (time.monotonic() - total_start) * 1000.0  # ms
+                                _LOGGER.error("Failed to attach label %s to task %s", lid, task_id)
+                except Exception as attach_err:  # noqa: BLE001
+                    _LOGGER.error("Error attaching labels to task: %s", attach_err)
 
             if result:
                 task_title = task_data.get("title")
-                _LOGGER.warning(
-                    "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=%.1fms | VikunjaPOST=%.1fms | Total=%.1fms | Task='%s'",
-                    vikunja_get_duration,
-                    openai_duration,
-                    vikunja_post_duration,
-                    total_duration,
-                    task_title,
-                )
+                _LOGGER.info("Created Vikunja task '%s'", task_title)
                 return True, f"Successfully added task: {task_title}", task_title
             else:
                 _LOGGER.error("Failed to create task in Vikunja")
-                _LOGGER.warning(
-                    "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=%.1fms | VikunjaPOST=FAILED | Total=%.1fms | TaskCreation=FAILED",
-                    vikunja_get_duration,
-                    openai_duration,
-                    total_duration,
-                )
                 return False, "Sorry, I couldn't add the task to Vikunja. Please check your Vikunja connection.", ""
-                
-        except json.JSONDecodeError as err:
+        except json.JSONDecodeError as err:  # noqa: BLE001
             _LOGGER.error("Failed to parse OpenAI response as JSON: %s", err)
-            total_duration = (time.monotonic() - total_start) * 1000.0  # ms
-            _LOGGER.warning(
-                "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=%.1fms | VikunjaPOST=SKIPPED(JSON_ERROR) | Total=%.1fms | TaskCreation=FAILED",
-                vikunja_get_duration,
-                openai_duration,
-                total_duration,
-            )
             return False, "Sorry, there was an error processing your task. Please try again.", ""
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             _LOGGER.error("Unexpected error creating task: %s", err)
-            total_duration = (time.monotonic() - total_start) * 1000.0  # ms
-            _LOGGER.warning(
-                "PERF SUMMARY | VikunjaGET=%.1fms | OpenAI=%.1fms | VikunjaPOST=SKIPPED(EXCEPTION) | Total=%.1fms | TaskCreation=FAILED",
-                vikunja_get_duration,
-                openai_duration,
-                total_duration,
-            )
             return False, "Sorry, an unexpected error occurred. Please try again.", ""
 
-    # Create a proper intent handler class
     class VikunjaAddTaskIntentHandler(intent.IntentHandler):
-        """Handle VikunjaAddTask intents."""
-        
+        """Intent handler for natural language task creation."""
+
         def __init__(self):
-            self.intent_type = "VikunjaAddTask"  # Explicitly set intent_type
+            self.intent_type = "VikunjaAddTask"
         
         async def async_handle(self, call: intent.Intent):
-            """Handle the intent."""
+            """Handle the intent invocation from conversation agent."""
             slots = call.slots
             task_description = slots.get("task_description", {}).get("value", "")
             
@@ -263,8 +182,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             if not task_description.strip():
                 response.async_set_speech("I couldn't understand what task you wanted to add. Please try again.")
                 return response
-            
-            # Process the task and get the result
             success, message, task_title = await handle_vikunja_task(task_description)
             
             if success:
@@ -273,19 +190,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 response.async_set_speech(message)
                 
             return response   
-    
-    # Register the intent handler
+
     intent.async_register(hass, VikunjaAddTaskIntentHandler())
-    
-    # Set up services
     setup_services(hass)
-    
-    # Reload conversation agent to pick up the new sentences
     await hass.services.async_call("conversation", "reload", {})
-    
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
-    """Unload a config entry."""
-    # Nothing to unload
+    """Unload a config entry (placeholder for future cleanup)."""
     return True
