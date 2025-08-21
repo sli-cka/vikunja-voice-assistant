@@ -1,10 +1,3 @@
-"""Home Assistant integration entry for Vikunja Voice Assistant.
-
-Minimal runtime logging is kept intentionally: only errors and core success
-events are logged to avoid noise. Debug/performance logging was removed for
-public release clarity and can be reintroduced locally by contributors if
-needed.
-"""
 import logging
 import os
 import json
@@ -23,7 +16,7 @@ from .const import (
     CONF_AUTO_VOICE_LABEL,
 )
 from .vikunja_api import VikunjaAPI
-from .process_with_openai import process_with_openai
+from .openai_api import OpenAIAPI
 from .services import setup_services
 
 _LOGGER = logging.getLogger(__name__)
@@ -54,12 +47,10 @@ def copy_custom_sentences(hass: HomeAssistant) -> None:
                     dst.write(src.read())
 
 async def async_setup(hass: HomeAssistant, config):
-    """Set up the Vikunja voice assistant component."""
     hass.data.setdefault(DOMAIN, {})
     return True
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
-    """Set up Vikunja voice assistant from a config entry."""
     hass.data[DOMAIN] = {
         CONF_VIKUNJA_URL: entry.data[CONF_VIKUNJA_URL],
         CONF_VIKUNJA_API_TOKEN: entry.data[CONF_VIKUNJA_API_TOKEN],
@@ -68,13 +59,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         CONF_VOICE_CORRECTION: entry.data[CONF_VOICE_CORRECTION],
         CONF_AUTO_VOICE_LABEL: entry.data.get(CONF_AUTO_VOICE_LABEL, True)
     }
-    await hass.async_add_executor_job(copy_custom_sentences, hass)
 
     async def handle_vikunja_task(task_description: str):
-        """Create a Vikunja task based on natural language description.
-
-        Returns (success, user_message, created_task_title)
-        """
+        """Returns (success, user_message, created_task_title)"""
         domain_config = hass.data.get(DOMAIN, {})
         vikunja_url = domain_config.get(CONF_VIKUNJA_URL)
         vikunja_api_token = domain_config.get(CONF_VIKUNJA_API_TOKEN)
@@ -108,20 +95,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                         voice_label_id = voice_label.get("id")
             except Exception as label_err:
                 _LOGGER.error("Could not ensure 'voice' label exists: %s", label_err)
+        openai_client = OpenAIAPI(openai_api_key)
         openai_response = await hass.async_add_executor_job(
-            process_with_openai,
-            task_description,
-            projects,
-            labels,
-            openai_api_key,
-            default_due_date,
-            voice_correction,
+            lambda: openai_client.create_task_from_description(
+                task_description,
+                projects,
+                labels,
+                default_due_date,
+                voice_correction,
+            )
         )
         if not openai_response:
             _LOGGER.error("Failed to process task with OpenAI")
             return False, "Sorry, I couldn't process your task due to a connection error. Please try again later.", ""
         try:
-            response_data = json.loads(openai_response)
+            # openai_response is already a dict
+            response_data = openai_response if isinstance(openai_response, dict) else json.loads(openai_response)
             task_data = response_data.get("task_data", {})
             if not task_data.get("title"):
                 _LOGGER.error("Missing required 'title' field in task data")
@@ -167,8 +156,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             return False, "Sorry, an unexpected error occurred. Please try again.", ""
 
     class VikunjaAddTaskIntentHandler(intent.IntentHandler):
-        """Intent handler for natural language task creation."""
-
         def __init__(self):
             self.intent_type = "VikunjaAddTask"
         

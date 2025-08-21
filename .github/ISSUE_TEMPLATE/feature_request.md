@@ -11,9 +11,3 @@ What problem does this solve?
 ## Proposed Solution
 Describe the feature.
 
-## Example Use Case
-
-## Alternatives Considered
-
-
-## Additional Context

@@ -8,27 +8,20 @@ labels: bug
 ## Description
 Clear summary of the problem.
 
-## Steps To Reproduce
+## Steps To Reproduce (optional)
 1. 
 2. 
 3. 
 
-## Expected Behavior
-
-## Actual Behavior
 
 ## Logs (redact sensitive info)
 ```
 (paste relevant lines only)
 ```
 
-## Environment
+## Environment (optional)
 - Home Assistant version:
 - Integration version:
 - Vikunja version:
 
-## Video / Screenshot (REQUIRED)
-(Drag & drop or link a short clip or screenshot illustrating the issue)
-
-## Additional Context
-(Optional)
+## Additional Context (optional)

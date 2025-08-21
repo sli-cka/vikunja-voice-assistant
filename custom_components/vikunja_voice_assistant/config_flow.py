@@ -24,7 +24,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
 
     async def _test_openai_connection(self, api_key: str) -> bool:
-        """Test OpenAI API connection."""
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"

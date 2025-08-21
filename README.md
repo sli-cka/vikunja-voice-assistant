@@ -2,7 +2,9 @@
 
 # Vikunja Voice Assistant for Home Assistant
 
-Create structured Vikunja tasks hands‑free via Home Assistant's conversation agent (Assist) using OpenAI for natural language parsing.
+<img src="resources/logo.png" alt="Vikunja Voice Assistant logo" width="160" />
+
+Create structured Vikunja tasks hands‑free via Home Assistant's voice assistant using OpenAI for natural language parsing.
 
 </div>
 
@@ -12,13 +14,7 @@ Turn phrases like:
 
 into a properly formed Vikunja task with project, due date, priority, labels (optional auto 'voice' label) and recurrence when spoken.
 
-## 🚀 Key Features
-* Voice or text conversation task creation (Assist intent)
-* Project + label detection (uses existing IDs, no guessing new labels except optional auto 'voice')
-* Optional automatic speech-to-text correction mode
-* Configurable default due date strategy (none / tomorrow / end of week / end of month)
-* Optional automatic 'voice' label creation + attachment
-* Lightweight logging (errors + successes only)
+
 
 ## 📦 Requirements
 * Home Assistant (2024.x+ recommended)

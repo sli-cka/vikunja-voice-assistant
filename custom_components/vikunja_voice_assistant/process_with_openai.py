@@ -6,11 +6,6 @@ from datetime import datetime, timezone, timedelta
 _LOGGER = logging.getLogger(__name__)
 
 def process_with_openai(task_description, projects, labels, api_key,  default_due_date="none", voice_correction=False):
-    """Process the task with OpenAI API using a synchronous requests call.
-
-    This function is synchronous by design so it must be run in an executor
-    when called from Home Assistant's event loop.
-    """
     project_names = [{"id": p.get("id"), "name": p.get("title")} for p in projects]
     label_names = [{"id": l.get("id"), "name": l.get("title")} for l in (labels or []) if isinstance(l, dict) and l.get("id") is not None]
     
