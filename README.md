@@ -4,7 +4,7 @@
 
 <img src="https://raw.githubusercontent.com/NeoHuncho/vikunja-voice-assistant/main/logo.png" alt="Vikunja Voice Assistant logo" width="160" />
 
-Create structured Vikunja tasks hands‑free via Home Assistant's voice assistant using OpenAI for natural language parsing.
+Create structured Vikunja tasks hands‑free via Home Assistant's voice assistant using AI for natural language parsing.
 
 </div>
 

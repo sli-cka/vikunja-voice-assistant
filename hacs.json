@@ -1,10 +1,4 @@
 {
   "name": "Vikunja Voice Assistant",
-  "render_readme": true,
-  "domain": "vikunja_voice_assistant",
-  "documentation": "https://github.com/NeoHuncho/vikunja-todo-ai-homeassistant",
-  "issue_tracker": "https://github.com/NeoHuncho/vikunja-todo-ai-homeassistant/issues",
-  "dependencies": [],
-  "codeowners": ["@NeoHuncho"],
-  "iot_class": "cloud_polling"
+  "render_readme": true
 }

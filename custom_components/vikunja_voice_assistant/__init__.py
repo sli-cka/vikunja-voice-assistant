@@ -2,6 +2,8 @@ import logging
 import os
 import json
 import asyncio
+import voluptuous as vol
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import intent
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
@@ -20,6 +22,9 @@ from .openai_api import OpenAIAPI
 from .services import setup_services
 
 _LOGGER = logging.getLogger(__name__)
+
+# Integration uses config entries only, but hassfest expects a CONFIG_SCHEMA when async_setup exists
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 def copy_custom_sentences(hass: HomeAssistant) -> None:
     """Copy bundled custom sentences into Home Assistant's expected directory.
