@@ -8,23 +8,26 @@ Create structured Vikunja tasks hands‑free via Home Assistant's voice assistan
 
 </div>
 
-## ✨ What It Does
-Turn phrases like:
-> "Add task finish quarterly finance report for work next Friday at 5pm high priority"
+## ✨ How to Use
+Tell your Home Assistant voice assistant to **create** or **add** a task, then speak the details. You can include:
+- Project
+- Due date and time
+- Priority
+- Labels
+- Recurrence
 
-into a properly formed Vikunja task with project, due date, priority, labels (optional auto 'voice' label) and recurrence when spoken.
-
-
-
-## 📦 Requirements
-* Home Assistant (2024.x+ recommended)
-* Running Vikunja instance + API token (user settings -> API tokens)
-* OpenAI API key
-* HACS (for easy installation/updates)
+Example:
+> "Add task pump bike tires every month starting tomorrow with the label maintenance. Oh yeah and make it high priority."
 
 ---
 ## 🛠 Installation (HACS)
-Right after cloning or for end users:
+
+### 📦 Requirements
+* Home Assistant
+* Running Vikunja instance + API token (user settings -> API tokens)
+* OpenAI API key
+* HACS
+
 1. In Home Assistant go to HACS → Integrations → 3‑dot menu → Custom repositories
 2. Add this repo URL and choose category: Integration
 3. Search HACS for "Vikunja Voice Assistant" and install
@@ -52,52 +55,9 @@ Speak (or type into conversation):
 * "Add task buy milk with grocery label tomorrow"
 * "Add task schedule dentist appointment next March"
 * "Add task take vitamins daily"
-* "Add task finish marketing plan by Friday 5pm high priority"
+* "Add task finish the planting tomatoes to the project garden with high priority. Make it due next Friday."
 
-Response will confirm creation, e.g. "Successfully added task: Finish marketing plan".
-
-## 🔐 Privacy / Network
-* Sends only the task phrase plus available project + label names to OpenAI for structured extraction.
-* No task history or unrelated Home Assistant data is transmitted.
-
-## 🧪 Troubleshooting
-| Issue | Check |
-|-------|-------|
-| Cannot connect | URL must be reachable from HA, include https and not duplicate /api/v1 path |
-| Invalid OpenAI key | Confirm key not expired; no leading/trailing spaces |
-| Tasks missing labels | Ensure label already exists in Vikunja (except auto 'voice') |
-| Wrong due date | Confirm timezone of HA host and phrase specificity |
-
-Enable debug locally (not default) by adding to `configuration.yaml`:
-```
-logger:
-	logs:
-		custom_components.vikunja_voice_assistant: debug
-```
-
-## 🤝 Contributing
-Small focused PRs welcome. Before submitting:
-1. Keep logging minimal (debug only when truly needed)
-2. Follow existing naming style (snake_case, concise)
-3. Add/update doc snippets if behavior changes
-4. Include a short screen recording or screenshot for UI / flow changes
-
-See `.github/CONTRIBUTING.md` for details.
-
-## 🐞 Reporting Issues
-Open an issue and include:
-* Clear title
-* Reproduction steps
-* Expected vs actual
-* Screenshot or short video (required)
-* Redacted logs (if relevant)
+Response will confirm creation, e.g. "Successfully added task: Finish the planting tomatoes "
 
 ## 📄 License
 MIT – see `LICENSE`.
-
-## 🙏 Acknowledgements
-* Vikunja project team
-* Home Assistant community
-
----
-Enjoy faster inbox‑zero for your tasks ✨
