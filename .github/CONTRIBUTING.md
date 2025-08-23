@@ -16,7 +16,7 @@ Thanks for helping improve Vikunja Voice Assistant!
 ```
 logger:
   logs:
-    custom_components.vikunja_voice_assistant: debug
+    custom_components.vikunja: debug
 ```
 
 ## Submitting a PR

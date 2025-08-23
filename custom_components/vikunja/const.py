@@ -1,4 +1,4 @@
-DOMAIN = "vikunja_voice_assistant"
+DOMAIN = "vikunja"
 CONF_VIKUNJA_URL= "vikunja_url"
 CONF_VIKUNJA_API_TOKEN = "vikunja_api_token"
 CONF_OPENAI_API_KEY = "openai_api_key"

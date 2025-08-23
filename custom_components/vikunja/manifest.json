@@ -1,5 +1,5 @@
 {
-  "domain": "vikunja_voice_assistant",
+  "domain": "vikunja",
   "name": "Vikunja Voice Assistant",
   "codeowners": ["@NeoHuncho"],
   "config_flow": true,
