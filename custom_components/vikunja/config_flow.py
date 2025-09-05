@@ -9,7 +9,7 @@ from .const import (
     DOMAIN, 
     CONF_OPENAI_API_KEY, 
     CONF_VIKUNJA_URL,
-    CONF_VIKUNJA_API_TOKEN,
+    CONF_VIKUNJA_API_KEY,
     CONF_DUE_DATE,  
     DUE_DATE_OPTIONS,
     CONF_VOICE_CORRECTION, 
@@ -60,7 +60,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         data_schema = vol.Schema(
             {
                 vol.Required(CONF_VIKUNJA_URL, default=""): str,
-                vol.Required(CONF_VIKUNJA_API_TOKEN, default=""): str,
+                vol.Required(CONF_VIKUNJA_API_KEY, default=""): str,
                 vol.Required(CONF_OPENAI_API_KEY, default=""): str,
                 vol.Required(CONF_VOICE_CORRECTION, default=True): cv.boolean,
                 vol.Required(CONF_AUTO_VOICE_LABEL, default=True): cv.boolean,
@@ -70,7 +70,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             # Strip spaces from API keys and tokens
-            user_input[CONF_VIKUNJA_API_TOKEN] = user_input[CONF_VIKUNJA_API_TOKEN].strip()
+            user_input[CONF_VIKUNJA_API_KEY] = user_input[CONF_VIKUNJA_API_KEY].strip()
             user_input[CONF_OPENAI_API_KEY] = user_input[CONF_OPENAI_API_KEY].strip()
             
             base_url = user_input[CONF_VIKUNJA_URL].rstrip('/')
@@ -81,7 +81,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 
             vikunja_api = VikunjaAPI(
                 api_url,
-                user_input[CONF_VIKUNJA_API_TOKEN]
+                user_input[CONF_VIKUNJA_API_KEY]
             )
             
             # Test the Vikunja connection
@@ -112,7 +112,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema = vol.Schema(
                 {
                     vol.Required(CONF_VIKUNJA_URL, default=user_input.get(CONF_VIKUNJA_URL, "")): str,
-                    vol.Required(CONF_VIKUNJA_API_TOKEN, default=user_input.get(CONF_VIKUNJA_API_TOKEN, "")): str,
+                    vol.Required(CONF_VIKUNJA_API_KEY, default=user_input.get(CONF_VIKUNJA_API_KEY, "")): str,
                     vol.Required(CONF_OPENAI_API_KEY, default=user_input.get(CONF_OPENAI_API_KEY, "")): str,
                     vol.Required(CONF_VOICE_CORRECTION, default=user_input.get(CONF_VOICE_CORRECTION, True)): cv.boolean,
                     vol.Required(CONF_AUTO_VOICE_LABEL, default=user_input.get(CONF_AUTO_VOICE_LABEL, True)): cv.boolean,

@@ -10,7 +10,7 @@ from homeassistant.config_entries import ConfigEntry
 
 from .const import (
     DOMAIN,
-    CONF_VIKUNJA_API_TOKEN,
+    CONF_VIKUNJA_API_KEY,
     CONF_OPENAI_API_KEY,
     CONF_VIKUNJA_URL,
     CONF_DUE_DATE,
@@ -58,7 +58,7 @@ async def async_setup(hass: HomeAssistant, config):
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data[DOMAIN] = {
         CONF_VIKUNJA_URL: entry.data[CONF_VIKUNJA_URL],
-        CONF_VIKUNJA_API_TOKEN: entry.data[CONF_VIKUNJA_API_TOKEN],
+        CONF_VIKUNJA_API_KEY: entry.data[CONF_VIKUNJA_API_KEY],
         CONF_OPENAI_API_KEY: entry.data[CONF_OPENAI_API_KEY],
         CONF_DUE_DATE: entry.data[CONF_DUE_DATE],
         CONF_VOICE_CORRECTION: entry.data[CONF_VOICE_CORRECTION],
@@ -69,17 +69,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         """Returns (success, user_message, created_task_title)"""
         domain_config = hass.data.get(DOMAIN, {})
         vikunja_url = domain_config.get(CONF_VIKUNJA_URL)
-        vikunja_api_token = domain_config.get(CONF_VIKUNJA_API_TOKEN)
+        vikunja_api_key = domain_config.get(CONF_VIKUNJA_API_KEY)
         openai_api_key = domain_config.get(CONF_OPENAI_API_KEY)
         default_due_date = domain_config.get(CONF_DUE_DATE, "none")
         voice_correction = domain_config.get(CONF_VOICE_CORRECTION, True)
         auto_voice_label = domain_config.get(CONF_AUTO_VOICE_LABEL, True)
         
-        if not all([vikunja_url, vikunja_api_token, openai_api_key]):
+        if not all([vikunja_url, vikunja_api_key, openai_api_key]):
             _LOGGER.error("Missing configuration for Vikunja voice assistant")
             return False, "Configuration error. Please check your Vikunja and OpenAI settings.", ""
             
-        vikunja_api = VikunjaAPI(vikunja_url, vikunja_api_token)
+        vikunja_api = VikunjaAPI(vikunja_url, vikunja_api_key)
         projects, labels = await asyncio.gather(
             hass.async_add_executor_job(vikunja_api.get_projects),
             hass.async_add_executor_job(vikunja_api.get_labels),

@@ -3,7 +3,7 @@ import logging
 import voluptuous as vol
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import config_validation as cv
-from .const import DOMAIN, CONF_VIKUNJA_URL, CONF_VIKUNJA_API_TOKEN
+from .const import DOMAIN, CONF_VIKUNJA_URL, CONF_VIKUNJA_API_KEY
 from .vikunja_api import VikunjaAPI
 
 _LOGGER = logging.getLogger(__name__)
@@ -19,13 +19,13 @@ def setup_services(hass: HomeAssistant):
     """Register the create_task service."""
     domain_config = hass.data.get(DOMAIN, {})
     vikunja_url = domain_config.get(CONF_VIKUNJA_URL)
-    vikunja_api_token = domain_config.get(CONF_VIKUNJA_API_TOKEN)
+    vikunja_api_key = domain_config.get(CONF_VIKUNJA_API_KEY)
     
-    if not all([vikunja_url, vikunja_api_token]):
+    if not all([vikunja_url, vikunja_api_key]):
         _LOGGER.error("Missing configuration for Vikunja voice assistant")
         return
         
-    vikunja_api = VikunjaAPI(vikunja_url, vikunja_api_token)
+    vikunja_api = VikunjaAPI(vikunja_url, vikunja_api_key)
     
     async def create_task(call: ServiceCall):
         """Create a task in Vikunja."""

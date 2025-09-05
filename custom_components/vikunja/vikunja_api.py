@@ -6,12 +6,12 @@ import secrets
 _LOGGER = logging.getLogger(__name__)
 
 class VikunjaAPI:
-    def __init__(self, url, vikunja_api_token):
+    def __init__(self, url, vikunja_api_key):
         self.url = url.rstrip('/')
-        self.api_token = vikunja_api_token
+        self.api_token = vikunja_api_key
         self.headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {vikunja_api_token}"
+            "Authorization": f"Bearer {vikunja_api_key}"
         }
         
     def test_connection(self):

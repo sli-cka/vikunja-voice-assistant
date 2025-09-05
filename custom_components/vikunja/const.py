@@ -1,6 +1,6 @@
 DOMAIN = "vikunja"
 CONF_VIKUNJA_URL= "vikunja_url"
-CONF_VIKUNJA_API_TOKEN = "vikunja_api_token"
+CONF_VIKUNJA_API_KEY = "vikunja_api_key"
 CONF_OPENAI_API_KEY = "openai_api_key"
 CONF_DUE_DATE = "default_due_date"
 CONF_VOICE_CORRECTION = "voice_correction"

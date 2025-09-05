@@ -6,7 +6,7 @@
         "description": "Set up Vikunja voice assistant integration",
         "data": {
           "vikunja_url": "Vikunja base URL (e.g. https://vikunja.example.com)",
-          "vikunja_api_token": "Vikunja API Token",
+          "vikunja_api_key": "Vikunja API Token",
           "openai_api_key": "OpenAI API Key",
           "voice_correction": "Enable speech recognition text correction (highly recommended for all current speech-to-text models)",
           "default_due_date": "Default due date if none specified (applies only when no project is mentioned)",
