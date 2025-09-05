@@ -56,7 +56,7 @@ def build_task_creation_messages(
         SPEECH RECOGNITION CORRECTION:
         - Task came from voice command - expect speech recognition errors
         - Correct misheard project names, label names, dates, and common speech-to-text errors
-        - Use context to understand user's true intent
+        - Ensure the task title is logically consistent with the project name, labels etc. If something doesn't make sense, attempt to find the most likely intended word/phrase based on context
         """
 
     system_message = {
