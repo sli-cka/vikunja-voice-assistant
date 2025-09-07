@@ -8,6 +8,8 @@ def build_task_creation_messages(
     labels,
     default_due_date: str = "none",
     voice_correction: bool = False,
+    users=None,
+    enable_user_assignment: bool = False,
 ):
     """Build OpenAI chat messages to create a Vikunja task from a description.
 
@@ -59,6 +61,23 @@ def build_task_creation_messages(
         - Ensure the task title is logically consistent with the project name, labels etc. If something doesn't make sense, attempt to find the most likely intended word/phrase based on context
         """
 
+    user_list = []
+    if users and isinstance(users, list):
+        for u in users:
+            if isinstance(u, dict) and u.get("id") is not None:
+                user_list.append({"id": u.get("id"), "name": u.get("name"), "username": u.get("username")})
+
+    assignment_instructions = ""
+    if enable_user_assignment and user_list:
+        assignment_instructions = f"""
+        USER ASSIGNMENT:
+        - You can optionally include an assignee by username or name if clearly specified in the user's description.
+        - Output field: assignee (string) MUST be an existing username (preferred) or exact name match from available users.
+        - Available users: {json.dumps(user_list)}
+        - Only include assignee field if explicitly stated (e.g. 'assign to Alice', 'for william', 'give this to bob').
+        - Do not guess if unclear.
+        """
+
     system_message = {
         "role": "system",
         "content": f"""
@@ -82,6 +101,7 @@ def build_task_creation_messages(
             * priority (number, optional): Priority level 1-5, only when explicitly mentioned
             * repeat_after (number, optional): Repeat interval in seconds, only for recurring tasks
             * label_ids (array, optional): Array of existing label IDs
+            * assignee (string, optional): Username (preferred) or exact name of assignee (ONLY if explicitly stated)
 
         TASK FORMATTING:
         - Extract clear, concise titles.
@@ -128,9 +148,14 @@ def build_task_creation_messages(
         Input: "Schedule annual dentist appointment next March"
         Output: {{"title": "Schedule dentist appointment", "project_id": 1, "due_date": "2023-03-01T12:00:00Z"}}
 
-        Input: "Finish the project report"
+    Input: "Finish the project report"
         (assuming you have default due date settings set up)
         Output: {{"title": "Finish project report", "project_id": 1, "due_date": "2023-06-10T12:00:00Z"}}
+
+    Input: "Assign prepare slides to William for next week"
+    Output: {{"title": "Prepare slides", "project_id": 1, "due_date": "2023-06-16T12:00:00Z", "assignee": "william"}}
+
+    {assignment_instructions}
         """,
     }
 

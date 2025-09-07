@@ -105,3 +105,47 @@ class VikunjaAPI:
             if resp is not None and hasattr(resp, "text"):
                 _LOGGER.error("Response content: %s", resp.text)
             return None
+
+    # --- User / Assignee helpers ---
+    def search_users(self, search: str, page: int = 1):
+        """Search users by partial string. Returns list or []."""
+        try:
+            response = requests.get(
+                f"{self.url}/users",
+                params={"s": search, "page": page},
+                headers=self.headers,
+                timeout=30,
+            )
+            response.raise_for_status()
+            data = response.json()
+            # Expecting list of user objects
+            if isinstance(data, list):
+                return data
+            return []
+        except requests.exceptions.RequestException as err:
+            _LOGGER.error("Failed to search users with query '%s': %s", search, err)
+            return []
+
+    def assign_user_to_task(self, task_id: int, user_id: int):
+        """Assign a user to a task. Returns True on success."""
+        payload = {
+            "max_permission": None,
+            "created": "1970-01-01T00:00:00.000Z",
+            "user_id": user_id,
+            "task_id": task_id,
+        }
+        try:
+            response = requests.put(
+                f"{self.url}/tasks/{task_id}/assignees",
+                headers=self.headers,
+                json=payload,
+                timeout=30,
+            )
+            response.raise_for_status()
+            return True
+        except requests.exceptions.RequestException as err:
+            _LOGGER.error("Failed to assign user %s to task %s: %s", user_id, task_id, err)
+            resp = getattr(err, "response", None)
+            if resp is not None and hasattr(resp, "text"):
+                _LOGGER.error("Response content: %s", resp.text)
+            return False

@@ -14,6 +14,7 @@ from .const import (
     DUE_DATE_OPTIONS,
     CONF_VOICE_CORRECTION, 
     CONF_AUTO_VOICE_LABEL,
+    CONF_ENABLE_USER_ASSIGN,
 )
 from .vikunja_api import VikunjaAPI
 
@@ -64,6 +65,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_OPENAI_API_KEY, default=""): str,
                 vol.Required(CONF_VOICE_CORRECTION, default=True): cv.boolean,
                 vol.Required(CONF_AUTO_VOICE_LABEL, default=True): cv.boolean,
+                vol.Required(CONF_ENABLE_USER_ASSIGN, default=False): cv.boolean,
                 vol.Required(CONF_DUE_DATE, default="tomorrow"): vol.In(DUE_DATE_OPTIONS),
             }
         )
@@ -98,11 +100,45 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 else:
                     # Save the formatted URL
                     user_input[CONF_VIKUNJA_URL] = api_url
-                    
+
+                    # Build initial user cache if feature enabled
+                    if user_input.get(CONF_ENABLE_USER_ASSIGN):
+                        # Perform vowel-only searches synchronously (executor) just once here
+                        def _initial_fetch():
+                            api_local = VikunjaAPI(api_url, user_input[CONF_VIKUNJA_API_KEY])
+                            combined = {}
+                            for letter in ['a','e','i','o','u','y']:
+                                try:
+                                    for u in api_local.search_users(letter) or []:
+                                        if isinstance(u, dict) and u.get('id') is not None:
+                                            key = str(u.get('id'))
+                                            if key not in combined:
+                                                combined[key] = {
+                                                    'id': u.get('id'),
+                                                    'name': u.get('name'),
+                                                    'username': u.get('username')
+                                                }
+                                except Exception:  # noqa: BLE001
+                                    continue
+                            # Write cache file
+                            import json, os, datetime
+                            from .const import USER_CACHE_FILENAME
+                            cache_path = os.path.join(self.hass.config.config_dir, USER_CACHE_FILENAME)
+                            data = {
+                                'users': list(combined.values()),
+                                'last_refresh': datetime.datetime.utcnow().isoformat() + 'Z'
+                            }
+                            try:
+                                with open(cache_path, 'w', encoding='utf-8') as f:
+                                    json.dump(data, f, indent=2)
+                            except Exception:  # noqa: BLE001
+                                pass
+                        await self.hass.async_add_executor_job(_initial_fetch)
+
                     # Avoid duplicate entries
                     await self.async_set_unique_id(f"vikunja_{api_url}")
                     self._abort_if_unique_id_configured()
-                    
+
                     return self.async_create_entry(
                         title=f"Vikunja ({api_url})",
                         data=user_input
@@ -116,6 +152,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_OPENAI_API_KEY, default=user_input.get(CONF_OPENAI_API_KEY, "")): str,
                     vol.Required(CONF_VOICE_CORRECTION, default=user_input.get(CONF_VOICE_CORRECTION, True)): cv.boolean,
                     vol.Required(CONF_AUTO_VOICE_LABEL, default=user_input.get(CONF_AUTO_VOICE_LABEL, True)): cv.boolean,
+                    vol.Required(CONF_ENABLE_USER_ASSIGN, default=user_input.get(CONF_ENABLE_USER_ASSIGN, False)): cv.boolean,
                     vol.Required(CONF_DUE_DATE, default=user_input.get(CONF_DUE_DATE, "tomorrow")): vol.In(DUE_DATE_OPTIONS),
                 }
             )

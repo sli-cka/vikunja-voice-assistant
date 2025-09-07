@@ -42,6 +42,8 @@ class OpenAIAPI:
         default_due_date: str = "none",
         voice_correction: bool = False,
         reasoning_effort: str = "minimal",
+        users=None,
+        enable_user_assignment: bool = False,
     ):
         messages = build_task_creation_messages(
             task_description,
@@ -49,6 +51,8 @@ class OpenAIAPI:
             labels,
             default_due_date,
             voice_correction,
+            users,
+            enable_user_assignment,
         )
 
         payload = {
