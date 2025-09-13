@@ -1,79 +1,102 @@
 <div align="center">
 
-# Vikunja Voice Assistant for Home Assistant
+# 🎙️ Vikunja Voice Assistant for Home Assistant
 
-<img src="https://raw.githubusercontent.com/NeoHuncho/vikunja-voice-assistant/main/logo.png" alt="Vikunja Voice Assistant logo" width="160" />
+<img src="https://raw.githubusercontent.com/NeoHuncho/vikunja-voice-assistant/main/logo.png" alt="Vikunja Voice Assistant logo" width="160" />  
 
-Create structured Vikunja tasks hands‑free via Home Assistant's voice assistant using AI for natural language parsing.
-
-</div>
-
-## ✨ How to Use
-Tell your Home Assistant voice assistant to **create** or **add** a task, then speak the details. You can include:
-- Project
-- Due date and time
-- Priority
-- Labels
-- Recurrence
-
-Example:
-> "Add task pump bike tires every month starting tomorrow with the label maintenance. Oh yeah and make it high priority."
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)[![HACS Default](https://img.shields.io/badge/HACS-Default-blue.svg)](https://hacs.xyz/) [![Powered by OpenAI](https://img.shields.io/badge/AI-OpenAI-ff69b4.svg)](https://platform.openai.com/)
+Say **“create a task”** or **“add a task”** → Your task goes straight into Vikunja!
+*Make creating tasks as easy as talking ✨*
+</div>  
 
 ---
-## 🛠 Installation (HACS)
 
-### 📦 Requirements
-* Home Assistant
-* Running Vikunja instance + API token (user settings -> API tokens)
+## ✨ Features
+
+* **Natural voice commands**: *“Create a task…”* or *“Add a task…”* 🗣️
+* Supports **project, due date, priority, labels, recurrence** out of the box 📦
+* Optional: speech correction, auto voice label, default due date, user assignment
+
+---
+
+## 📦 Requirements
+
+**Required**
+
+* [Home Assistant](https://www.home-assistant.io/)
+* [HACS](https://hacs.xyz/docs/use/download/download/#to-download-hacs-ossupervised)
+* Running Vikunja instance + API token
 * OpenAI API key
-* HACS
 
-1. In Home Assistant go to HACS → Integrations → 3‑dot menu → Custom repositories
-2. Add this repo URL and choose category: Integration
-3. Search HACS for "Vikunja Voice Assistant" and install
-4. Restart Home Assistant if prompted
-5. Go to Settings → Devices & Services → Add Integration → search "Vikunja Voice Assistant"
-6. Enter:
-	 * Vikunja base URL (root, the integration will append /api/v1 if needed)
-	 * Vikunja API Token
-	 * OpenAI API Key
-	 * Toggle options (speech correction, auto 'voice' label)
-	 * Default due date preference
+---
 
-That's it—the intent sentences are auto‑installed and Assist is reloaded.
+## ⚙️ Installation (HACS) | [Full Video Walkthrough](https://github.com/user-attachments/assets/c897b523-2539-42e2-ba03-fa9534a80c36)
 
-## ⚙️ Configuration Options
-| Option | Description |
-|--------|-------------|
-| Speech correction | Improves parsing by correcting typical STT misspellings |
-| Auto 'voice' label | Ensures/creates a label named `voice` and attaches it |
-| Default due date | Applied only when user gives no project + no date |
-| Default due date choices | none, tomorrow, end_of_week, end_of_month |
-| Enable user assignment (new) | When enabled, the integration periodically fetches all users (A-Z search) and allows specifying an assignee in a natural phrase (e.g. "assign to William"). |
+⏱️ *Create your first task in under 2 minutes!*
 
-### 👥 User Assignment (Optional Feature)
-Disabled by default. When you enable it in the configuration:
-1. The integration builds a local cache (`vikunja_users.json`) in your HA config directory by querying Vikunja users A–Z.
-2. It refreshes every 24 hours automatically.
-3. You can say things like:
-	* "Add task prepare slides for next week assign to William"
-	* "Create task review PR for bob tomorrow"
+1. In HACS → Search: **Vikunja Voice Assistant** → Install
 
-If the assistant clearly identifies a user, it adds an `assignee` field and the integration assigns the task after creation.
+2. Restart Home Assistant
 
-Service to force refresh the user cache:
-`vikunja.refresh_user_cache`
+3. Go to *Settings → Devices & Services → Add Integration*
 
-If a referenced user isn't found in the cache, the task is still created without an assignee.
+4. Search: **Vikunja Voice Assistant**
 
-## 🗣 Usage Examples
-Speak (or type into conversation):
-* "Add task buy milk with grocery label tomorrow"
-* "Add task schedule dentist appointment next March"
-* "Add task take vitamins daily"
-* "Add task finish the planting tomatoes to the project garden with high priority. Make it due next Friday."
+5. Fill out setup form (Vikunja URL, API token, OpenAI key, options)
 
-Response will confirm creation, e.g. "Successfully added task: Finish the planting tomatoes "
+   * **Vikunja API Token** → *User Settings → API Tokens*
 
-## 📄 License
-MIT – see `LICENSE`.
+     * Labels: Create, Read All
+     * Projects: Read All
+     * Tasks: Create
+       📹 [Video Guide](https://github.com/user-attachments/assets/aa60d448-650f-4148-9f11-1e27f12e37ac)
+
+   * **OpenAI API Key** → [Create one here](https://platform.openai.com/account/api-keys)
+     📹 [Video Guide](https://github.com/user-attachments/assets/1aae42cb-ba0b-4ebb-951c-bd017da45f71)
+
+6. ✅ Done – Just say **“create a task”**!
+
+---
+
+## 🔧 Configuration Options
+
+| Option                   | Purpose                                       | Example/Default |
+| ------------------------ | --------------------------------------------- | --------------- |
+| Speech correction        | Fix STT mistakes before parsing               | On              |
+| Auto `voice` label       | Attaches/creates a `voice` label              | Enabled         |
+| Default due date         | Used if no date & no project given            | tomorrow        |
+| Default due date choices | none, tomorrow, end\_of\_week, end\_of\_month | tomorrow        |
+| Enable user assignment   | Assign tasks to existing users                | Disabled         |
+
+---
+
+## 🤖 AI Conversation Agent (Recommended)
+
+Append this to your Home Assistant Voice Assistant’s custom instructions:
+
+
+```
+If the user mentions or implies creating or adding a new task, 
+always call this tool (do not leave any field empty):
+
+tool_name: VikunjaAddTask
+tool_args: {
+  task_description: "<exact user sentence>",
+}
+```
+*This will allow your voice assistant to create tasks even if the keywords were missing.*
+📹 [Video Guide](https://github.com/user-attachments/assets/f1c97712-b753-4bbb-9293-d9f57b0b6ee9)
+
+---
+
+## 🚧 Limitations
+
+* ❌ Cannot create new labels (except auto-creating **voice**)
+* ❌ Cannot create new projects
+* ❌ Cannot create new assignee users (only assign existing)
+
+---
+
+## 📜 License
+
+MIT – see [LICENSE](LICENSE).
