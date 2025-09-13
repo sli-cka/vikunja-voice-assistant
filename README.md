@@ -23,9 +23,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
 ## 📦 Requirements
 
-**Required**
-
-* [Home Assistant](https://www.home-assistant.io/)
+* [Home Assistant](https://www.home-assistant.io/) with a [voice assistant set up](https://www.home-assistant.io/voice_control/)
 * [HACS](https://hacs.xyz/docs/use/download/download/#to-download-hacs-ossupervised)
 * Running Vikunja instance + API token
 * OpenAI API key
@@ -51,9 +49,11 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
      * Labels: Create, Read All
      * Projects: Read All
      * Tasks: Create
+
        📹 [Video Guide](https://github.com/user-attachments/assets/aa60d448-650f-4148-9f11-1e27f12e37ac)
 
    * **OpenAI API Key** → [Create one here](https://platform.openai.com/account/api-keys)
+
      📹 [Video Guide](https://github.com/user-attachments/assets/1aae42cb-ba0b-4ebb-951c-bd017da45f71)
 
 6. ✅ Done – Just say **“create a task”**!
@@ -87,12 +87,14 @@ tool_args: {
 }
 ```
 *This will allow your voice assistant to create tasks even if the keywords were missing.*
-📹 [Video Guide](https://github.com/user-attachments/assets/f1c97712-b753-4bbb-9293-d9f57b0b6ee9)
+
+📹 [Video Guide](https://github.com/user-attachments/assets/0440bc71-b748-4118-8afd-6f0f10b22003)
 
 ---
 
 ## 🚧 Limitations
 
+* ❌ Only supports **English** commands
 * ❌ Cannot create new labels (except auto-creating **voice**)
 * ❌ Cannot create new projects
 * ❌ Cannot create new assignee users (only assign existing)
