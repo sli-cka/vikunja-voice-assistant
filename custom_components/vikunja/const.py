@@ -7,7 +7,7 @@ CONF_VOICE_CORRECTION = "voice_correction"
 CONF_AUTO_VOICE_LABEL = "auto_voice_label"
 CONF_ENABLE_USER_ASSIGN = "enable_user_assignment"
 USER_CACHE_FILENAME = "vikunja_users.json"
-USER_CACHE_REFRESH_HOURS = 12  # default refresh cadence
+USER_CACHE_REFRESH_HOURS = 24  # default refresh cadence
 DEFAULT_PROJECT_ID = 1
 DUE_DATE_OPTIONS = [
     "none",

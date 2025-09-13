@@ -17,10 +17,12 @@ from .const import (
     CONF_ENABLE_USER_ASSIGN,
 )
 from .vikunja_api import VikunjaAPI
+from .user_cache import build_initial_user_cache_sync
 
 _LOGGER = logging.getLogger(__name__)
 
-class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
+    """Handle a config flow for the Vikunja integration."""
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
 
@@ -103,37 +105,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
                     # Build initial user cache if feature enabled
                     if user_input.get(CONF_ENABLE_USER_ASSIGN):
-                        # Perform vowel-only searches synchronously (executor) just once here
-                        def _initial_fetch():
-                            api_local = VikunjaAPI(api_url, user_input[CONF_VIKUNJA_API_KEY])
-                            combined = {}
-                            for letter in ['a','e','i','o','u','y']:
-                                try:
-                                    for u in api_local.search_users(letter) or []:
-                                        if isinstance(u, dict) and u.get('id') is not None:
-                                            key = str(u.get('id'))
-                                            if key not in combined:
-                                                combined[key] = {
-                                                    'id': u.get('id'),
-                                                    'name': u.get('name'),
-                                                    'username': u.get('username')
-                                                }
-                                except Exception:  # noqa: BLE001
-                                    continue
-                            # Write cache file
-                            import json, os, datetime
-                            from .const import USER_CACHE_FILENAME
-                            cache_path = os.path.join(self.hass.config.config_dir, USER_CACHE_FILENAME)
-                            data = {
-                                'users': list(combined.values()),
-                                'last_refresh': datetime.datetime.utcnow().isoformat() + 'Z'
-                            }
-                            try:
-                                with open(cache_path, 'w', encoding='utf-8') as f:
-                                    json.dump(data, f, indent=2)
-                            except Exception:  # noqa: BLE001
-                                pass
-                        await self.hass.async_add_executor_job(_initial_fetch)
+                        # Reuse shared helper to avoid duplication
+                        await self.hass.async_add_executor_job(
+                            build_initial_user_cache_sync,
+                            self.hass.config.config_dir,
+                            api_url,
+                            user_input[CONF_VIKUNJA_API_KEY],
+                        )
 
                     # Avoid duplicate entries
                     await self.async_set_unique_id(f"vikunja_{api_url}")
