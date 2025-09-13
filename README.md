@@ -43,19 +43,22 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 4. Search: **Vikunja Voice Assistant**
 
 5. Fill out setup form (Vikunja URL, API token, OpenAI key, options)
+  <br>
+  
+   * **Vikunja API Token** → User Settings → API Tokens
 
-   * **Vikunja API Token** → *User Settings → API Tokens*
-
+     * **Set the following permissions**:
      * Labels: Create, Read All
      * Projects: Read All
      * Tasks: Create
+     * Users: Read All (at the bottom of the list) - optional
 
        📹 [Video Guide](https://github.com/user-attachments/assets/aa60d448-650f-4148-9f11-1e27f12e37ac)
 
    * **OpenAI API Key** → [Create one here](https://platform.openai.com/account/api-keys)
 
      📹 [Video Guide](https://github.com/user-attachments/assets/1aae42cb-ba0b-4ebb-951c-bd017da45f71)
-
+<br>
 6. ✅ Done – Just say **“create a task”**!
 
 ---

@@ -4,6 +4,7 @@ import aiohttp
 
 from homeassistant import config_entries
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import selector  # added
 
 from .const import (
     DOMAIN, 
@@ -15,12 +16,15 @@ from .const import (
     CONF_VOICE_CORRECTION, 
     CONF_AUTO_VOICE_LABEL,
     CONF_ENABLE_USER_ASSIGN,
+    DUE_DATE_OPTION_LABELS,  # added
 )
 from .vikunja_api import VikunjaAPI
+from .user_cache import build_initial_user_cache_sync
 
 _LOGGER = logging.getLogger(__name__)
 
-class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
+    """Handle a config flow for the Vikunja integration."""
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
 
@@ -57,6 +61,17 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle the initial step."""
         errors = {}
         
+        # Build selector once (human-friendly labels, internal values preserved)
+        due_date_selector = selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=[
+                    selector.SelectOptionDict(value=v, label=DUE_DATE_OPTION_LABELS[v])
+                    for v in DUE_DATE_OPTIONS
+                ],
+                mode=selector.SelectSelectorMode.DROPDOWN,
+            )
+        )
+
         # Default values to show in the form
         data_schema = vol.Schema(
             {
@@ -66,7 +81,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_VOICE_CORRECTION, default=True): cv.boolean,
                 vol.Required(CONF_AUTO_VOICE_LABEL, default=True): cv.boolean,
                 vol.Required(CONF_ENABLE_USER_ASSIGN, default=False): cv.boolean,
-                vol.Required(CONF_DUE_DATE, default="tomorrow"): vol.In(DUE_DATE_OPTIONS),
+                vol.Required(CONF_DUE_DATE, default="tomorrow"): due_date_selector,
             }
         )
 
@@ -103,37 +118,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
                     # Build initial user cache if feature enabled
                     if user_input.get(CONF_ENABLE_USER_ASSIGN):
-                        # Perform vowel-only searches synchronously (executor) just once here
-                        def _initial_fetch():
-                            api_local = VikunjaAPI(api_url, user_input[CONF_VIKUNJA_API_KEY])
-                            combined = {}
-                            for letter in ['a','e','i','o','u','y']:
-                                try:
-                                    for u in api_local.search_users(letter) or []:
-                                        if isinstance(u, dict) and u.get('id') is not None:
-                                            key = str(u.get('id'))
-                                            if key not in combined:
-                                                combined[key] = {
-                                                    'id': u.get('id'),
-                                                    'name': u.get('name'),
-                                                    'username': u.get('username')
-                                                }
-                                except Exception:  # noqa: BLE001
-                                    continue
-                            # Write cache file
-                            import json, os, datetime
-                            from .const import USER_CACHE_FILENAME
-                            cache_path = os.path.join(self.hass.config.config_dir, USER_CACHE_FILENAME)
-                            data = {
-                                'users': list(combined.values()),
-                                'last_refresh': datetime.datetime.utcnow().isoformat() + 'Z'
-                            }
-                            try:
-                                with open(cache_path, 'w', encoding='utf-8') as f:
-                                    json.dump(data, f, indent=2)
-                            except Exception:  # noqa: BLE001
-                                pass
-                        await self.hass.async_add_executor_job(_initial_fetch)
+                        # Reuse shared helper to avoid duplication
+                        await self.hass.async_add_executor_job(
+                            build_initial_user_cache_sync,
+                            self.hass.config.config_dir,
+                            api_url,
+                            user_input[CONF_VIKUNJA_API_KEY],
+                        )
 
                     # Avoid duplicate entries
                     await self.async_set_unique_id(f"vikunja_{api_url}")
@@ -153,7 +144,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_VOICE_CORRECTION, default=user_input.get(CONF_VOICE_CORRECTION, True)): cv.boolean,
                     vol.Required(CONF_AUTO_VOICE_LABEL, default=user_input.get(CONF_AUTO_VOICE_LABEL, True)): cv.boolean,
                     vol.Required(CONF_ENABLE_USER_ASSIGN, default=user_input.get(CONF_ENABLE_USER_ASSIGN, False)): cv.boolean,
-                    vol.Required(CONF_DUE_DATE, default=user_input.get(CONF_DUE_DATE, "tomorrow")): vol.In(DUE_DATE_OPTIONS),
+                    vol.Required(CONF_DUE_DATE, default=user_input.get(CONF_DUE_DATE, "tomorrow")): due_date_selector,
                 }
             )
 
