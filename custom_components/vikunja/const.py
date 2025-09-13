@@ -15,3 +15,9 @@ DUE_DATE_OPTIONS = [
     "end_of_week",
     "end_of_month"
 ]
+DUE_DATE_OPTION_LABELS = {
+    "none": "No default",
+    "tomorrow": "Tomorrow",
+    "end_of_week": "End of week",
+    "end_of_month": "End of month",
+}

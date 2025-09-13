@@ -4,6 +4,7 @@ import aiohttp
 
 from homeassistant import config_entries
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import selector  # added
 
 from .const import (
     DOMAIN, 
@@ -15,6 +16,7 @@ from .const import (
     CONF_VOICE_CORRECTION, 
     CONF_AUTO_VOICE_LABEL,
     CONF_ENABLE_USER_ASSIGN,
+    DUE_DATE_OPTION_LABELS,  # added
 )
 from .vikunja_api import VikunjaAPI
 from .user_cache import build_initial_user_cache_sync
@@ -59,6 +61,17 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
         """Handle the initial step."""
         errors = {}
         
+        # Build selector once (human-friendly labels, internal values preserved)
+        due_date_selector = selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=[
+                    selector.SelectOptionDict(value=v, label=DUE_DATE_OPTION_LABELS[v])
+                    for v in DUE_DATE_OPTIONS
+                ],
+                mode=selector.SelectSelectorMode.DROPDOWN,
+            )
+        )
+
         # Default values to show in the form
         data_schema = vol.Schema(
             {
@@ -68,7 +81,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
                 vol.Required(CONF_VOICE_CORRECTION, default=True): cv.boolean,
                 vol.Required(CONF_AUTO_VOICE_LABEL, default=True): cv.boolean,
                 vol.Required(CONF_ENABLE_USER_ASSIGN, default=False): cv.boolean,
-                vol.Required(CONF_DUE_DATE, default="tomorrow"): vol.In(DUE_DATE_OPTIONS),
+                vol.Required(CONF_DUE_DATE, default="tomorrow"): due_date_selector,
             }
         )
 
@@ -131,7 +144,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
                     vol.Required(CONF_VOICE_CORRECTION, default=user_input.get(CONF_VOICE_CORRECTION, True)): cv.boolean,
                     vol.Required(CONF_AUTO_VOICE_LABEL, default=user_input.get(CONF_AUTO_VOICE_LABEL, True)): cv.boolean,
                     vol.Required(CONF_ENABLE_USER_ASSIGN, default=user_input.get(CONF_ENABLE_USER_ASSIGN, False)): cv.boolean,
-                    vol.Required(CONF_DUE_DATE, default=user_input.get(CONF_DUE_DATE, "tomorrow")): vol.In(DUE_DATE_OPTIONS),
+                    vol.Required(CONF_DUE_DATE, default=user_input.get(CONF_DUE_DATE, "tomorrow")): due_date_selector,
                 }
             )
 
