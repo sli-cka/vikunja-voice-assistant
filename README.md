@@ -5,6 +5,7 @@
 <img src="https://raw.githubusercontent.com/NeoHuncho/vikunja-voice-assistant/main/logo.png" alt="Vikunja Voice Assistant logo" width="160" />  
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)[![HACS Default](https://img.shields.io/badge/HACS-Default-blue.svg)](https://hacs.xyz/) [![Powered by OpenAI](https://img.shields.io/badge/AI-OpenAI-ff69b4.svg)](https://platform.openai.com/)
+
 Say **“create a task”** or **“add a task”** → Your task goes straight into Vikunja!
 *Make creating tasks as easy as talking ✨*
 </div>  
