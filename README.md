@@ -44,7 +44,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
 5. Fill out setup form (Vikunja URL, API token, OpenAI key, options)
   <br>
-   * **Vikunja API Token** → *User Settings → API Tokens*
+   * **Vikunja API Token** → User Settings → API Tokens
 
      * **Set the following permissions**:
      * Labels: Create, Read All
