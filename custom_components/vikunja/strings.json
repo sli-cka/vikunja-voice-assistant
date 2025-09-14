@@ -19,6 +19,16 @@
           ,"response_include_due_date": "Include due date in response"
           ,"response_include_assignee": "Include assignee in response"
         }
+      },
+      "response_details": {
+        "title": "Detailed response options",
+        "description": "Select which elements to include in the spoken confirmation when detailed responses are enabled.",
+        "data": {
+          "response_include_project": "Include project name",
+          "response_include_labels": "Include labels",
+          "response_include_due_date": "Include due date",
+          "response_include_assignee": "Include assignee"
+        }
       }
     },
     "error": {

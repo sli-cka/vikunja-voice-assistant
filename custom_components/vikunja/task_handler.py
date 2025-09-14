@@ -5,6 +5,7 @@ import asyncio
 import json
 import logging
 from typing import Any, Dict, List, Tuple
+from datetime import datetime, timezone
 
 from .const import (
     DOMAIN,
@@ -25,6 +26,50 @@ from .vikunja_api import VikunjaAPI
 from .openai_api import OpenAIAPI
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _friendly_due_phrase(iso_dt: str) -> str:
+    try:
+        # Normalize typical formats: ensure 'Z' removed for parsing if present
+        cleaned = iso_dt.rstrip('Z')
+        # Try full datetime first
+        dt = None
+        for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M", "%Y-%m-%d"):
+            try:
+                dt = datetime.strptime(cleaned, fmt)
+                break
+            except ValueError:
+                continue
+        if dt is None:
+            return iso_dt  # fallback raw
+        now = datetime.now()
+        delta_days = (dt.date() - now.date()).days
+        if delta_days == 0:
+            return "today"
+        if delta_days == 1:
+            return "tomorrow"
+        if 2 <= delta_days <= 6:
+            return f"in {delta_days} days"
+        if 7 <= delta_days <= 13:
+            return "next week"
+        if 14 <= delta_days <= 27:
+            weeks = round(delta_days / 7)
+            if weeks <= 4:
+                return f"in {weeks} weeks"
+        if 28 <= delta_days <= 60:
+            return "next month" if delta_days < 45 else "in 2 months"
+        if delta_days > 60 and delta_days < 365:
+            months = round(delta_days / 30)
+            return f"in {months} months"
+        if delta_days >= 365:
+            years = round(delta_days / 365)
+            return f"in {years} year{'s' if years != 1 else ''}"
+        if delta_days < 0:
+            # Past date fallback
+            return dt.strftime("%Y-%m-%d")
+        return dt.strftime("%Y-%m-%d")
+    except Exception:  # noqa: BLE001
+        return iso_dt
 
 
 async def process_task(hass, task_description: str, user_cache_users: List[Dict[str, Any]]):
@@ -151,9 +196,14 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
             if include_project:
                 try:
                     project_id = task_data.get("project_id")
+                    if not project_id:
+                        # Fallback if missing: assume default project id 1 or first project
+                        if projects:
+                            first = next((p for p in projects if isinstance(p, dict) and p.get("id")), None)
+                            project_id = first.get("id") if first else 1
+                    proj_lookup = {p.get("id"): p.get("title") for p in (projects or []) if isinstance(p, dict)}
                     if project_id:
-                        proj_lookup = {p.get("id"): p.get("title") for p in (projects or []) if isinstance(p, dict)}
-                        project_name = proj_lookup.get(project_id, f"Project {project_id}")
+                        project_name = proj_lookup.get(project_id) or f"Project {project_id}"
                         details_parts.append(f"project '{project_name}'")
                 except Exception:  # noqa: BLE001
                     pass
@@ -173,7 +223,8 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
             if include_due_date:
                 due_date = task_data.get("due_date")
                 if due_date:
-                    details_parts.append(f"due {due_date}")
+                    friendly = _friendly_due_phrase(due_date)
+                    details_parts.append(f"due {friendly}")
             if include_assignee and enable_user_assignment:
                 assignee_username_or_name = assignee_username_or_name if 'assignee_username_or_name' in locals() else None
                 if assignee_username_or_name:

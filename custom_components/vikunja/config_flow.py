@@ -165,7 +165,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
         )
 
     async def async_step_response_details(self, user_input=None):
-        """Second step to configure which details appear in responses."""
+        """One more step: What do you want included in the responses?"""
         if not self._basic_input:
             # Safety fallback: go back to first step
             return await self.async_step_user()
