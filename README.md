@@ -16,7 +16,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 ## ✨ Features
 
 * **Natural voice commands**: *“Create a task…”* or *“Add a task…”* 🗣️
-* Supports **project, due date, priority, labels, recurrence** out of the box 📦
+* Supports **project, due date, priority, labels, recurrence** and more 📅
 * Optional: speech correction, auto voice label, default due date, user assignment
 
 ---
@@ -59,19 +59,21 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
      📹 [Video Guide](https://github.com/user-attachments/assets/1aae42cb-ba0b-4ebb-951c-bd017da45f71)
 <br>
-6. ✅ Done – Just say **“create a task”**!
+
+6. ✅ Done – Just say **"create a task"** !
 
 ---
 
 ## 🔧 Configuration Options
 
-| Option                   | Purpose                                       | Example/Default |
-| ------------------------ | --------------------------------------------- | --------------- |
-| Speech correction        | Fix STT mistakes before parsing               | On              |
-| Auto `voice` label       | Attaches/creates a `voice` label              | Enabled         |
-| Default due date         | Used if no date & no project given            | tomorrow        |
-| Default due date choices | none, tomorrow, end\_of\_week, end\_of\_month | tomorrow        |
-| Enable user assignment   | Assign tasks to existing users                | Disabled         |
+| Option                           | Purpose                                                      | Example/Default |
+| -------------------------------- | ------------------------------------------------------------ | --------------- |
+| Speech correction                | Fix STT mistakes before parsing                              | On              |
+| Auto `voice` label               | Attaches/creates a `voice` label                             | Enabled         |
+| Default due date                 | Used if no date & no project given                           | tomorrow        |
+| Default due date choices         | none, tomorrow, end\_of\_week, end\_of\_month                | tomorrow        |
+| Enable user assignment           | Assign tasks to existing users                               | Disabled        |
+| Detailed response                | Speak back richer confirmation details                       | Off             |
 
 ---
 
