@@ -203,11 +203,14 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
                             if not isinstance(p, dict):
                                 continue
                             pid = p.get("id")
-                            if pid is None:
+                            if not isinstance(pid, int):
                                 continue
-                            pname = p.get("name") or ""
+                            pname = p.get("name")
                             if isinstance(pname, str):
-                                proj_lookup[pid] = pname.strip()
+                                proj_lookup[pid] = pname
+                        project_name = proj_lookup.get(project_id)
+                        _LOGGER.error("project_id", project_id, "-> project_name", project_name, "lookup", proj_lookup, "projects", projects)
+                        details_parts.append(f"project '{project_name}'")
                 except Exception:  # noqa: BLE001
                     pass
             if include_labels:
