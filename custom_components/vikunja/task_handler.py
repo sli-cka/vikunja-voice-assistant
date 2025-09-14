@@ -195,7 +195,9 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
             details_parts = []
             if include_project:
                 try:
+
                     project_id = task_data.get("project_id")
+                    _LOGGER.error("project_id", project_id)
                     if project_id and project_id != 1:
                         # Build lookup supporting both 'title' and 'name' keys
                         proj_lookup: Dict[int, str] = {}
