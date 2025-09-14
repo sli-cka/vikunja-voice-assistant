@@ -193,13 +193,13 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
                 return True, f"Successfully added task: {task_title}", task_title
 
             details_parts = []
+            _LOGGER.error("include_project", include_project, "project_id", task_data)
             if include_project:
                 try:
-                    _LOGGER.error("include_project", include_project, "project_id", task_data)
                     project_id = task_data.get("project_id", 1)
                     
                     if project_id and project_id != 1:
-                        # Build lookup supporting both 'title' and 'name' keys
+                        
                         proj_lookup: Dict[int, str] = {}
                         for p in (projects or []):
                             if not isinstance(p, dict):
@@ -207,7 +207,7 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
                             pid = p.get("id")
                             if not isinstance(pid, int):
                                 continue
-                            pname = p.get("name")
+                            pname = p.get("name") or p.get("title")
                             if isinstance(pname, str):
                                 proj_lookup[pid] = pname
                         project_name = proj_lookup.get(project_id)
