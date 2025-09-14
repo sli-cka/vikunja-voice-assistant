@@ -8,7 +8,7 @@
           "vikunja_url": "Vikunja base URL (e.g. https://vikunja.example.com)",
           "vikunja_api_key": "Vikunja API Token",
           "openai_api_key": "OpenAI API Key",
-          "voice_correction": "Enable speech recognition text correction (highly recommended for all current speech-to-text models)",
+          "voice_correction": "Enable speech recognition text correction (recommended)",
           "default_due_date": "Default due date if none specified (applies only when no project is mentioned)",
           "auto_voice_label": "Automatically add a 'voice' label to tasks created via this integration",
           "enable_user_assignment": "Enable user assignment"

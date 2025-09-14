@@ -32,6 +32,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
     """Handle a config flow for the Vikunja integration."""
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
+    _basic_input: dict | None = None
 
     async def _test_openai_connection(self, api_key: str) -> bool:
         headers = {
@@ -77,7 +78,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
             )
         )
 
-        # Default values to show in the form
+        # Base schema (no include toggles yet)
         data_schema = vol.Schema(
             {
                 vol.Required(CONF_VIKUNJA_URL, default=""): str,
@@ -88,10 +89,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
                 vol.Required(CONF_ENABLE_USER_ASSIGN, default=False): cv.boolean,
                 vol.Required(CONF_DUE_DATE, default="tomorrow"): due_date_selector,
                 vol.Required(CONF_DETAILED_RESPONSE, default=False): cv.boolean,
-                vol.Optional(CONF_RESPONSE_INCLUDE_PROJECT, default=True): cv.boolean,
-                vol.Optional(CONF_RESPONSE_INCLUDE_LABELS, default=True): cv.boolean,
-                vol.Optional(CONF_RESPONSE_INCLUDE_DUE_DATE, default=True): cv.boolean,
-                vol.Optional(CONF_RESPONSE_INCLUDE_ASSIGNEE, default=True): cv.boolean,
             }
         )
 
@@ -140,10 +137,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
                     await self.async_set_unique_id(f"vikunja_{api_url}")
                     self._abort_if_unique_id_configured()
 
-                    return self.async_create_entry(
-                        title=f"Vikunja ({api_url})",
-                        data=user_input
-                    )
+                    # If detailed response enabled, move to second step
+                    if user_input.get(CONF_DETAILED_RESPONSE):
+                        self._basic_input = user_input
+                        return await self.async_step_response_details()
+                    # Otherwise finish now
+                    return self.async_create_entry(title=f"Vikunja ({api_url})", data=user_input)
             
             # If there are errors, update the schema with the user's input as defaults
             data_schema = vol.Schema(
@@ -156,15 +155,40 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
                     vol.Required(CONF_ENABLE_USER_ASSIGN, default=user_input.get(CONF_ENABLE_USER_ASSIGN, False)): cv.boolean,
                     vol.Required(CONF_DUE_DATE, default=user_input.get(CONF_DUE_DATE, "tomorrow")): due_date_selector,
                     vol.Required(CONF_DETAILED_RESPONSE, default=user_input.get(CONF_DETAILED_RESPONSE, False)): cv.boolean,
-                    vol.Optional(CONF_RESPONSE_INCLUDE_PROJECT, default=user_input.get(CONF_RESPONSE_INCLUDE_PROJECT, True)): cv.boolean,
-                    vol.Optional(CONF_RESPONSE_INCLUDE_LABELS, default=user_input.get(CONF_RESPONSE_INCLUDE_LABELS, True)): cv.boolean,
-                    vol.Optional(CONF_RESPONSE_INCLUDE_DUE_DATE, default=user_input.get(CONF_RESPONSE_INCLUDE_DUE_DATE, True)): cv.boolean,
-                    vol.Optional(CONF_RESPONSE_INCLUDE_ASSIGNEE, default=user_input.get(CONF_RESPONSE_INCLUDE_ASSIGNEE, True)): cv.boolean,
                 }
             )
 
         return self.async_show_form(
             step_id="user",
             data_schema=data_schema,
+            errors=errors,
+        )
+
+    async def async_step_response_details(self, user_input=None):
+        """Second step to configure which details appear in responses."""
+        if not self._basic_input:
+            # Safety fallback: go back to first step
+            return await self.async_step_user()
+
+        errors = {}
+        schema = vol.Schema(
+            {
+                vol.Required(CONF_RESPONSE_INCLUDE_PROJECT, default=True): cv.boolean,
+                vol.Required(CONF_RESPONSE_INCLUDE_LABELS, default=True): cv.boolean,
+                vol.Required(CONF_RESPONSE_INCLUDE_DUE_DATE, default=True): cv.boolean,
+                vol.Required(CONF_RESPONSE_INCLUDE_ASSIGNEE, default=True): cv.boolean,
+            }
+        )
+
+        if user_input is not None:
+            final_data = {**self._basic_input, **user_input}
+            return self.async_create_entry(
+                title=f"Vikunja ({final_data.get(CONF_VIKUNJA_URL)})",
+                data=final_data,
+            )
+
+        return self.async_show_form(
+            step_id="response_details",
+            data_schema=schema,
             errors=errors,
         )
