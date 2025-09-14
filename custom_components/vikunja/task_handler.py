@@ -193,25 +193,28 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
                 return True, f"Successfully added task: {task_title}", task_title
 
             details_parts = []
-            
             if include_project:
                 try:
-                    project_id = task_data.get("project_id", 1)
-                    
+                    project_id = task_data.get("project_id")
+                    # Only show if there is an explicit project id and it's not the default (1)
                     if project_id and project_id != 1:
-                        
+                        # Build lookup supporting both 'title' and 'name' keys
                         proj_lookup: Dict[int, str] = {}
                         for p in (projects or []):
                             if not isinstance(p, dict):
                                 continue
                             pid = p.get("id")
-                            if not isinstance(pid, int):
+                            if pid is None:
                                 continue
-                            pname = p.get("name") or p.get("title")
+                            # Some APIs may return either 'title' or 'name'
+                            pname = p.get("title") or p.get("name") or ""
                             if isinstance(pname, str):
-                                proj_lookup[pid] = pname
+                                proj_lookup[pid] = pname.strip()
                         project_name = proj_lookup.get(project_id)
-                        details_parts.append(f"project '{project_name}'")
+                        if project_name:
+                            # Skip if project name is a generic bucket like 'other'
+                            if project_name.lower() not in {"other", "misc", "general"}:
+                                details_parts.append(f"project '{project_name}'")
                 except Exception:  # noqa: BLE001
                     pass
             if include_labels:
