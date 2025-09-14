@@ -193,7 +193,7 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
                 return True, f"Successfully added task: {task_title}", task_title
 
             details_parts = []
-            _LOGGER.error("include_project", include_project, "project_id", task_data.get("project_id",), "projects", projects)
+            _LOGGER.error("include_project", include_project, "project_id", task_data)
             if include_project:
                 try:
                     project_id = task_data.get("project_id")
