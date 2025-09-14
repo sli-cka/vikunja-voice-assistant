@@ -12,6 +12,11 @@
           "default_due_date": "Default due date if none specified (applies only when no project is mentioned)",
           "auto_voice_label": "Automatically add a 'voice' label to tasks created via this integration",
           "enable_user_assignment": "Enable user assignment"
+          ,"detailed_response": "Enable detailed spoken response"
+          ,"response_include_project": "Include project name in response"
+          ,"response_include_labels": "Include labels in response"
+          ,"response_include_due_date": "Include due date in response"
+          ,"response_include_assignee": "Include assignee in response"
         }
       }
     },

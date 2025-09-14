@@ -15,6 +15,11 @@ from .const import (
     CONF_VOICE_CORRECTION,
     CONF_AUTO_VOICE_LABEL,
     CONF_ENABLE_USER_ASSIGN,
+    CONF_DETAILED_RESPONSE,
+    CONF_RESPONSE_INCLUDE_PROJECT,
+    CONF_RESPONSE_INCLUDE_LABELS,
+    CONF_RESPONSE_INCLUDE_DUE_DATE,
+    CONF_RESPONSE_INCLUDE_ASSIGNEE,
 )
 from .vikunja_api import VikunjaAPI
 from .openai_api import OpenAIAPI
@@ -35,6 +40,11 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
     voice_correction = domain_config.get(CONF_VOICE_CORRECTION, True)
     auto_voice_label = domain_config.get(CONF_AUTO_VOICE_LABEL, True)
     enable_user_assignment = domain_config.get(CONF_ENABLE_USER_ASSIGN, False)
+    detailed_response = domain_config.get(CONF_DETAILED_RESPONSE, False)
+    include_project = domain_config.get(CONF_RESPONSE_INCLUDE_PROJECT, True)
+    include_labels = domain_config.get(CONF_RESPONSE_INCLUDE_LABELS, True)
+    include_due_date = domain_config.get(CONF_RESPONSE_INCLUDE_DUE_DATE, True)
+    include_assignee = domain_config.get(CONF_RESPONSE_INCLUDE_ASSIGNEE, True)
 
     if not all([vikunja_url, vikunja_api_key, openai_api_key]):
         _LOGGER.error("Missing configuration for Vikunja voice assistant")
@@ -133,7 +143,43 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
         if result:
             task_title = task_data.get("title")
             _LOGGER.info("Created Vikunja task '%s'", task_title)
-            return True, f"Successfully added task: {task_title}", task_title
+            # Build response message
+            if not detailed_response:
+                return True, f"Successfully added task: {task_title}", task_title
+
+            details_parts = []
+            if include_project:
+                try:
+                    project_id = task_data.get("project_id")
+                    if project_id:
+                        proj_lookup = {p.get("id"): p.get("title") for p in (projects or []) if isinstance(p, dict)}
+                        project_name = proj_lookup.get(project_id, f"Project {project_id}")
+                        details_parts.append(f"project '{project_name}'")
+                except Exception:  # noqa: BLE001
+                    pass
+            if include_labels:
+                try:
+                    label_ids_attached = extracted_label_ids.copy()
+                    if auto_voice_label and voice_label_id and voice_label_id in label_ids_attached:
+                        # Keep voice label but show at end
+                        pass
+                    if label_ids_attached:
+                        label_lookup = {l.get("id"): l.get("title") for l in (labels or []) if isinstance(l, dict)}
+                        label_names = [str(label_lookup.get(lid, str(lid))) for lid in label_ids_attached if lid in label_lookup or lid is not None]
+                        if label_names:
+                            details_parts.append("labels: " + ", ".join(label_names))
+                except Exception:  # noqa: BLE001
+                    pass
+            if include_due_date:
+                due_date = task_data.get("due_date")
+                if due_date:
+                    details_parts.append(f"due {due_date}")
+            if include_assignee and enable_user_assignment:
+                assignee_username_or_name = assignee_username_or_name if 'assignee_username_or_name' in locals() else None
+                if assignee_username_or_name:
+                    details_parts.append(f"assigned to {assignee_username_or_name}")
+            detail_suffix = " (" + "; ".join(details_parts) + ")" if details_parts else ""
+            return True, f"Successfully added task: {task_title}{detail_suffix}", task_title
         _LOGGER.error("Failed to create task in Vikunja")
         return False, "Sorry, I couldn't add the task to Vikunja. Please check your Vikunja connection.", ""
     except json.JSONDecodeError as err:  # noqa: BLE001

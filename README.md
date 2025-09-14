@@ -16,7 +16,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 ## ✨ Features
 
 * **Natural voice commands**: *“Create a task…”* or *“Add a task…”* 🗣️
-* Supports **project, due date, priority, labels, recurrence** out of the box 📦
+* Supports **project, due date, priority, labels, recurrence** and more 📅
 * Optional: speech correction, auto voice label, default due date, user assignment
 
 ---
@@ -65,13 +65,34 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
 ## 🔧 Configuration Options
 
-| Option                   | Purpose                                       | Example/Default |
-| ------------------------ | --------------------------------------------- | --------------- |
-| Speech correction        | Fix STT mistakes before parsing               | On              |
-| Auto `voice` label       | Attaches/creates a `voice` label              | Enabled         |
-| Default due date         | Used if no date & no project given            | tomorrow        |
-| Default due date choices | none, tomorrow, end\_of\_week, end\_of\_month | tomorrow        |
-| Enable user assignment   | Assign tasks to existing users                | Disabled         |
+| Option                           | Purpose                                                      | Example/Default |
+| -------------------------------- | ------------------------------------------------------------ | --------------- |
+| Speech correction                | Fix STT mistakes before parsing                              | On              |
+| Auto `voice` label               | Attaches/creates a `voice` label                             | Enabled         |
+| Default due date                 | Used if no date & no project given                           | tomorrow        |
+| Default due date choices         | none, tomorrow, end\_of\_week, end\_of\_month                | tomorrow        |
+| Enable user assignment           | Assign tasks to existing users                               | Disabled        |
+| Detailed response (new)          | Speak back richer confirmation details                       | Off             |
+| Include project in response      | If detailed response enabled, include project name           | On              |
+| Include labels in response       | If detailed response enabled, include label names            | On              |
+| Include due date in response     | If detailed response enabled, include ISO due date           | On              |
+| Include assignee in response     | If detailed response + assignment, include assignee username | On              |
+
+### Detailed Response Behavior
+
+When disabled (default) the assistant replies with a short confirmation:
+
+`"Successfully added task: Buy milk"`
+
+When enabled, extra context is added based on the toggles you selected, for example:
+
+`"Successfully added task: Buy milk (project 'Groceries'; labels: errands, dairy; due 2025-09-15T12:00:00Z)"`
+
+If user assignment is enabled and detected:
+
+`"Successfully added task: Prepare slides (project 'Work'; due 2025-09-20T17:00:00Z; assigned to william)"`
+
+You can fine‑tune exactly which elements to include without turning off the whole feature.
 
 ---
 

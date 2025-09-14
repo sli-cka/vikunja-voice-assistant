@@ -17,6 +17,11 @@ from .const import (
     CONF_AUTO_VOICE_LABEL,
     CONF_ENABLE_USER_ASSIGN,
     DUE_DATE_OPTION_LABELS,  # added
+    CONF_DETAILED_RESPONSE,
+    CONF_RESPONSE_INCLUDE_PROJECT,
+    CONF_RESPONSE_INCLUDE_LABELS,
+    CONF_RESPONSE_INCLUDE_DUE_DATE,
+    CONF_RESPONSE_INCLUDE_ASSIGNEE,
 )
 from .vikunja_api import VikunjaAPI
 from .user_cache import build_initial_user_cache_sync
@@ -82,6 +87,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
                 vol.Required(CONF_AUTO_VOICE_LABEL, default=True): cv.boolean,
                 vol.Required(CONF_ENABLE_USER_ASSIGN, default=False): cv.boolean,
                 vol.Required(CONF_DUE_DATE, default="tomorrow"): due_date_selector,
+                vol.Required(CONF_DETAILED_RESPONSE, default=False): cv.boolean,
+                vol.Optional(CONF_RESPONSE_INCLUDE_PROJECT, default=True): cv.boolean,
+                vol.Optional(CONF_RESPONSE_INCLUDE_LABELS, default=True): cv.boolean,
+                vol.Optional(CONF_RESPONSE_INCLUDE_DUE_DATE, default=True): cv.boolean,
+                vol.Optional(CONF_RESPONSE_INCLUDE_ASSIGNEE, default=True): cv.boolean,
             }
         )
 
@@ -145,6 +155,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
                     vol.Required(CONF_AUTO_VOICE_LABEL, default=user_input.get(CONF_AUTO_VOICE_LABEL, True)): cv.boolean,
                     vol.Required(CONF_ENABLE_USER_ASSIGN, default=user_input.get(CONF_ENABLE_USER_ASSIGN, False)): cv.boolean,
                     vol.Required(CONF_DUE_DATE, default=user_input.get(CONF_DUE_DATE, "tomorrow")): due_date_selector,
+                    vol.Required(CONF_DETAILED_RESPONSE, default=user_input.get(CONF_DETAILED_RESPONSE, False)): cv.boolean,
+                    vol.Optional(CONF_RESPONSE_INCLUDE_PROJECT, default=user_input.get(CONF_RESPONSE_INCLUDE_PROJECT, True)): cv.boolean,
+                    vol.Optional(CONF_RESPONSE_INCLUDE_LABELS, default=user_input.get(CONF_RESPONSE_INCLUDE_LABELS, True)): cv.boolean,
+                    vol.Optional(CONF_RESPONSE_INCLUDE_DUE_DATE, default=user_input.get(CONF_RESPONSE_INCLUDE_DUE_DATE, True)): cv.boolean,
+                    vol.Optional(CONF_RESPONSE_INCLUDE_ASSIGNEE, default=user_input.get(CONF_RESPONSE_INCLUDE_ASSIGNEE, True)): cv.boolean,
                 }
             )
 
