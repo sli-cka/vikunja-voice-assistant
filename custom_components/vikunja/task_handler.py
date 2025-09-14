@@ -195,6 +195,7 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
             details_parts = []
             if include_project:
                 try:
+                    _LOGGER.error("include_project", include_project, "project_id", task_data)
                     project_id = task_data.get("project_id", 1)
                     
                     if project_id and project_id != 1:
