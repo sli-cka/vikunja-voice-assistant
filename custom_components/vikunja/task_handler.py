@@ -193,10 +193,9 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
                 return True, f"Successfully added task: {task_title}", task_title
 
             details_parts = []
-            _LOGGER.error("include_project", include_project, "project_id", task_data)
             if include_project:
                 try:
-                    project_id = task_data.get("project_id")
+                    project_id = task_data.get("project_id", 1)
                     
                     if project_id and project_id != 1:
                         # Build lookup supporting both 'title' and 'name' keys
@@ -211,7 +210,6 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
                             if isinstance(pname, str):
                                 proj_lookup[pid] = pname
                         project_name = proj_lookup.get(project_id)
-                        _LOGGER.error("project_id", project_id, "-> project_name", project_name, "lookup", proj_lookup, "projects", projects)
                         details_parts.append(f"project '{project_name}'")
                 except Exception:  # noqa: BLE001
                     pass
