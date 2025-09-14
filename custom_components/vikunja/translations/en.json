@@ -21,7 +21,7 @@
       },
       "response_details": {
         "title": "Detailed response options",
-        "description": "Select which elements to include in the spoken confirmation when detailed responses are enabled.",
+        "description": "Select which elements to include in the spoken confirmation",
         "data": {
           "response_include_project": "Include project name",
           "response_include_labels": "Include labels",

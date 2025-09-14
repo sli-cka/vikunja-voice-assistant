@@ -196,15 +196,18 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
             if include_project:
                 try:
                     project_id = task_data.get("project_id")
-                    if not project_id:
-                        # Fallback if missing: assume default project id 1 or first project
-                        if projects:
-                            first = next((p for p in projects if isinstance(p, dict) and p.get("id")), None)
-                            project_id = first.get("id") if first else 1
-                    proj_lookup = {p.get("id"): p.get("title") for p in (projects or []) if isinstance(p, dict)}
-                    if project_id:
-                        project_name = proj_lookup.get(project_id) or f"Project {project_id}"
-                        details_parts.append(f"project '{project_name}'")
+                    if project_id and project_id != 1:
+                        # Build lookup supporting both 'title' and 'name' keys
+                        proj_lookup: Dict[int, str] = {}
+                        for p in (projects or []):
+                            if not isinstance(p, dict):
+                                continue
+                            pid = p.get("id")
+                            if pid is None:
+                                continue
+                            pname = p.get("name") or ""
+                            if isinstance(pname, str):
+                                proj_lookup[pid] = pname.strip()
                 except Exception:  # noqa: BLE001
                     pass
             if include_labels:
