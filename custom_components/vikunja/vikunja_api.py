@@ -86,7 +86,6 @@ class VikunjaAPI:
     def add_task(self, task_data):
         """Create a new task (requires title, uses project_id then removes it)."""
         project_id = task_data.get("project_id", 1)
-        task_data.pop("project_id", None)
         if not task_data.get("title"):
             _LOGGER.error("Cannot create task: missing 'title'")
             return None
