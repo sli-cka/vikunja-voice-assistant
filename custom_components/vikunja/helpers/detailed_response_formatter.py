@@ -37,13 +37,6 @@ def friendly_due_phrase(iso_dt: str) -> str:
         return iso_dt
 
 
-# Mapping for typical repeat intervals (seconds)
-_REPEAT_MAPPING = {
-    86400: "daily",
-    604800: "weekly",
-    2592000: "monthly",  # approximate 30d
-    31536000: "yearly",  # 365d
-}
 
 
 def friendly_repeat_phrase(repeat_after_seconds: int) -> Optional[str]:
@@ -53,8 +46,6 @@ def friendly_repeat_phrase(repeat_after_seconds: int) -> Optional[str]:
     if repeat_after_seconds % 86400 != 0:
         return f"repeats every {repeat_after_seconds} seconds"
     days = repeat_after_seconds // 86400
-    # Determine base label if canonical
-    base = _REPEAT_MAPPING.get(repeat_after_seconds)
     if 1 <= days < 365:
         phrase = f"repeats in {days} day{'s' if days != 1 else ''}"
     else:
@@ -64,9 +55,6 @@ def friendly_repeat_phrase(repeat_after_seconds: int) -> Optional[str]:
             phrase = f"repeats in {years} {year_word} ({days} days)"
         else:  # safety fallback though logically unreachable due to earlier branch
             phrase = f"repeats in {days} days"
-    if base:
-        # Add canonical label only if not redundant (avoid duplicating 'daily' when days==1?)
-        return f"{phrase} ({base})"
     return phrase
 
 
@@ -121,11 +109,20 @@ def build_detailed_response(
     if enable_user_assignment and assignee_username_or_name:
         details_parts.append(f"assigned to {assignee_username_or_name}")
 
-    # Priority
+    # Priority (map 1-5 to words)
     try:
         priority = task_data.get("priority")
-        if isinstance(priority, int) and 1 <= priority <= 5:
-            details_parts.append(f"priority {priority}")
+        if isinstance(priority, int):
+            priority_map = {
+                1: "low",
+                2: "medium",
+                3: "high",
+                4: "urgent",
+                5: "do now",
+            }
+            label = priority_map.get(priority)
+            if label:
+                details_parts.append(f"priority {label}")
     except Exception:  # noqa: BLE001
         pass
 
