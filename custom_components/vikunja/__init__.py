@@ -14,10 +14,6 @@ from .const import (
     CONF_AUTO_VOICE_LABEL,
     CONF_ENABLE_USER_ASSIGN,
     CONF_DETAILED_RESPONSE,
-    CONF_RESPONSE_INCLUDE_PROJECT,
-    CONF_RESPONSE_INCLUDE_LABELS,
-    CONF_RESPONSE_INCLUDE_DUE_DATE,
-    CONF_RESPONSE_INCLUDE_ASSIGNEE,
 )
 from .services import setup_services
 from .user_cache import VikunjaUserCacheManager
@@ -67,11 +63,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         CONF_VOICE_CORRECTION: entry.data[CONF_VOICE_CORRECTION],
         CONF_AUTO_VOICE_LABEL: entry.data.get(CONF_AUTO_VOICE_LABEL, True),
         CONF_ENABLE_USER_ASSIGN: entry.data.get(CONF_ENABLE_USER_ASSIGN, False),
-        CONF_DETAILED_RESPONSE: entry.data.get(CONF_DETAILED_RESPONSE, False),
-        CONF_RESPONSE_INCLUDE_PROJECT: entry.data.get(CONF_RESPONSE_INCLUDE_PROJECT, True),
-        CONF_RESPONSE_INCLUDE_LABELS: entry.data.get(CONF_RESPONSE_INCLUDE_LABELS, True),
-        CONF_RESPONSE_INCLUDE_DUE_DATE: entry.data.get(CONF_RESPONSE_INCLUDE_DUE_DATE, True),
-        CONF_RESPONSE_INCLUDE_ASSIGNEE: entry.data.get(CONF_RESPONSE_INCLUDE_ASSIGNEE, True),
+    CONF_DETAILED_RESPONSE: entry.data.get(CONF_DETAILED_RESPONSE, False),
     }
 
     # User cache manager (optional feature)

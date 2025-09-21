@@ -11,22 +11,8 @@
           "voice_correction": "Enable speech recognition text correction (recommended)",
           "default_due_date": "Default due date if none specified (applies only when no project is mentioned)",
           "auto_voice_label": "Automatically add a 'voice' label to tasks created via this integration",
-          "enable_user_assignment": "Enable user assignment"
-          ,"detailed_response": "Enable detailed spoken response"
-          ,"response_include_project": "Include project name in response"
-          ,"response_include_labels": "Include labels in response"
-          ,"response_include_due_date": "Include due date in response"
-          ,"response_include_assignee": "Include assignee in response"
-        }
-      },
-      "response_details": {
-        "title": "Detailed response options",
-        "description": "Select which elements to include in the spoken confirmation",
-        "data": {
-          "response_include_project": "Include project name",
-          "response_include_labels": "Include labels",
-          "response_include_due_date": "Include due date",
-          "response_include_assignee": "Include assignee"
+          "enable_user_assignment": "Enable user assignment",
+          "detailed_response": "Enable detailed spoken response (includes project, labels, due date, assignee, priority & repeat info)"
         }
       }
     },
