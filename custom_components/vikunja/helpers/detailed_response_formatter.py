@@ -77,8 +77,6 @@ def build_detailed_response(
     projects: List[Dict[str, Any]] | None,
     labels: List[Dict[str, Any]] | None,
     extracted_label_ids: List[int],
-    auto_voice_label: bool,
-    voice_label_id: Optional[int],
     assignee_username_or_name: Optional[str],
     enable_user_assignment: bool,
 ) -> str:

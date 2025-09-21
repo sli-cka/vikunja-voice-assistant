@@ -19,7 +19,7 @@ from .const import (
     DUE_DATE_OPTION_LABELS,
     CONF_DETAILED_RESPONSE,
 )
-from .vikunja_api import VikunjaAPI
+from .api.vikunja_api import VikunjaAPI
 from .user_cache import build_initial_user_cache_sync
 
 _LOGGER = logging.getLogger(__name__)

@@ -1,15 +1,9 @@
-"""Core task processing logic extracted from __init__ for clarity.
-
-Refactored: detailed response construction & friendly date/repeat logic moved to
-`response_formatter` module to simplify this file.
-"""
 from __future__ import annotations
 
 import asyncio
 import json
 import logging
-from typing import Any, Dict, List, Tuple
-from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 from .const import (
     DOMAIN,
@@ -22,9 +16,9 @@ from .const import (
     CONF_ENABLE_USER_ASSIGN,
     CONF_DETAILED_RESPONSE,
 )
-from .vikunja_api import VikunjaAPI
-from .openai_api import OpenAIAPI
-from .detailed_response_formatter import build_detailed_response, friendly_due_phrase
+from .api.vikunja_api import VikunjaAPI
+from .api.openai_api import OpenAIAPI
+from .helpers.detailed_response_formatter import build_detailed_response, friendly_due_phrase
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -156,8 +150,6 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
                 projects=projects,
                 labels=labels,
                 extracted_label_ids=extracted_label_ids,
-                auto_voice_label=auto_voice_label,
-                voice_label_id=voice_label_id,
                 assignee_username_or_name=assignee_username_or_name,
                 enable_user_assignment=enable_user_assignment,
             )

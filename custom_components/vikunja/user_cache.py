@@ -1,10 +1,3 @@
-"""User cache management for Vikunja integration.
-
-Encapsulates loading/saving a lightweight cache of users and refreshing it
-periodically by performing a limited set of search queries (vowels) against
-the Vikunja API. This is intentionally conservative to reduce API load while
-still discovering most users whose names contain at least one vowel.
-"""
 from __future__ import annotations
 
 import json
@@ -22,7 +15,7 @@ from .const import (
     CONF_VIKUNJA_API_KEY,
     DOMAIN,
 )
-from .vikunja_api import VikunjaAPI
+from .api.vikunja_api import VikunjaAPI
 
 _LOGGER = logging.getLogger(__name__)
 
