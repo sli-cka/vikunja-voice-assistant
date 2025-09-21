@@ -1,11 +1,9 @@
-"""Core task processing logic extracted from __init__ for clarity."""
 from __future__ import annotations
 
 import asyncio
 import json
 import logging
-from typing import Any, Dict, List, Tuple
-from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 from .const import (
     DOMAIN,
@@ -17,59 +15,14 @@ from .const import (
     CONF_AUTO_VOICE_LABEL,
     CONF_ENABLE_USER_ASSIGN,
     CONF_DETAILED_RESPONSE,
-    CONF_RESPONSE_INCLUDE_PROJECT,
-    CONF_RESPONSE_INCLUDE_LABELS,
-    CONF_RESPONSE_INCLUDE_DUE_DATE,
-    CONF_RESPONSE_INCLUDE_ASSIGNEE,
 )
-from .vikunja_api import VikunjaAPI
-from .openai_api import OpenAIAPI
+from .api.vikunja_api import VikunjaAPI
+from .api.openai_api import OpenAIAPI
+from .helpers.detailed_response_formatter import build_detailed_response, friendly_due_phrase
 
 _LOGGER = logging.getLogger(__name__)
 
-
-def _friendly_due_phrase(iso_dt: str) -> str:
-    try:
-        # Normalize typical formats: ensure 'Z' removed for parsing if present
-        cleaned = iso_dt.rstrip('Z')
-        # Try full datetime first
-        dt = None
-        for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M", "%Y-%m-%d"):
-            try:
-                dt = datetime.strptime(cleaned, fmt)
-                break
-            except ValueError:
-                continue
-        if dt is None:
-            return iso_dt  # fallback raw
-        now = datetime.now()
-        delta_days = (dt.date() - now.date()).days
-        if delta_days == 0:
-            return "today"
-        if delta_days == 1:
-            return "tomorrow"
-        if 2 <= delta_days <= 6:
-            return f"in {delta_days} days"
-        if 7 <= delta_days <= 13:
-            return "next week"
-        if 14 <= delta_days <= 27:
-            weeks = round(delta_days / 7)
-            if weeks <= 4:
-                return f"in {weeks} weeks"
-        if 28 <= delta_days <= 60:
-            return "next month" if delta_days < 45 else "in 2 months"
-        if delta_days > 60 and delta_days < 365:
-            months = round(delta_days / 30)
-            return f"in {months} months"
-        if delta_days >= 365:
-            years = round(delta_days / 365)
-            return f"in {years} year{'s' if years != 1 else ''}"
-        if delta_days < 0:
-            # Past date fallback
-            return dt.strftime("%Y-%m-%d")
-        return dt.strftime("%Y-%m-%d")
-    except Exception:  # noqa: BLE001
-        return iso_dt
+## NOTE: `_friendly_due_phrase` removed; using `friendly_due_phrase` from response_formatter.
 
 
 async def process_task(hass, task_description: str, user_cache_users: List[Dict[str, Any]]):
@@ -86,10 +39,7 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
     auto_voice_label = domain_config.get(CONF_AUTO_VOICE_LABEL, True)
     enable_user_assignment = domain_config.get(CONF_ENABLE_USER_ASSIGN, False)
     detailed_response = domain_config.get(CONF_DETAILED_RESPONSE, False)
-    include_project = domain_config.get(CONF_RESPONSE_INCLUDE_PROJECT, True)
-    include_labels = domain_config.get(CONF_RESPONSE_INCLUDE_LABELS, True)
-    include_due_date = domain_config.get(CONF_RESPONSE_INCLUDE_DUE_DATE, True)
-    include_assignee = domain_config.get(CONF_RESPONSE_INCLUDE_ASSIGNEE, True)
+    # Granular include flags removed; when detailed_response is true we include all available metadata.
 
     if not all([vikunja_url, vikunja_api_key, openai_api_key]):
         _LOGGER.error("Missing configuration for Vikunja voice assistant")
@@ -192,55 +142,18 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
             if not detailed_response:
                 return True, f"Successfully added task: {task_title}", task_title
 
-            details_parts = []
-            if include_project:
-                try:
-                    project_id = task_data.get("project_id")
-                    # Only show if there is an explicit project id and it's not the default (1)
-                    if project_id and project_id != 1:
-                        # Build lookup supporting both 'title' and 'name' keys
-                        proj_lookup: Dict[int, str] = {}
-                        for p in (projects or []):
-                            if not isinstance(p, dict):
-                                continue
-                            pid = p.get("id")
-                            if pid is None:
-                                continue
-                            # Some APIs may return either 'title' or 'name'
-                            pname = p.get("title") or p.get("name") or ""
-                            if isinstance(pname, str):
-                                proj_lookup[pid] = pname.strip()
-                        project_name = proj_lookup.get(project_id)
-                        if project_name:
-                            # Skip if project name is a generic bucket like 'other'
-                            if project_name.lower() not in {"other", "misc", "general"}:
-                                details_parts.append(f"project '{project_name}'")
-                except Exception:  # noqa: BLE001
-                    pass
-            if include_labels:
-                try:
-                    label_ids_attached = extracted_label_ids.copy()
-                    if auto_voice_label and voice_label_id and voice_label_id in label_ids_attached:
-                        # Keep voice label but show at end
-                        pass
-                    if label_ids_attached:
-                        label_lookup = {l.get("id"): l.get("title") for l in (labels or []) if isinstance(l, dict)}
-                        label_names = [str(label_lookup.get(lid, str(lid))) for lid in label_ids_attached if lid in label_lookup or lid is not None]
-                        if label_names:
-                            details_parts.append("labels: " + ", ".join(label_names))
-                except Exception:  # noqa: BLE001
-                    pass
-            if include_due_date:
-                due_date = task_data.get("due_date")
-                if due_date:
-                    friendly = _friendly_due_phrase(due_date)
-                    details_parts.append(f"due {friendly}")
-            if include_assignee and enable_user_assignment:
-                assignee_username_or_name = assignee_username_or_name if 'assignee_username_or_name' in locals() else None
-                if assignee_username_or_name:
-                    details_parts.append(f"assigned to {assignee_username_or_name}")
-            detail_suffix = " (" + "; ".join(details_parts) + ")" if details_parts else ""
-            return True, f"Successfully added task: {task_title}{detail_suffix}", task_title
+            # Build detailed response via helper module
+            safe_task_title = task_title or ""
+            detailed_message = build_detailed_response(
+                task_title=safe_task_title,
+                task_data=task_data,
+                projects=projects,
+                labels=labels,
+                extracted_label_ids=extracted_label_ids,
+                assignee_username_or_name=assignee_username_or_name,
+                enable_user_assignment=enable_user_assignment,
+            )
+            return True, detailed_message, safe_task_title
         _LOGGER.error("Failed to create task in Vikunja")
         return False, "Sorry, I couldn't add the task to Vikunja. Please check your Vikunja connection.", ""
     except json.JSONDecodeError as err:  # noqa: BLE001

@@ -4,7 +4,7 @@ import voluptuous as vol
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import config_validation as cv
 from .const import DOMAIN, CONF_VIKUNJA_URL, CONF_VIKUNJA_API_KEY
-from .vikunja_api import VikunjaAPI
+from .api.vikunja_api import VikunjaAPI
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -23,7 +23,4 @@ DUE_DATE_OPTION_LABELS = {
 
 # Response detail configuration
 CONF_DETAILED_RESPONSE = "detailed_response"
-CONF_RESPONSE_INCLUDE_PROJECT = "response_include_project"
-CONF_RESPONSE_INCLUDE_LABELS = "response_include_labels"
-CONF_RESPONSE_INCLUDE_DUE_DATE = "response_include_due_date"
-CONF_RESPONSE_INCLUDE_ASSIGNEE = "response_include_assignee"
+"""When true, detailed voice responses will include project, labels, due date, assignee, priority and repeat info automatically."""

@@ -73,7 +73,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 | Default due date                 | Used if no date & no project given                           | tomorrow        |
 | Default due date choices         | none, tomorrow, end\_of\_week, end\_of\_month                | tomorrow        |
 | Enable user assignment           | Assign tasks to existing users                               | Disabled        |
-| Detailed response                | Speak back richer confirmation details                       | Off             |
+| Detailed response                | Speak back project, labels, due date, assignee, priority & repeat info | Off             |
 
 ---
 
@@ -92,6 +92,7 @@ tool_args: {
 }
 ```
 *This will allow your voice assistant to create tasks even if the keywords were missing.*
+
 
 📹 [Video Guide](https://github.com/user-attachments/assets/0440bc71-b748-4118-8afd-6f0f10b22003)
 

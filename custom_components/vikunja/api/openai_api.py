@@ -2,7 +2,7 @@ import logging
 import json
 import requests
 
-from .prompt_builder import build_task_creation_messages
+from ..helpers.prompt_builder import build_task_creation_messages
 
 _LOGGER = logging.getLogger(__name__)
 

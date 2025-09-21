@@ -7,23 +7,19 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import selector  # added
 
 from .const import (
-    DOMAIN, 
-    CONF_OPENAI_API_KEY, 
+    DOMAIN,
+    CONF_OPENAI_API_KEY,
     CONF_VIKUNJA_URL,
     CONF_VIKUNJA_API_KEY,
-    CONF_DUE_DATE,  
+    CONF_DUE_DATE,
     DUE_DATE_OPTIONS,
-    CONF_VOICE_CORRECTION, 
+    CONF_VOICE_CORRECTION,
     CONF_AUTO_VOICE_LABEL,
     CONF_ENABLE_USER_ASSIGN,
-    DUE_DATE_OPTION_LABELS,  # added
+    DUE_DATE_OPTION_LABELS,
     CONF_DETAILED_RESPONSE,
-    CONF_RESPONSE_INCLUDE_PROJECT,
-    CONF_RESPONSE_INCLUDE_LABELS,
-    CONF_RESPONSE_INCLUDE_DUE_DATE,
-    CONF_RESPONSE_INCLUDE_ASSIGNEE,
 )
-from .vikunja_api import VikunjaAPI
+from .api.vikunja_api import VikunjaAPI
 from .user_cache import build_initial_user_cache_sync
 
 _LOGGER = logging.getLogger(__name__)
@@ -137,11 +133,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
                     await self.async_set_unique_id(f"vikunja_{api_url}")
                     self._abort_if_unique_id_configured()
 
-                    # If detailed response enabled, move to second step
-                    if user_input.get(CONF_DETAILED_RESPONSE):
-                        self._basic_input = user_input
-                        return await self.async_step_response_details()
-                    # Otherwise finish now
+                    # Single step flow now – if detailed response selected we just store the flag.
                     return self.async_create_entry(title=f"Vikunja ({api_url})", data=user_input)
             
             # If there are errors, update the schema with the user's input as defaults
@@ -164,31 +156,4 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
             errors=errors,
         )
 
-    async def async_step_response_details(self, user_input=None):
-        """One more step: What do you want included in the responses?"""
-        if not self._basic_input:
-            # Safety fallback: go back to first step
-            return await self.async_step_user()
-
-        errors = {}
-        schema = vol.Schema(
-            {
-                vol.Required(CONF_RESPONSE_INCLUDE_PROJECT, default=True): cv.boolean,
-                vol.Required(CONF_RESPONSE_INCLUDE_LABELS, default=True): cv.boolean,
-                vol.Required(CONF_RESPONSE_INCLUDE_DUE_DATE, default=True): cv.boolean,
-                vol.Required(CONF_RESPONSE_INCLUDE_ASSIGNEE, default=True): cv.boolean,
-            }
-        )
-
-        if user_input is not None:
-            final_data = {**self._basic_input, **user_input}
-            return self.async_create_entry(
-                title=f"Vikunja ({final_data.get(CONF_VIKUNJA_URL)})",
-                data=final_data,
-            )
-
-        return self.async_show_form(
-            step_id="response_details",
-            data_schema=schema,
-            errors=errors,
-        )
+    # Removed second step; kept method slot intentionally deleted.
