@@ -8,8 +8,12 @@
 
 Say **“create a task”** or **“add a task”** → Your task goes straight into Vikunja!
 
-*Make creating tasks as easy as talking ✨*
+*[Video Demo 🎥](https://github.com/user-attachments/assets/c592b0e8-efc6-40d1-ad53-a442de69bfc5)*
 </div>  
+
+
+
+
 
 ---
 
@@ -73,13 +77,13 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 | Default due date                 | Used if no date & no project given                           | tomorrow        |
 | Default due date choices         | none, tomorrow, end\_of\_week, end\_of\_month                | tomorrow        |
 | Enable user assignment           | Assign tasks to existing users                               | Disabled        |
-| Detailed response                | Speak back project, labels, due date, assignee, priority & repeat info | Off             |
+| Detailed response                | Speak back project, labels, due date, assignee, priority & repeat info | On             |
 
 ---
 
 ## 🤖 AI Conversation Agent (Recommended)
 
-Append this to your Home Assistant Voice Assistant’s custom instructions:
+Append this to your Home Assistant Voice Assistant’s conversation Agent custom instructions:
 
 
 ```
@@ -97,10 +101,13 @@ tool_args: {
 📹 [Video Guide](https://github.com/user-attachments/assets/0440bc71-b748-4118-8afd-6f0f10b22003)
 
 ---
+## 🗺️ Roadmap
+Check the [roadmap project](https://github.com/users/NeoHuncho/projects/1) to see and add your feature requests! ✍️
+
+---
 
 ## 🚧 Limitations
 
-* ❌ Only supports **English** commands
 * ❌ Cannot create new labels (except auto-creating **voice**)
 * ❌ Cannot create new projects
 * ❌ Cannot create new assignee users (only assign existing)
