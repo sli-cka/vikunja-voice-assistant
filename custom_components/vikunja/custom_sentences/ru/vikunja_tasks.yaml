@@ -1,0 +1,9 @@
+language: "ru"
+intents:
+  VikunjaAddTask:
+    data:
+      - sentences:
+          - "[добавь|создай|поставь] [новую|мою|эту] (задачу|таск) {task_description}"
+lists:
+  task_description:
+    wildcard: true

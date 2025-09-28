@@ -1,0 +1,9 @@
+language: "fr"
+intents:
+  VikunjaAddTask:
+    data:
+      - sentences:
+          - "[ajoute|ajouter|crée|créé|créer|mets|ajoute moi] [une|la|nouvelle|ma] (tâche|tache) {task_description}"
+lists:
+  task_description:
+    wildcard: true

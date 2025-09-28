@@ -1,0 +1,9 @@
+language: "pt"
+intents:
+  VikunjaAddTask:
+    data:
+      - sentences:
+          - "[adiciona|adicionar|cria|criar|coloca|ponha] [uma|a|nova|minha] (tarefa|tarefa de) {task_description}"
+lists:
+  task_description:
+    wildcard: true

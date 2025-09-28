@@ -1,0 +1,27 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "مساعد الصوت Vikunja",
+        "description": "إعداد تكامل مساعد الصوت لفكونجا",
+        "data": {
+          "vikunja_url": "عنوان URL الأساسي لـ Vikunja (مثال https://vikunja.example.com)",
+          "vikunja_api_key": "رمز واجهة برمجة تطبيقات Vikunja",
+          "openai_api_key": "مفتاح واجهة برمجة تطبيقات OpenAI",
+          "voice_correction": "تفعيل تصحيح نص التعرف الصوتي (مستحسن)",
+          "default_due_date": "تاريخ الاستحقاق الافتراضي عند عدم التحديد (يطبق فقط إذا لم يُذكر مشروع)",
+          "auto_voice_label": "إضافة وسم 'voice' تلقائيًا للمهام التي تُنشأ عبر هذا التكامل",
+          "enable_user_assignment": "تفعيل إسناد المستخدم",
+          "detailed_response": "تفعيل استجابة صوتية مفصلة (تتضمن المشروع، الوسوم، تاريخ الاستحقاق، المكلَّف، الأولوية والتكرار)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "فشل الاتصال بواجهة Vikunja، يرجى التحقق من العنوان والرمز.",
+      "invalid_openai_key": "مفتاح OpenAI غير صالح. يرجى التحقق."
+    },
+    "abort": {
+      "already_configured": "تم إعداد حساب Vikunja هذا مسبقًا."
+    }
+  }
+}

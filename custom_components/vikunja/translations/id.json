@@ -1,0 +1,27 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Asisten suara Vikunja",
+        "description": "Atur integrasi asisten suara Vikunja",
+        "data": {
+          "vikunja_url": "URL dasar Vikunja (mis. https://vikunja.example.com)",
+          "vikunja_api_key": "Token API Vikunja",
+          "openai_api_key": "Kunci API OpenAI",
+          "voice_correction": "Aktifkan koreksi teks pengenalan suara (disarankan)",
+          "default_due_date": "Tanggal jatuh tempo default jika tidak ditentukan (hanya saat tidak ada proyek disebut)",
+          "auto_voice_label": "Otomatis tambahkan label 'voice' ke tugas yang dibuat melalui integrasi ini",
+          "enable_user_assignment": "Aktifkan penugasan pengguna",
+          "detailed_response": "Aktifkan respons suara terperinci (termasuk proyek, label, jatuh tempo, penerima tugas, prioritas & pengulangan)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Gagal terhubung ke API Vikunja, periksa URL dan token.",
+      "invalid_openai_key": "Kunci OpenAI tidak valid. Harap periksa."
+    },
+    "abort": {
+      "already_configured": "Akun Vikunja ini sudah dikonfigurasi."
+    }
+  }
+}

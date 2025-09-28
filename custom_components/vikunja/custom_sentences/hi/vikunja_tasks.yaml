@@ -1,0 +1,9 @@
+language: "hi"
+intents:
+  VikunjaAddTask:
+    data:
+      - sentences:
+          - "[कृपया|मेरे लिए|ज़रा] (जोड़ो|जोड़ो|बनाओ|बना दो|ऐड करो) [एक|नई|मेरी] (टास्क|कार्य) {task_description}"
+lists:
+  task_description:
+    wildcard: true

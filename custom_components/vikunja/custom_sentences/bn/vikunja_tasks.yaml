@@ -1,0 +1,9 @@
+language: "bn"
+intents:
+  VikunjaAddTask:
+    data:
+      - sentences:
+          - "[দয়া করে|প্লিজ|আমার জন্য] (যোগ করো|অ্যাড করো|তৈরি করো|ক্রিয়েট করো) [একটি|নতুন|আমার] (টাস্ক|কাজ) {task_description}"
+lists:
+  task_description:
+    wildcard: true

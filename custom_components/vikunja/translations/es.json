@@ -1,0 +1,27 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Asistente de voz Vikunja",
+        "description": "Configura la integración del asistente de voz de Vikunja",
+        "data": {
+          "vikunja_url": "URL base de Vikunja (ej. https://vikunja.example.com)",
+          "vikunja_api_key": "Token API de Vikunja",
+          "openai_api_key": "Clave API de OpenAI",
+          "voice_correction": "Habilitar corrección de texto de reconocimiento de voz (recomendado)",
+          "default_due_date": "Fecha de vencimiento predeterminada si no se especifica (solo cuando no hay proyecto mencionado)",
+          "auto_voice_label": "Agregar automáticamente la etiqueta 'voice' a tareas creadas por esta integración",
+          "enable_user_assignment": "Habilitar asignación de usuarios",
+          "detailed_response": "Habilitar respuesta detallada hablada (incluye proyecto, etiquetas, fecha, asignado, prioridad y repetición)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "No se pudo conectar a la API de Vikunja; verifica la URL y el token.",
+      "invalid_openai_key": "Clave de API de OpenAI inválida. Por favor verifica."
+    },
+    "abort": {
+      "already_configured": "Esta cuenta de Vikunja ya está configurada."
+    }
+  }
+}

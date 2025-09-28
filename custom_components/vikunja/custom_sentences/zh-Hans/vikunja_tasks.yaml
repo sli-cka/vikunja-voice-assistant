@@ -1,0 +1,9 @@
+language: "zh-Hans"
+intents:
+  VikunjaAddTask:
+    data:
+      - sentences:
+          - "[请|帮我|给我] (添加|创建|新建|加上) [一个|一条|新的|这条] (任务|事项) {task_description}"
+lists:
+  task_description:
+    wildcard: true

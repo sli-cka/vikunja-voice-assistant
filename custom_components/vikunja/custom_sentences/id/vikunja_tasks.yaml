@@ -1,0 +1,9 @@
+language: "id"
+intents:
+  VikunjaAddTask:
+    data:
+      - sentences:
+          - "[tolong|mohon|silakan] (tambah|buat|buatkan) [sebuah|satu|tugas|task] {task_description}"
+lists:
+  task_description:
+    wildcard: true

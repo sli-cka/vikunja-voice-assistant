@@ -1,0 +1,9 @@
+language: "ar"
+intents:
+  VikunjaAddTask:
+    data:
+      - sentences:
+          - "[من فضلك|رجاءً|أضف|اضف|أريد] (أضف|اضف|أنشئ|انشئ|أنشاء|ضع) [مهمة|مهمه|المهمة|مهمة جديدة] {task_description}"
+lists:
+  task_description:
+    wildcard: true
