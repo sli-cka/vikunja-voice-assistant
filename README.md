@@ -22,6 +22,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 * **Natural voice commands**: *“Create a task…”* or *“Add a task…”* 🗣️
 * Supports **project, due date, priority, labels, recurrence** and more 📅
 * Optional: speech correction, auto voice label, default due date, user assignment
+* Supports English, Mandarin Chinese, Hindi, Spanish, Arabic, French, Bengali, Portuguese, Russian & Indonesian 🌐
 
 ---
 
@@ -115,50 +116,3 @@ Check the [roadmap project](https://github.com/users/NeoHuncho/projects/1) to se
 ## 📜 License
 
 MIT – see [LICENSE](LICENSE).
-
----
-
-## 🌐 Internationalization (i18n)
-
-This integration now includes configuration UI translations and intent sentence examples for the following languages:
-
-| Code | Language | File |
-|------|----------|------|
-| en | English | `translations/en.json` |
-| zh-Hans | Simplified Chinese | `translations/zh-Hans.json` |
-| hi | Hindi | `translations/hi.json` |
-| es | Spanish | `translations/es.json` |
-| ar | Arabic (MSA) | `translations/ar.json` |
-| fr | French | `translations/fr.json` |
-| bn | Bengali | `translations/bn.json` |
-| pt | Portuguese | `translations/pt.json` |
-| ru | Russian | `translations/ru.json` |
-| id | Indonesian | `translations/id.json` |
-
-### Custom Sentences per Language
-
-Add additional localized voice patterns under `custom_components/vikunja/custom_sentences/<lang>/vikunja_tasks.yaml` using the same structure as English. If a language directory is missing, create it and restart Home Assistant. Example English pattern:
-
-```yaml
-intents:
-  VikunjaAddTask:
-    data:
-      - sentences:
-          - "[add|create] [a|the|new] task {task_description}"
-lists:
-  task_description:
-    wildcard: true
-```
-
-### Adding a New Language
-1. Copy `translations/en.json` → `translations/<new>.json` and translate values (keep keys identical).
-2. Add a new sentence file mirroring the English one.
-3. (Optional) Run the translation lint script (coming soon) to verify key parity.
-4. Submit a PR.
-
-### Notes
-* Translations provided are best-effort; community corrections are welcome.
-* The English base file defines the authoritative key set.
-* Sentence expansion uses Home Assistant’s template sentence syntax; keep patterns concise to avoid recognition ambiguity.
-
----
