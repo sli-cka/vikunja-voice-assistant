@@ -22,7 +22,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 * **Natural voice commands**: *“Create a task…”* or *“Add a task…”* 🗣️
 * Supports **project, due date, priority, labels, recurrence** and more 📅
 * Optional: speech correction, auto voice label, default due date, user assignment
-* Supports english, mandarin chinese, hindi, spanish, arabic, french, bengali, portuguese, russian & indonesian 🌐
+* Supports english, mandarin chinese, hindi, spanish, arabic, french, bengali, portuguese, russian, indonesian 🌐
 
 ---
 
