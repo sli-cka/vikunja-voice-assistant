@@ -90,9 +90,16 @@ def base_config(**overrides):
         CONF_VOICE_CORRECTION: True,
         CONF_AUTO_VOICE_LABEL: False,
         CONF_ENABLE_USER_ASSIGN: False,
-        CONF_DETAILED_RESPONSE: False,
+        CONF_DETAILED_RESPONSE: True,
     }
-    cfg.update(overrides)
+    normalized = {}
+    for k, v in overrides.items():
+        if k.startswith("CONF_") and k in globals():
+            const_value = globals()[k]
+            normalized[const_value] = v
+        else:
+            normalized[k] = v
+    cfg.update(normalized)
     return cfg
 
 
@@ -120,8 +127,7 @@ def test_process_task_detailed_with_metadata(patch_apis):
         "repeat_after": 86400,
         "label_ids": [9]
     })
-    # Use dict expansion so key is the constant value string, not the literal identifier name
-    hass = FakeHass(base_config(**{CONF_DETAILED_RESPONSE: True}))
+    hass = FakeHass(base_config())
     ok, msg, title = asyncio.run(process_task(hass, "Buy milk for home", []))
     assert ok is True
     assert title == "Buy milk"
@@ -142,7 +148,7 @@ def test_process_task_with_assignee(patch_apis):
         "assignee": "alice"
     })
     users = [{"id": 7, "username": "alice", "name": "Alice"}]
-    hass = FakeHass(base_config(**{CONF_DETAILED_RESPONSE: True, CONF_ENABLE_USER_ASSIGN: True}))
+    hass = FakeHass(base_config(CONF_ENABLE_USER_ASSIGN=True))
     ok, msg, title = asyncio.run(process_task(hass, "prepare slides assign to alice", users))
     assert ok is True
     assert "assigned to alice" in msg
@@ -156,8 +162,7 @@ def test_process_task_openai_failure(patch_apis, monkeypatch):
     hass = FakeHass(base_config())
     ok, msg, title = asyncio.run(process_task(hass, "some description", []))
     assert ok is False
-    # Allow broader matching since code may return generic unexpected error
-    assert any(key in msg.lower() for key in ["couldn't process", "unexpected error", "connection error"])
+    assert "couldn't process" in msg.lower()
     assert title == ""
 
 
