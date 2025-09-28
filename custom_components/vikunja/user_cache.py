@@ -26,7 +26,9 @@ def _utc_now_iso() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-def build_initial_user_cache_sync(hass_config_dir: str, vikunja_url: str, api_key: str) -> None:
+def build_initial_user_cache_sync(
+    hass_config_dir: str, vikunja_url: str, api_key: str
+) -> None:
     """Initial synchronous (executor) build for config flow usage.
 
     Performs vowel searches once and writes the cache file. Errors are swallowed
@@ -90,7 +92,9 @@ class VikunjaUserCacheManager:
                 with open(self.cache_path, "r", encoding="utf-8") as f:
                     raw = json.load(f)
                 if isinstance(raw, dict) and isinstance(raw.get("users"), list):
-                    return UserCache(users=raw.get("users", []), last_refresh=raw.get("last_refresh"))
+                    return UserCache(
+                        users=raw.get("users", []), last_refresh=raw.get("last_refresh")
+                    )
             except Exception as err:  # noqa: BLE001
                 _LOGGER.error("Failed loading user cache: %s", err)
         return UserCache()
@@ -98,7 +102,11 @@ class VikunjaUserCacheManager:
     def _save_sync(self) -> None:
         try:
             with open(self.cache_path, "w", encoding="utf-8") as f:
-                json.dump({"users": self.data.users, "last_refresh": self.data.last_refresh}, f, indent=2)
+                json.dump(
+                    {"users": self.data.users, "last_refresh": self.data.last_refresh},
+                    f,
+                    indent=2,
+                )
         except Exception as err:  # noqa: BLE001
             _LOGGER.error("Failed saving user cache: %s", err)
 
@@ -122,10 +130,16 @@ class VikunjaUserCacheManager:
                             }
             except Exception as err:  # noqa: BLE001
                 _LOGGER.error("User search failed for '%s': %s", letter, err)
-        new_cache = UserCache(users=list(combined.values()), last_refresh=_utc_now_iso())
+        new_cache = UserCache(
+            users=list(combined.values()), last_refresh=_utc_now_iso()
+        )
         try:
             with open(self.cache_path, "w", encoding="utf-8") as f:
-                json.dump({"users": new_cache.users, "last_refresh": new_cache.last_refresh}, f, indent=2)
+                json.dump(
+                    {"users": new_cache.users, "last_refresh": new_cache.last_refresh},
+                    f,
+                    indent=2,
+                )
         except Exception as err:  # noqa: BLE001
             _LOGGER.error("Failed writing user cache: %s", err)
         return new_cache
@@ -138,9 +152,15 @@ class VikunjaUserCacheManager:
         api_key = domain_config.get(CONF_VIKUNJA_API_KEY)
         if not (vikunja_url and api_key):
             return
-        if not force and self.data.age_hours is not None and self.data.age_hours < USER_CACHE_REFRESH_HOURS:
+        if (
+            not force
+            and self.data.age_hours is not None
+            and self.data.age_hours < USER_CACHE_REFRESH_HOURS
+        ):
             return
-        self.data = await self.hass.async_add_executor_job(self._refresh_sync, vikunja_url, api_key)
+        self.data = await self.hass.async_add_executor_job(
+            self._refresh_sync, vikunja_url, api_key
+        )
         _LOGGER.info("Vikunja user cache refreshed: %s users", len(self.data.users))
 
     # --------------- Scheduling ---------------
@@ -148,6 +168,7 @@ class VikunjaUserCacheManager:
         """Schedule periodic refresh task via HA helper."""
         try:
             from homeassistant.helpers.event import async_track_time_interval
+
             interval = timedelta(hours=USER_CACHE_REFRESH_HOURS)
 
             async def _scheduled(_now):  # noqa: D401
@@ -162,7 +183,10 @@ class VikunjaUserCacheManager:
         lookup_l = lookup.strip().lower()
         for u in self.data.users:
             try:
-                if lookup_l in {str(u.get("username", "")).lower(), str(u.get("name", "")).lower()}:
+                if lookup_l in {
+                    str(u.get("username", "")).lower(),
+                    str(u.get("name", "")).lower(),
+                }:
                     return u.get("id")
             except Exception:  # noqa: BLE001
                 continue

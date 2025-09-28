@@ -1,23 +1,25 @@
 import logging
 import requests
-import json
 import secrets
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class VikunjaAPI:
     def __init__(self, url, vikunja_api_key):
-        self.url = url.rstrip('/')
+        self.url = url.rstrip("/")
         self.api_token = vikunja_api_key
         self.headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {vikunja_api_key}"
+            "Authorization": f"Bearer {vikunja_api_key}",
         }
 
     def test_connection(self):
         """Simple connectivity check by listing projects."""
         try:
-            response = requests.get(f"{self.url}/projects", headers=self.headers, timeout=30)
+            response = requests.get(
+                f"{self.url}/projects", headers=self.headers, timeout=30
+            )
             response.raise_for_status()
             return True
         except requests.exceptions.RequestException as err:
@@ -29,7 +31,9 @@ class VikunjaAPI:
 
     def get_projects(self):
         try:
-            response = requests.get(f"{self.url}/projects", headers=self.headers, timeout=30)
+            response = requests.get(
+                f"{self.url}/projects", headers=self.headers, timeout=30
+            )
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as err:
@@ -41,7 +45,9 @@ class VikunjaAPI:
 
     def get_labels(self):
         try:
-            response = requests.get(f"{self.url}/labels", headers=self.headers, timeout=30)
+            response = requests.get(
+                f"{self.url}/labels", headers=self.headers, timeout=30
+            )
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as err:
@@ -55,7 +61,9 @@ class VikunjaAPI:
         """Create a new label with a random hex color."""
         payload = {"title": label_name, "hex_color": secrets.token_hex(3)}
         try:
-            response = requests.put(f"{self.url}/labels", headers=self.headers, json=payload, timeout=30)
+            response = requests.put(
+                f"{self.url}/labels", headers=self.headers, json=payload, timeout=30
+            )
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as err:
@@ -77,7 +85,9 @@ class VikunjaAPI:
             response.raise_for_status()
             return True
         except requests.exceptions.RequestException as err:
-            _LOGGER.error("Failed to attach label %s to task %s: %s", label_id, task_id, err)
+            _LOGGER.error(
+                "Failed to attach label %s to task %s: %s", label_id, task_id, err
+            )
             resp = getattr(err, "response", None)
             if resp is not None and hasattr(resp, "text"):
                 _LOGGER.error("Response content: %s", resp.text)
@@ -143,7 +153,9 @@ class VikunjaAPI:
             response.raise_for_status()
             return True
         except requests.exceptions.RequestException as err:
-            _LOGGER.error("Failed to assign user %s to task %s: %s", user_id, task_id, err)
+            _LOGGER.error(
+                "Failed to assign user %s to task %s: %s", user_id, task_id, err
+            )
             resp = getattr(err, "response", None)
             if resp is not None and hasattr(resp, "text"):
                 _LOGGER.error("Response content: %s", resp.text)

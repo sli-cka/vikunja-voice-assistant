@@ -19,13 +19,16 @@ from .const import (
     DUE_DATE_OPTION_LABELS,
     CONF_DETAILED_RESPONSE,
 )
+from .helpers.localization import get_language
 from .api.vikunja_api import VikunjaAPI
 from .user_cache import build_initial_user_cache_sync
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Handle a config flow for the Vikunja integration."""
+
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
     _basic_input: dict | None = None
@@ -33,7 +36,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
     async def _test_openai_connection(self, api_key: str) -> bool:
         headers = {
             "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
 
         # Simple test payload to validate API key
@@ -41,7 +44,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
             "model": "gpt-5-nano",
             "messages": [{"role": "user", "content": "test"}],
             "max_tokens": 1,
-            "reasoning_effort": "minimal"
+            "reasoning_effort": "minimal",
         }
 
         try:
@@ -50,7 +53,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
                 async with session.post(
                     "https://api.openai.com/v1/chat/completions",
                     headers=headers,
-                    json=payload
+                    json=payload,
                 ) as response:
                     # Accept both 200 (success) and 400 (bad request but valid auth)
                     # 401 would indicate invalid API key
@@ -63,11 +66,20 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
         """Handle the initial step."""
         errors = {}
 
-        # Build selector once (human-friendly labels, internal values preserved)
+        # Determine language for localized labels, fallback handled by lookup
+        lang = get_language(self.hass)
+        # Build selector once with localized labels. We don't put these into the translation
+        # json because they are dynamic options coming from our own constant structure.
         due_date_selector = selector.SelectSelector(
             selector.SelectSelectorConfig(
                 options=[
-                    selector.SelectOptionDict(value=v, label=DUE_DATE_OPTION_LABELS[v])
+                    selector.SelectOptionDict(
+                        value=v,
+                        label=(
+                            DUE_DATE_OPTION_LABELS.get(v, {}).get(lang)
+                            or DUE_DATE_OPTION_LABELS.get(v, {}).get("en", v)
+                        ),
+                    )
                     for v in DUE_DATE_OPTIONS
                 ],
                 mode=selector.SelectSelectorMode.DROPDOWN,
@@ -93,25 +105,26 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
             user_input[CONF_VIKUNJA_API_KEY] = user_input[CONF_VIKUNJA_API_KEY].strip()
             user_input[CONF_OPENAI_API_KEY] = user_input[CONF_OPENAI_API_KEY].strip()
 
-            base_url = user_input[CONF_VIKUNJA_URL].rstrip('/')
-            if not base_url.endswith('/api/v1'):
+            base_url = user_input[CONF_VIKUNJA_URL].rstrip("/")
+            if not base_url.endswith("/api/v1"):
                 api_url = f"{base_url}/api/v1"
             else:
                 api_url = base_url
 
-            vikunja_api = VikunjaAPI(
-                api_url,
-                user_input[CONF_VIKUNJA_API_KEY]
-            )
+            vikunja_api = VikunjaAPI(api_url, user_input[CONF_VIKUNJA_API_KEY])
 
             # Test the Vikunja connection
-            vikunja_success = await self.hass.async_add_executor_job(vikunja_api.test_connection)
+            vikunja_success = await self.hass.async_add_executor_job(
+                vikunja_api.test_connection
+            )
 
             if not vikunja_success:
                 errors["base"] = "cannot_connect"
             else:
                 # Test OpenAI connection
-                openai_success = await self._test_openai_connection(user_input[CONF_OPENAI_API_KEY])
+                openai_success = await self._test_openai_connection(
+                    user_input[CONF_OPENAI_API_KEY]
+                )
 
                 if not openai_success:
                     errors[CONF_OPENAI_API_KEY] = "invalid_openai_key"
@@ -134,19 +147,43 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
                     self._abort_if_unique_id_configured()
 
                     # Single step flow now – if detailed response selected we just store the flag.
-                    return self.async_create_entry(title=f"Vikunja ({api_url})", data=user_input)
+                    return self.async_create_entry(
+                        title=f"Vikunja ({api_url})", data=user_input
+                    )
 
             # If there are errors, update the schema with the user's input as defaults
             data_schema = vol.Schema(
                 {
-                    vol.Required(CONF_VIKUNJA_URL, default=user_input.get(CONF_VIKUNJA_URL, "")): str,
-                    vol.Required(CONF_VIKUNJA_API_KEY, default=user_input.get(CONF_VIKUNJA_API_KEY, "")): str,
-                    vol.Required(CONF_OPENAI_API_KEY, default=user_input.get(CONF_OPENAI_API_KEY, "")): str,
-                    vol.Required(CONF_VOICE_CORRECTION, default=user_input.get(CONF_VOICE_CORRECTION, True)): cv.boolean,
-                    vol.Required(CONF_AUTO_VOICE_LABEL, default=user_input.get(CONF_AUTO_VOICE_LABEL, True)): cv.boolean,
-                    vol.Required(CONF_ENABLE_USER_ASSIGN, default=user_input.get(CONF_ENABLE_USER_ASSIGN, False)): cv.boolean,
-                    vol.Required(CONF_DUE_DATE, default=user_input.get(CONF_DUE_DATE, "tomorrow")): due_date_selector,
-                    vol.Required(CONF_DETAILED_RESPONSE, default=user_input.get(CONF_DETAILED_RESPONSE, True)): cv.boolean,
+                    vol.Required(
+                        CONF_VIKUNJA_URL, default=user_input.get(CONF_VIKUNJA_URL, "")
+                    ): str,
+                    vol.Required(
+                        CONF_VIKUNJA_API_KEY,
+                        default=user_input.get(CONF_VIKUNJA_API_KEY, ""),
+                    ): str,
+                    vol.Required(
+                        CONF_OPENAI_API_KEY,
+                        default=user_input.get(CONF_OPENAI_API_KEY, ""),
+                    ): str,
+                    vol.Required(
+                        CONF_VOICE_CORRECTION,
+                        default=user_input.get(CONF_VOICE_CORRECTION, True),
+                    ): cv.boolean,
+                    vol.Required(
+                        CONF_AUTO_VOICE_LABEL,
+                        default=user_input.get(CONF_AUTO_VOICE_LABEL, True),
+                    ): cv.boolean,
+                    vol.Required(
+                        CONF_ENABLE_USER_ASSIGN,
+                        default=user_input.get(CONF_ENABLE_USER_ASSIGN, False),
+                    ): cv.boolean,
+                    vol.Required(
+                        CONF_DUE_DATE, default=user_input.get(CONF_DUE_DATE, "tomorrow")
+                    ): due_date_selector,
+                    vol.Required(
+                        CONF_DETAILED_RESPONSE,
+                        default=user_input.get(CONF_DETAILED_RESPONSE, True),
+                    ): cv.boolean,
                 }
             )
 

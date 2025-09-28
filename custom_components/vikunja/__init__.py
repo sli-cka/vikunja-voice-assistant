@@ -24,12 +24,15 @@ _LOGGER = logging.getLogger(__name__)
 # Integration uses config entries only, but hassfest expects a CONFIG_SCHEMA when async_setup exists
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
+
 def copy_custom_sentences(hass: HomeAssistant) -> None:
     """Copy bundled custom sentences into Home Assistant's expected directory.
 
     Only copies when source exists and when the target file is missing or older.
     """
-    source_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "custom_sentences")
+    source_dir = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), "custom_sentences"
+    )
     if not os.path.exists(source_dir):
         return
     target_root = os.path.join(hass.config.config_dir, "custom_sentences")
@@ -45,13 +48,19 @@ def copy_custom_sentences(hass: HomeAssistant) -> None:
                 continue
             src_file = os.path.join(src_lang, fname)
             dst_file = os.path.join(dst_lang, fname)
-            if not os.path.exists(dst_file) or os.path.getmtime(src_file) > os.path.getmtime(dst_file):
-                with open(src_file, "r", encoding="utf-8") as src, open(dst_file, "w", encoding="utf-8") as dst:
+            if not os.path.exists(dst_file) or os.path.getmtime(
+                src_file
+            ) > os.path.getmtime(dst_file):
+                with open(src_file, "r", encoding="utf-8") as src, open(
+                    dst_file, "w", encoding="utf-8"
+                ) as dst:
                     dst.write(src.read())
+
 
 async def async_setup(hass: HomeAssistant, config):
     hass.data.setdefault(DOMAIN, {})
     return True
+
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up Vikunja from a config entry."""
@@ -80,9 +89,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     # Manual refresh service (only if feature enabled)
     if hass.data[DOMAIN].get(CONF_ENABLE_USER_ASSIGN):
+
         async def _handle_refresh_users(call):  # noqa: D401
             await user_cache_manager.refresh(force=True)
-        hass.services.async_register(DOMAIN, "refresh_user_cache", _handle_refresh_users)
+
+        hass.services.async_register(
+            DOMAIN, "refresh_user_cache", _handle_refresh_users
+        )
 
     # Copy bundled custom sentences (all languages) into HA config dir before reload
     try:
@@ -93,6 +106,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     # Prompt conversation agent to reload custom sentences / intents
     await hass.services.async_call("conversation", "reload", {})
     return True
+
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload a config entry (placeholder for future cleanup)."""

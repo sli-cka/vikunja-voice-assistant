@@ -19,9 +19,9 @@ def build_task_creation_messages(
         {"id": p.get("id"), "name": p.get("title")} for p in (projects or [])
     ]
     label_names = [
-        {"id": l.get("id"), "name": l.get("title")}
-        for l in (labels or [])
-        if isinstance(l, dict) and l.get("id") is not None
+        {"id": label_obj.get("id"), "name": label_obj.get("title")}
+        for label_obj in (labels or [])
+        if isinstance(label_obj, dict) and label_obj.get("id") is not None
     ]
 
     # Current date/time context
@@ -30,9 +30,21 @@ def build_task_creation_messages(
     current_date = now.strftime("%Y-%m-%d")
 
     # Default due date helper values
-    tomorrow = (now + timedelta(days=1)).replace(hour=12, minute=0, second=0, microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ")
-    end_of_week = (now + timedelta(days=7)).replace(hour=17, minute=0, second=0, microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ")
-    end_of_month = (now + timedelta(days=30)).replace(hour=17, minute=0, second=0, microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ")
+    tomorrow = (
+        (now + timedelta(days=1))
+        .replace(hour=12, minute=0, second=0, microsecond=0)
+        .strftime("%Y-%m-%dT%H:%M:%SZ")
+    )
+    end_of_week = (
+        (now + timedelta(days=7))
+        .replace(hour=17, minute=0, second=0, microsecond=0)
+        .strftime("%Y-%m-%dT%H:%M:%SZ")
+    )
+    end_of_month = (
+        (now + timedelta(days=30))
+        .replace(hour=17, minute=0, second=0, microsecond=0)
+        .strftime("%Y-%m-%dT%H:%M:%SZ")
+    )
 
     default_due_date_instructions = ""
     if default_due_date != "none":
@@ -65,7 +77,13 @@ def build_task_creation_messages(
     if users and isinstance(users, list):
         for u in users:
             if isinstance(u, dict) and u.get("id") is not None:
-                user_list.append({"id": u.get("id"), "name": u.get("name"), "username": u.get("username")})
+                user_list.append(
+                    {
+                        "id": u.get("id"),
+                        "name": u.get("name"),
+                        "username": u.get("username"),
+                    }
+                )
 
     assignment_instructions = ""
     if enable_user_assignment and user_list:

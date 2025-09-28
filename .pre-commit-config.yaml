@@ -1,3 +1,6 @@
+default_language_version:
+  python: python3.13
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
@@ -7,18 +10,31 @@ repos:
       - id: check-json
       - id: check-yaml
       - id: debug-statements
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.5
+    hooks:
+      - id: ruff
+        args: [--fix, --show-fixes]
+      - id: ruff-format
   - repo: local
     hooks:
       - id: translation-parity
         name: Translation key parity
         entry: python scripts/check_translations.py
-        language: system
+        language: python
         pass_filenames: false
-        stages: [commit]
+        additional_dependencies:
+          - voluptuous
       - id: pytest
         name: Pytest quick run
         entry: python -m pytest -q
-        language: system
+        language: python
         pass_filenames: false
-        stages: [commit]
         types: [python]
+        additional_dependencies:
+          - pytest>=8.0.0
+          - pytest-asyncio>=0.23.0
+          - pytest-mock>=3.12.0
+          - pytest-cov>=5.0.0
+          - voluptuous>=0.13.1
+          - requests>=2.31.0

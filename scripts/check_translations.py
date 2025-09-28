@@ -4,13 +4,19 @@
 Usage: python scripts/check_translations.py
 Exits non-zero if any file is missing or has extra keys.
 """
+
 from __future__ import annotations
 import json
 import sys
 from pathlib import Path
 from typing import Any, Dict
 
-TRANSLATION_DIR = Path(__file__).resolve().parent.parent / "custom_components" / "vikunja" / "translations"
+TRANSLATION_DIR = (
+    Path(__file__).resolve().parent.parent
+    / "custom_components"
+    / "vikunja"
+    / "translations"
+)
 
 
 def flatten(d: Dict[str, Any], prefix: str = ""):
@@ -23,7 +29,11 @@ def flatten(d: Dict[str, Any], prefix: str = ""):
 
 
 def main():
-    files = [f for f in sorted(TRANSLATION_DIR.glob("*.json")) if f.name != "relative_phrases.json"]
+    files = [
+        f
+        for f in sorted(TRANSLATION_DIR.glob("*.json"))
+        if f.name != "relative_phrases.json"
+    ]
     if not files:
         print("No translation files found.")
         return 1
@@ -48,8 +58,11 @@ def main():
     if problems:
         print("Translation key mismatch detected.")
         return 2
-    print(f"All translation files share identical key set ({len(base_keys)} keys) relative to {base}.")
+    print(
+        f"All translation files share identical key set ({len(base_keys)} keys) relative to {base}."
+    )
     return 0
+
 
 if __name__ == "__main__":  # pragma: no cover
     sys.exit(main())

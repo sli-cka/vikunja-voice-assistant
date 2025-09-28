@@ -119,14 +119,16 @@ def test_process_task_detailed_with_metadata(patch_apis):
     fake_vikunja, fake_openai = patch_apis
     fake_vikunja._set_projects([{"id": 2, "title": "Home"}])
     fake_vikunja._set_labels([{"id": 9, "title": "errand"}])
-    fake_openai.set_response({
-        "title": "Buy milk",
-        "project_id": 2,
-        "due_date": "2099-01-01",
-        "priority": 3,
-        "repeat_after": 86400,
-        "label_ids": [9]
-    })
+    fake_openai.set_response(
+        {
+            "title": "Buy milk",
+            "project_id": 2,
+            "due_date": "2099-01-01",
+            "priority": 3,
+            "repeat_after": 86400,
+            "label_ids": [9],
+        }
+    )
     hass = FakeHass(base_config())
     ok, msg, title = asyncio.run(process_task(hass, "Buy milk for home", []))
     assert ok is True
@@ -142,14 +144,14 @@ def test_process_task_with_assignee(patch_apis):
     fake_vikunja, fake_openai = patch_apis
     fake_vikunja._set_projects([])
     fake_vikunja._set_labels([])
-    fake_openai.set_response({
-        "title": "Prepare slides",
-        "project_id": 1,
-        "assignee": "alice"
-    })
+    fake_openai.set_response(
+        {"title": "Prepare slides", "project_id": 1, "assignee": "alice"}
+    )
     users = [{"id": 7, "username": "alice", "name": "Alice"}]
     hass = FakeHass(base_config(CONF_ENABLE_USER_ASSIGN=True))
-    ok, msg, title = asyncio.run(process_task(hass, "prepare slides assign to alice", users))
+    ok, msg, title = asyncio.run(
+        process_task(hass, "prepare slides assign to alice", users)
+    )
     assert ok is True
     assert "assigned to alice" in msg
     assert fake_vikunja._assignments == [(123, 7)]

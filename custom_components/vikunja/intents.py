@@ -1,4 +1,5 @@
 """Intent handlers for the Vikunja integration."""
+
 from __future__ import annotations
 
 import logging
@@ -23,9 +24,13 @@ class VikunjaAddTaskIntentHandler(intent.IntentHandler):
         task_description = slots.get("task_description", {}).get("value", "")
         response = intent.IntentResponse(language=call.language)
         if not task_description.strip():
-            response.async_set_speech("I couldn't understand what task you wanted to add. Please try again.")
+            response.async_set_speech(
+                "I couldn't understand what task you wanted to add. Please try again."
+            )
             return response
-        success, message, _title = await process_task(self.hass, task_description, self._user_cache_provider())
+        success, message, _title = await process_task(
+            self.hass, task_description, self._user_cache_provider()
+        )
         response.async_set_speech(message)
         return response
 
@@ -33,6 +38,8 @@ class VikunjaAddTaskIntentHandler(intent.IntentHandler):
 def register_intents(hass, user_cache_provider) -> None:
     """Register all intents for the integration."""
     try:
-        intent.async_register(hass, VikunjaAddTaskIntentHandler(hass, user_cache_provider))
+        intent.async_register(
+            hass, VikunjaAddTaskIntentHandler(hass, user_cache_provider)
+        )
     except Exception as err:  # noqa: BLE001
         _LOGGER.error("Failed to register intents for %s: %s", DOMAIN, err)

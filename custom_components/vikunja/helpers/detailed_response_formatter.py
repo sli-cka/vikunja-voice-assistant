@@ -6,14 +6,21 @@ from typing import Dict, List, Any, Optional
 # Optional localization imports are done lazily to avoid circulars when tests import
 # this module directly. We keep English defaults if localization module unavailable.
 try:  # pragma: no cover - defensive import
-    from .localization import build_detailed_parts, localized_priority, localize_due_phrase, localize_repeat_phrase, L
+    from .localization import (
+        build_detailed_parts,
+        localized_priority,
+        localize_due_phrase,
+        localize_repeat_phrase,
+        L,
+    )
 except Exception:  # noqa: BLE001
     build_detailed_parts = None  # type: ignore
     localized_priority = None  # type: ignore
 
+
 def friendly_due_phrase(iso_dt: str) -> str:
     try:
-        cleaned = iso_dt.rstrip('Z')
+        cleaned = iso_dt.rstrip("Z")
         # Accept common formats
         dt = None
         for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M", "%Y-%m-%d"):
@@ -42,10 +49,7 @@ def friendly_due_phrase(iso_dt: str) -> str:
         return iso_dt
 
 
-
-
 def friendly_repeat_phrase(repeat_after_seconds: int) -> Optional[str]:
-
     if not isinstance(repeat_after_seconds, int) or repeat_after_seconds <= 0:
         return None
     if repeat_after_seconds % 86400 != 0:
@@ -61,7 +65,6 @@ def friendly_repeat_phrase(repeat_after_seconds: int) -> Optional[str]:
         else:  # fallback
             phrase = f"repeats in {days} days"
     return phrase
-
 
 
 def build_detailed_response(
@@ -84,7 +87,7 @@ def build_detailed_response(
         project_id = task_data.get("project_id")
         if project_id and project_id != 1:
             proj_lookup: Dict[int, str] = {}
-            for p in (projects or []):
+            for p in projects or []:
                 if isinstance(p, dict):
                     pid = p.get("id")
                     pname = p.get("title") or p.get("name") or ""
@@ -99,8 +102,16 @@ def build_detailed_response(
     labels_part: Optional[str] = None
     try:
         if extracted_label_ids:
-            label_lookup = {l.get("id"): l.get("title") for l in (labels or []) if isinstance(l, dict)}
-            label_names = [str(label_lookup.get(lid, str(lid))) for lid in extracted_label_ids if lid in label_lookup or lid is not None]
+            label_lookup = {
+                label_item.get("id"): label_item.get("title")
+                for label_item in (labels or [])
+                if isinstance(label_item, dict)
+            }
+            label_names = [
+                str(label_lookup.get(lid, str(lid)))
+                for lid in extracted_label_ids
+                if lid in label_lookup or lid is not None
+            ]
             if label_names:
                 labels_part = ", ".join(label_names)
     except Exception:  # noqa: BLE001
@@ -110,7 +121,12 @@ def build_detailed_response(
     due_date = task_data.get("due_date")
     if due_date:
         base_due = friendly_due_phrase(due_date)
-        if lang and lang != "en" and 'localize_due_phrase' in globals() and 'localize_due_phrase':  # type: ignore
+        if (
+            lang
+            and lang != "en"
+            and "localize_due_phrase" in globals()
+            and "localize_due_phrase"
+        ):  # type: ignore
             try:
                 due_phrase = localize_due_phrase(base_due, lang)  # type: ignore
             except Exception:  # noqa: BLE001
@@ -118,7 +134,11 @@ def build_detailed_response(
         else:
             due_phrase = base_due
 
-    assignee = assignee_username_or_name if enable_user_assignment and assignee_username_or_name else None
+    assignee = (
+        assignee_username_or_name
+        if enable_user_assignment and assignee_username_or_name
+        else None
+    )
 
     priority_word: Optional[str] = None
     try:
@@ -127,7 +147,13 @@ def build_detailed_response(
             if localized_priority and lang:
                 priority_word = localized_priority(priority, lang) or None
             if not priority_word:  # fallback English
-                priority_map = {1: "low", 2: "medium", 3: "high", 4: "urgent", 5: "do now"}
+                priority_map = {
+                    1: "low",
+                    2: "medium",
+                    3: "high",
+                    4: "urgent",
+                    5: "do now",
+                }
                 priority_word = priority_map.get(priority)
     except Exception:  # noqa: BLE001
         priority_word = None
@@ -135,8 +161,17 @@ def build_detailed_response(
     repeat_phrase: Optional[str] = None
     try:
         repeat_after = task_data.get("repeat_after")
-        raw_repeat = friendly_repeat_phrase(repeat_after) if isinstance(repeat_after, int) else None
-        if raw_repeat and lang and lang != "en" and 'localize_repeat_phrase' in globals():  # type: ignore
+        raw_repeat = (
+            friendly_repeat_phrase(repeat_after)
+            if isinstance(repeat_after, int)
+            else None
+        )
+        if (
+            raw_repeat
+            and lang
+            and lang != "en"
+            and "localize_repeat_phrase" in globals()
+        ):  # type: ignore
             try:
                 repeat_phrase = localize_repeat_phrase(raw_repeat, lang)  # type: ignore
             except Exception:  # noqa: BLE001
@@ -158,7 +193,7 @@ def build_detailed_response(
             repeat_phrase=repeat_phrase,
         )
         suffix = " (" + "; ".join(parts) + ")" if parts else ""
-        if lang and lang != "en" and 'L' in globals():  # type: ignore
+        if lang and lang != "en" and "L" in globals():  # type: ignore
             try:
                 prefix = L("success_added", lang, title=task_title)  # type: ignore
                 return f"{prefix}{suffix}"

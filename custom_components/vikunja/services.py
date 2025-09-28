@@ -1,4 +1,5 @@
 """Service registrations for Vikunja Voice Assistant."""
+
 import logging
 import voluptuous as vol
 from homeassistant.core import HomeAssistant, ServiceCall
@@ -8,12 +9,15 @@ from .api.vikunja_api import VikunjaAPI
 
 _LOGGER = logging.getLogger(__name__)
 
-CREATE_TASK_SCHEMA = vol.Schema({
-    vol.Required("title"): cv.string,
-    vol.Optional("description"): cv.string,
-    vol.Optional("project_id"): cv.positive_int,
-    vol.Optional("due_date"): cv.string,
-})
+CREATE_TASK_SCHEMA = vol.Schema(
+    {
+        vol.Required("title"): cv.string,
+        vol.Optional("description"): cv.string,
+        vol.Optional("project_id"): cv.positive_int,
+        vol.Optional("due_date"): cv.string,
+    }
+)
+
 
 def setup_services(hass: HomeAssistant):
     """Register the create_task service."""
@@ -36,9 +40,15 @@ def setup_services(hass: HomeAssistant):
         )
 
         if result:
-            _LOGGER.info("Successfully created task via service: %s", task_data.get("title", "Unknown"))
+            _LOGGER.info(
+                "Successfully created task via service: %s",
+                task_data.get("title", "Unknown"),
+            )
         else:
-            _LOGGER.error("Failed to create task via service: %s", task_data.get("title", "Unknown"))
+            _LOGGER.error(
+                "Failed to create task via service: %s",
+                task_data.get("title", "Unknown"),
+            )
             raise Exception("Failed to create task in Vikunja")
 
     hass.services.async_register(

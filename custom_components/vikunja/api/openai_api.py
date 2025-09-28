@@ -8,7 +8,12 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class OpenAIAPI:
-    def __init__(self, api_key: str, model: str = "gpt-5-mini", base_url: str = "https://api.openai.com/v1"):
+    def __init__(
+        self,
+        api_key: str,
+        model: str = "gpt-5-mini",
+        base_url: str = "https://api.openai.com/v1",
+    ):
         self.api_key = api_key
         self.model = model
         self.base_url = base_url.rstrip("/")
@@ -68,7 +73,9 @@ class OpenAIAPI:
 
         try:
             result = response.json()
-            raw_response = result.get("choices", [{}])[0].get("message", {}).get("content", "")
+            raw_response = (
+                result.get("choices", [{}])[0].get("message", {}).get("content", "")
+            )
             # Extract JSON content
             start_idx = raw_response.find("{")
             end_idx = raw_response.rfind("}") + 1
@@ -78,7 +85,10 @@ class OpenAIAPI:
                 if "title" not in task_data or not task_data["title"]:
                     _LOGGER.error("OpenAI response missing required 'title' field")
                     return None
-                _LOGGER.info("Successfully processed task: '%s'", task_data.get("title", "Unknown"))
+                _LOGGER.info(
+                    "Successfully processed task: '%s'",
+                    task_data.get("title", "Unknown"),
+                )
                 return {"task_data": task_data}
             _LOGGER.error("No JSON found in OpenAI response")
             return None

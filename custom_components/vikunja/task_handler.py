@@ -18,7 +18,7 @@ from .const import (
 )
 from .api.vikunja_api import VikunjaAPI
 from .api.openai_api import OpenAIAPI
-from .helpers.detailed_response_formatter import build_detailed_response, friendly_due_phrase
+from .helpers.detailed_response_formatter import build_detailed_response
 from .helpers.localization import (
     get_language,
     L,
@@ -29,7 +29,9 @@ _LOGGER = logging.getLogger(__name__)
 ## NOTE: `_friendly_due_phrase` removed; using `friendly_due_phrase` from response_formatter.
 
 
-async def process_task(hass, task_description: str, user_cache_users: List[Dict[str, Any]]):
+async def process_task(
+    hass, task_description: str, user_cache_users: List[Dict[str, Any]]
+):
     """Create a Vikunja task from natural language description.
 
     Returns (success, message, task_title)
@@ -88,7 +90,11 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
         _LOGGER.error("Failed to process task with OpenAI")
         return False, L("openai_conn_error", lang), ""
     try:
-        response_data = openai_response if isinstance(openai_response, dict) else json.loads(openai_response)
+        response_data = (
+            openai_response
+            if isinstance(openai_response, dict)
+            else json.loads(openai_response)
+        )
         task_data = response_data.get("task_data", {})
         # Some upstream responses in tests wrap the task payload under "task_data" but may
         # produce None instead of an object. Treat that as an OpenAI processing failure
@@ -105,27 +111,39 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
 
         extracted_label_ids = []
         if isinstance(task_data, dict) and task_data.get("label_ids"):
-            existing_label_ids = {l.get("id") for l in (labels or []) if isinstance(l, dict)}
+            existing_label_ids = {
+                label_obj.get("id")
+                for label_obj in (labels or [])
+                if isinstance(label_obj, dict)
+            }
             for lid in task_data.get("label_ids", []):
                 if lid in existing_label_ids:
                     extracted_label_ids.append(lid)
             task_data.pop("label_ids", None)
 
         assignee_username_or_name = task_data.pop("assignee", None)
-        result = await hass.async_add_executor_job(lambda: vikunja_api.add_task(task_data))
+        result = await hass.async_add_executor_job(
+            lambda: vikunja_api.add_task(task_data)
+        )
         if result:
             try:
                 task_id = result.get("id") if isinstance(result, dict) else None
                 if task_id:
                     label_ids_to_attach = list(dict.fromkeys(extracted_label_ids))
-                    if auto_voice_label and voice_label_id and voice_label_id not in label_ids_to_attach:
+                    if (
+                        auto_voice_label
+                        and voice_label_id
+                        and voice_label_id not in label_ids_to_attach
+                    ):
                         label_ids_to_attach.append(voice_label_id)
                     for lid in label_ids_to_attach:
                         attach_success = await hass.async_add_executor_job(
                             vikunja_api.add_label_to_task, task_id, lid
                         )
                         if not attach_success:
-                            _LOGGER.error("Failed to attach label %s to task %s", lid, task_id)
+                            _LOGGER.error(
+                                "Failed to attach label %s to task %s", lid, task_id
+                            )
                     if enable_user_assignment and assignee_username_or_name:
                         # Late import to avoid circulars
                         lookup = assignee_username_or_name.strip().lower()
@@ -142,9 +160,16 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
                                 vikunja_api.assign_user_to_task, task_id, uid
                             )
                             if not assign_ok:
-                                _LOGGER.error("Failed to assign user %s to task %s", lookup, task_id)
+                                _LOGGER.error(
+                                    "Failed to assign user %s to task %s",
+                                    lookup,
+                                    task_id,
+                                )
                         else:
-                            _LOGGER.warning("Assignee '%s' not found in cached users", assignee_username_or_name)
+                            _LOGGER.warning(
+                                "Assignee '%s' not found in cached users",
+                                assignee_username_or_name,
+                            )
             except Exception as attach_err:  # noqa: BLE001
                 _LOGGER.error("Error attaching labels/assignee to task: %s", attach_err)
 
@@ -171,7 +196,11 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
                 )
             except Exception as format_err:  # noqa: BLE001
                 _LOGGER.error("Error building detailed response: %s", format_err)
-                return True, L("success_added", lang, title=safe_task_title), safe_task_title
+                return (
+                    True,
+                    L("success_added", lang, title=safe_task_title),
+                    safe_task_title,
+                )
             return True, detailed_message, safe_task_title
         _LOGGER.error("Failed to create task in Vikunja")
         return False, L("vikunja_add_error", lang), ""

@@ -9,15 +9,14 @@ phrases). Date / repeat phrases leverage the existing logic; if extended
 natural language localization is desired in the future those functions can
 accept a language parameter as well.
 """
+
 from __future__ import annotations
 
 from typing import Dict, Any
 import json
 import os
 
-SUPPORTED_LANGS = {
-    "en", "fr", "es", "pt", "ru", "hi", "zh-Hans", "ar", "bn", "id"
-}
+SUPPORTED_LANGS = {"en", "fr", "es", "pt", "ru", "hi", "zh-Hans", "ar", "bn", "id"}
 
 
 def get_language(hass) -> str:  # noqa: D401
@@ -202,23 +201,105 @@ _DETAIL_TOKENS: Dict[str, Dict[str, str]] = {
 }
 
 _PRIORITY_WORD = {
-    1: {"en": "low", "fr": "basse", "es": "baja", "pt": "baixa", "ru": "низкий", "hi": "कम", "zh-Hans": "低", "ar": "منخفضة", "bn": "কম", "id": "rendah"},
-    2: {"en": "medium", "fr": "moyenne", "es": "media", "pt": "média", "ru": "средний", "hi": "मध्यम", "zh-Hans": "中", "ar": "متوسطة", "bn": "মাঝারি", "id": "sedang"},
-    3: {"en": "high", "fr": "haute", "es": "alta", "pt": "alta", "ru": "высокий", "hi": "उच्च", "zh-Hans": "高", "ar": "عالية", "bn": "উচ্চ", "id": "tinggi"},
-    4: {"en": "urgent", "fr": "urgente", "es": "urgente", "pt": "urgente", "ru": "срочный", "hi": "तात्कालिक", "zh-Hans": "紧急", "ar": "عاجلة", "bn": "জরুরি", "id": "mendesak"},
-    5: {"en": "do now", "fr": "faire maintenant", "es": "hacer ahora", "pt": "fazer agora", "ru": "сделать сейчас", "hi": "अभी करो", "zh-Hans": "立刻", "ar": "نفّذ الآن", "bn": "এখনই", "id": "lakukan sekarang"},
+    1: {
+        "en": "low",
+        "fr": "basse",
+        "es": "baja",
+        "pt": "baixa",
+        "ru": "низкий",
+        "hi": "कम",
+        "zh-Hans": "低",
+        "ar": "منخفضة",
+        "bn": "কম",
+        "id": "rendah",
+    },
+    2: {
+        "en": "medium",
+        "fr": "moyenne",
+        "es": "media",
+        "pt": "média",
+        "ru": "средний",
+        "hi": "मध्यम",
+        "zh-Hans": "中",
+        "ar": "متوسطة",
+        "bn": "মাঝারি",
+        "id": "sedang",
+    },
+    3: {
+        "en": "high",
+        "fr": "haute",
+        "es": "alta",
+        "pt": "alta",
+        "ru": "высокий",
+        "hi": "उच्च",
+        "zh-Hans": "高",
+        "ar": "عالية",
+        "bn": "উচ্চ",
+        "id": "tinggi",
+    },
+    4: {
+        "en": "urgent",
+        "fr": "urgente",
+        "es": "urgente",
+        "pt": "urgente",
+        "ru": "срочный",
+        "hi": "तात्कालिक",
+        "zh-Hans": "紧急",
+        "ar": "عاجلة",
+        "bn": "জরুরি",
+        "id": "mendesak",
+    },
+    5: {
+        "en": "do now",
+        "fr": "faire maintenant",
+        "es": "hacer ahora",
+        "pt": "fazer agora",
+        "ru": "сделать сейчас",
+        "hi": "अभी करो",
+        "zh-Hans": "立刻",
+        "ar": "نفّذ الآن",
+        "bn": "এখনই",
+        "id": "lakukan sekarang",
+    },
 }
 
 # Relative due date short phrases (only small set we currently generate)
 _DUE_BASE = {
     "today": {
-        "en": "today", "fr": "aujourd'hui", "es": "hoy", "pt": "hoje", "ru": "сегодня", "hi": "आज", "zh-Hans": "今天", "ar": "اليوم", "bn": "আজ", "id": "hari ini"
+        "en": "today",
+        "fr": "aujourd'hui",
+        "es": "hoy",
+        "pt": "hoje",
+        "ru": "сегодня",
+        "hi": "आज",
+        "zh-Hans": "今天",
+        "ar": "اليوم",
+        "bn": "আজ",
+        "id": "hari ini",
     },
     "tomorrow": {
-        "en": "tomorrow", "fr": "demain", "es": "mañana", "pt": "amanhã", "ru": "завтра", "hi": "कल", "zh-Hans": "明天", "ar": "غدًا", "bn": "আগামীকাল", "id": "besok"
+        "en": "tomorrow",
+        "fr": "demain",
+        "es": "mañana",
+        "pt": "amanhã",
+        "ru": "завтра",
+        "hi": "कल",
+        "zh-Hans": "明天",
+        "ar": "غدًا",
+        "bn": "আগামীকাল",
+        "id": "besok",
     },
     "like currently": {
-        "en": "like currently", "fr": "en cours", "es": "en curso", "pt": "em andamento", "ru": "в процессе", "hi": "वर्तमान", "zh-Hans": "当前", "ar": "جارٍ", "bn": "চলমান", "id": "sedang berlangsung"
+        "en": "like currently",
+        "fr": "en cours",
+        "es": "en curso",
+        "pt": "em andamento",
+        "ru": "в процессе",
+        "hi": "वर्तमान",
+        "zh-Hans": "当前",
+        "ar": "جارٍ",
+        "bn": "চলমান",
+        "id": "sedang berlangsung",
     },
     # Patterns with {n} and optional years/days composite handled in function
 }
@@ -234,8 +315,8 @@ def _load_relative():  # lazy load
     _RELATIVE_LOAD_TRIED = True
     try:
         base_dir = os.path.dirname(os.path.dirname(__file__))  # helpers/ -> vikunja/
-        rel_path = os.path.join(base_dir, 'translations', 'relative_phrases.json')
-        with open(rel_path, 'r', encoding='utf-8') as f:  # noqa: PTH123
+        rel_path = os.path.join(base_dir, "translations", "relative_phrases.json")
+        with open(rel_path, "r", encoding="utf-8") as f:  # noqa: PTH123
             _RELATIVE_PHRASES = json.load(f)
     except Exception:  # noqa: BLE001
         _RELATIVE_PHRASES = None
@@ -243,7 +324,7 @@ def _load_relative():  # lazy load
 
 def localize_due_phrase(raw: str, lang: str) -> str:
     _load_relative()
-    rp = _RELATIVE_PHRASES.get('due') if isinstance(_RELATIVE_PHRASES, dict) else None  # type: ignore
+    rp = _RELATIVE_PHRASES.get("due") if isinstance(_RELATIVE_PHRASES, dict) else None  # type: ignore
     # direct map
     if raw in _DUE_BASE and lang in _DUE_BASE[raw]:
         return _DUE_BASE[raw][lang]
@@ -254,10 +335,21 @@ def localize_due_phrase(raw: str, lang: str) -> str:
         # in 3 days
         try:
             num = raw.split()[1]
-            if rp and 'in_days' in rp:
-                templates = rp['in_days']
+            if rp and "in_days" in rp:
+                templates = rp["in_days"]
             else:
-                templates = {"en": "in {n} days", "fr": "dans {n} jours", "es": "en {n} días", "pt": "em {n} dias", "ru": "через {n} дней", "hi": "{n} दिन में", "zh-Hans": "{n} 天后", "ar": "خلال {n} يومًا", "bn": "{n} দিনে", "id": "dalam {n} hari"}
+                templates = {
+                    "en": "in {n} days",
+                    "fr": "dans {n} jours",
+                    "es": "en {n} días",
+                    "pt": "em {n} dias",
+                    "ru": "через {n} дней",
+                    "hi": "{n} दिन में",
+                    "zh-Hans": "{n} 天后",
+                    "ar": "خلال {n} يومًا",
+                    "bn": "{n} দিনে",
+                    "id": "dalam {n} hari",
+                }
             tpl = templates.get(lang, templates["en"])
             return tpl.format(n=num)
         except Exception:  # noqa: BLE001
@@ -267,17 +359,39 @@ def localize_due_phrase(raw: str, lang: str) -> str:
         try:
             parts = raw.split()
             years = parts[1]
-            rest = raw[raw.find("("):]
-            if rp and 'in_years' in rp:
-                templates = rp['in_years']
+            rest = raw[raw.find("(") :]
+            if rp and "in_years" in rp:
+                templates = rp["in_years"]
             else:
-                templates = {"en": "in {y} years {rest}", "fr": "dans {y} ans {rest}", "es": "en {y} años {rest}", "pt": "em {y} anos {rest}", "ru": "через {y} лет {rest}", "hi": "{y} वर्ष में {rest}", "zh-Hans": "{y} 年后 {rest}", "ar": "خلال {y} سنوات {rest}", "bn": "{y} বছরে {rest}", "id": "dalam {y} tahun {rest}"}
+                templates = {
+                    "en": "in {y} years {rest}",
+                    "fr": "dans {y} ans {rest}",
+                    "es": "en {y} años {rest}",
+                    "pt": "em {y} anos {rest}",
+                    "ru": "через {y} лет {rest}",
+                    "hi": "{y} वर्ष में {rest}",
+                    "zh-Hans": "{y} 年后 {rest}",
+                    "ar": "خلال {y} سنوات {rest}",
+                    "bn": "{y} বছরে {rest}",
+                    "id": "dalam {y} tahun {rest}",
+                }
             # singular detection
             if years == "1":
-                if rp and 'in_year' in rp:
-                    templates_sing = rp['in_year']
+                if rp and "in_year" in rp:
+                    templates_sing = rp["in_year"]
                 else:
-                    templates_sing = {"en": "in {y} year {rest}", "fr": "dans {y} an {rest}", "es": "en {y} año {rest}", "pt": "em {y} ano {rest}", "ru": "через {y} год {rest}", "hi": "{y} वर्ष में {rest}", "zh-Hans": "{y} 年后 {rest}", "ar": "خلال {y} سنة {rest}", "bn": "{y} বছরে {rest}", "id": "dalam {y} tahun {rest}"}
+                    templates_sing = {
+                        "en": "in {y} year {rest}",
+                        "fr": "dans {y} an {rest}",
+                        "es": "en {y} año {rest}",
+                        "pt": "em {y} ano {rest}",
+                        "ru": "через {y} год {rest}",
+                        "hi": "{y} वर्ष में {rest}",
+                        "zh-Hans": "{y} 年后 {rest}",
+                        "ar": "خلال {y} سنة {rest}",
+                        "bn": "{y} বছরে {rest}",
+                        "id": "dalam {y} tahun {rest}",
+                    }
                 templates.update({k: v for k, v in templates_sing.items()})
             tpl = templates.get(lang, templates["en"])
             return tpl.format(y=years, rest=rest)
@@ -288,42 +402,99 @@ def localize_due_phrase(raw: str, lang: str) -> str:
 
 def localize_repeat_phrase(raw: str, lang: str) -> str:
     _load_relative()
-    rp = _RELATIVE_PHRASES.get('repeat') if isinstance(_RELATIVE_PHRASES, dict) else None  # type: ignore
+    rp = (
+        _RELATIVE_PHRASES.get("repeat") if isinstance(_RELATIVE_PHRASES, dict) else None
+    )  # type: ignore
     if not raw:
         return raw
     # raw patterns: repeats in X day(s); repeats in Y years (Z days); repeats every N seconds
     if raw.startswith("repeats every ") and raw.endswith(" seconds"):
         num = raw.split()[2]
-        if rp and 'every_seconds' in rp:
-            templates = rp['every_seconds']
+        if rp and "every_seconds" in rp:
+            templates = rp["every_seconds"]
         else:
-            templates = {"en": "repeats every {n} seconds", "fr": "se répète toutes les {n} secondes", "es": "se repite cada {n} segundos", "pt": "repete a cada {n} segundos", "ru": "повторяется каждые {n} секунд", "hi": "हर {n} सेकंड में دوहराता है", "zh-Hans": "每 {n} 秒重复", "ar": "يتكرر كل {n} ثانية", "bn": "প্রতি {n} সেকেন্ডে পুনরাবৃত্তি", "id": "berulang setiap {n} detik"}
+            templates = {
+                "en": "repeats every {n} seconds",
+                "fr": "se répète toutes les {n} secondes",
+                "es": "se repite cada {n} segundos",
+                "pt": "repete a cada {n} segundos",
+                "ru": "повторяется каждые {n} секунд",
+                "hi": "हर {n} सेकंड में دوहराता है",
+                "zh-Hans": "每 {n} 秒重复",
+                "ar": "يتكرر كل {n} ثانية",
+                "bn": "প্রতি {n} সেকেন্ডে পুনরাবৃত্তি",
+                "id": "berulang setiap {n} detik",
+            }
         return templates.get(lang, templates["en"]).format(n=num)
     if raw.startswith("repeats in ") and raw.endswith(" days") and "year" not in raw:
         num = raw.split()[2]
-        if rp and 'in_days' in rp:
-            templates = rp['in_days']
+        if rp and "in_days" in rp:
+            templates = rp["in_days"]
         else:
-            templates = {"en": "repeats in {n} days", "fr": "se répète dans {n} jours", "es": "se repite en {n} días", "pt": "repete em {n} dias", "ru": "повтор через {n} дней", "hi": "{n} दिन में दोहराता है", "zh-Hans": "{n} 天后重复", "ar": "يتكرر خلال {n} يومًا", "bn": "{n} দিনে পুনরাবৃত্তি", "id": "berulang dalam {n} hari"}
+            templates = {
+                "en": "repeats in {n} days",
+                "fr": "se répète dans {n} jours",
+                "es": "se repite en {n} días",
+                "pt": "repete em {n} dias",
+                "ru": "повтор через {n} дней",
+                "hi": "{n} दिन में दोहराता है",
+                "zh-Hans": "{n} 天后重复",
+                "ar": "يتكرر خلال {n} يومًا",
+                "bn": "{n} দিনে পুনরাবৃত্তি",
+                "id": "berulang dalam {n} hari",
+            }
         if num == "1":
-            if rp and 'in_day' in rp:
-                templates_sing = rp['in_day']
+            if rp and "in_day" in rp:
+                templates_sing = rp["in_day"]
             else:
-                templates_sing = {"en": "repeats in {n} day", "fr": "se répète dans {n} jour", "es": "se repite en {n} día", "pt": "repete em {n} dia", "ru": "повтор через {n} день", "hi": "{n} दिन में दोहराता है", "zh-Hans": "{n} 天后重复", "ar": "يتكرر خلال {n} يوم", "bn": "{n} দিনে পুনরাবৃত্তি", "id": "berulang dalam {n} hari"}
+                templates_sing = {
+                    "en": "repeats in {n} day",
+                    "fr": "se répète dans {n} jour",
+                    "es": "se repite en {n} día",
+                    "pt": "repete em {n} dia",
+                    "ru": "повтор через {n} день",
+                    "hi": "{n} दिन में दोहराता है",
+                    "zh-Hans": "{n} 天后重复",
+                    "ar": "يتكرر خلال {n} يوم",
+                    "bn": "{n} দিনে পুনরাবৃত্তি",
+                    "id": "berulang dalam {n} hari",
+                }
             templates.update(templates_sing)
         return templates.get(lang, templates["en"]).format(n=num)
     if raw.startswith("repeats in ") and "year" in raw:
         years = raw.split()[2]
-        rest = raw[raw.find("("):]
-        if rp and 'in_years' in rp:
-            templates = rp['in_years']
+        rest = raw[raw.find("(") :]
+        if rp and "in_years" in rp:
+            templates = rp["in_years"]
         else:
-            templates = {"en": "repeats in {y} years {rest}", "fr": "se répète dans {y} ans {rest}", "es": "se repite en {y} años {rest}", "pt": "repete em {y} anos {rest}", "ru": "повтор через {y} лет {rest}", "hi": "{y} वर्ष में दोहराता है {rest}", "zh-Hans": "{y} 年后重复 {rest}", "ar": "يتكرر خلال {y} سنوات {rest}", "bn": "{y} বছরে পুনরাবৃত্তি {rest}", "id": "berulang dalam {y} tahun {rest}"}
+            templates = {
+                "en": "repeats in {y} years {rest}",
+                "fr": "se répète dans {y} ans {rest}",
+                "es": "se repite en {y} años {rest}",
+                "pt": "repete em {y} anos {rest}",
+                "ru": "повтор через {y} лет {rest}",
+                "hi": "{y} वर्ष में दोहराता है {rest}",
+                "zh-Hans": "{y} 年后重复 {rest}",
+                "ar": "يتكرر خلال {y} سنوات {rest}",
+                "bn": "{y} বছরে পুনরাবৃত্তি {rest}",
+                "id": "berulang dalam {y} tahun {rest}",
+            }
         if years == "1":
-            if rp and 'in_year' in rp:
-                templates_sing = rp['in_year']
+            if rp and "in_year" in rp:
+                templates_sing = rp["in_year"]
             else:
-                templates_sing = {"en": "repeats in {y} year {rest}", "fr": "se répète dans {y} an {rest}", "es": "se repite en {y} año {rest}", "pt": "repete em {y} ano {rest}", "ru": "повтор через {y} год {rest}", "hi": "{y} वर्ष में दोहराता है {rest}", "zh-Hans": "{y} 年后重复 {rest}", "ar": "يتكرر خلال {y} سنة {rest}", "bn": "{y} বছরে पुनরাবৃত্তि {rest}", "id": "berulang dalam {y} tahun {rest}"}
+                templates_sing = {
+                    "en": "repeats in {y} year {rest}",
+                    "fr": "se répète dans {y} an {rest}",
+                    "es": "se repite en {y} año {rest}",
+                    "pt": "repete em {y} ano {rest}",
+                    "ru": "повтор через {y} год {rest}",
+                    "hi": "{y} वर्ष में दोहराता है {rest}",
+                    "zh-Hans": "{y} 年后重复 {rest}",
+                    "ar": "يتكرر خلال {y} سنة {rest}",
+                    "bn": "{y} বছরে पुनরাবৃত্তि {rest}",
+                    "id": "berulang dalam {y} tahun {rest}",
+                }
             templates.update(templates_sing)
         return templates.get(lang, templates["en"]).format(y=years, rest=rest)
     return raw
@@ -342,20 +513,50 @@ def localized_priority(priority: int, lang: str) -> str | None:
     return mapping.get(lang) or mapping.get("en")
 
 
-def build_detailed_parts(lang: str, project_name: str | None, labels_part: str | None,
-                          due_phrase: str | None, assignee: str | None,
-                          priority_word: str | None, repeat_phrase: str | None):
+def build_detailed_parts(
+    lang: str,
+    project_name: str | None,
+    labels_part: str | None,
+    due_phrase: str | None,
+    assignee: str | None,
+    priority_word: str | None,
+    repeat_phrase: str | None,
+):
     parts = []
     if project_name:
-        parts.append(_DETAIL_TOKENS["project"].get(lang, _DETAIL_TOKENS["project"]["en"]).format(name=project_name))
+        parts.append(
+            _DETAIL_TOKENS["project"]
+            .get(lang, _DETAIL_TOKENS["project"]["en"])
+            .format(name=project_name)
+        )
     if labels_part:
-        parts.append(_DETAIL_TOKENS["labels"].get(lang, _DETAIL_TOKENS["labels"]["en"]).format(labels=labels_part))
+        parts.append(
+            _DETAIL_TOKENS["labels"]
+            .get(lang, _DETAIL_TOKENS["labels"]["en"])
+            .format(labels=labels_part)
+        )
     if due_phrase:
-        parts.append(_DETAIL_TOKENS["due"].get(lang, _DETAIL_TOKENS["due"]["en"]).format(phrase=due_phrase))
+        parts.append(
+            _DETAIL_TOKENS["due"]
+            .get(lang, _DETAIL_TOKENS["due"]["en"])
+            .format(phrase=due_phrase)
+        )
     if assignee:
-        parts.append(_DETAIL_TOKENS["assigned"].get(lang, _DETAIL_TOKENS["assigned"]["en"]).format(name=assignee))
+        parts.append(
+            _DETAIL_TOKENS["assigned"]
+            .get(lang, _DETAIL_TOKENS["assigned"]["en"])
+            .format(name=assignee)
+        )
     if priority_word:
-        parts.append(_DETAIL_TOKENS["priority"].get(lang, _DETAIL_TOKENS["priority"]["en"]).format(label=priority_word))
+        parts.append(
+            _DETAIL_TOKENS["priority"]
+            .get(lang, _DETAIL_TOKENS["priority"]["en"])
+            .format(label=priority_word)
+        )
     if repeat_phrase:
-        parts.append(_DETAIL_TOKENS["repeat"].get(lang, _DETAIL_TOKENS["repeat"]["en"]).format(phrase=repeat_phrase))
+        parts.append(
+            _DETAIL_TOKENS["repeat"]
+            .get(lang, _DETAIL_TOKENS["repeat"]["en"])
+            .format(phrase=repeat_phrase)
+        )
     return parts
