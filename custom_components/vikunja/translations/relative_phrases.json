@@ -1,0 +1,18 @@
+{
+  "due": {
+    "today": {"en":"today","fr":"aujourd'hui","es":"hoy","pt":"hoje","ru":"сегодня","hi":"आज","zh-Hans":"今天","ar":"اليوم","bn":"আজ","id":"hari ini"},
+    "tomorrow": {"en":"tomorrow","fr":"demain","es":"mañana","pt":"amanhã","ru":"завтра","hi":"कल","zh-Hans":"明天","ar":"غدًا","bn":"আগামীকাল","id":"besok"},
+    "like currently": {"en":"like currently","fr":"en cours","es":"en curso","pt":"em andamento","ru":"в процессе","hi":"वर्तमान","zh-Hans":"当前","ar":"جارٍ","bn":"চলমান","id":"sedang berlangsung"},
+    "in_days": {"en":"in {n} days","fr":"dans {n} jours","es":"en {n} días","pt":"em {n} dias","ru":"через {n} дней","hi":"{n} दिन में","zh-Hans":"{n} 天后","ar":"خلال {n} يومًا","bn":"{n} দিনে","id":"dalam {n} hari"},
+    "in_days_sing": {"en":"in {n} day","fr":"dans {n} jour","es":"en {n} día","pt":"em {n} dia","ru":"через {n} день","hi":"{n} दिन में","zh-Hans":"{n} 天后","ar":"خلال {n} يوم","bn":"{n} দিনে","id":"dalam {n} hari"},
+    "in_years": {"en":"in {y} years ({d} days)","fr":"dans {y} ans ({d} jours)","es":"en {y} años ({d} días)","pt":"em {y} anos ({d} dias)","ru":"через {y} лет ({d} дней)","hi":"{y} वर्ष में ({d} दिन)","zh-Hans":"{y} 年后 ({d} 天)","ar":"خلال {y} سنوات ({d} يومًا)","bn":"{y} বছরে ({d} দিন)","id":"dalam {y} tahun ({d} hari)"},
+    "in_year": {"en":"in {y} year ({d} days)","fr":"dans {y} an ({d} jours)","es":"en {y} año ({d} días)","pt":"em {y} ano ({d} dias)","ru":"через {y} год ({d} дней)","hi":"{y} वर्ष में ({d} दिन)","zh-Hans":"{y} 年后 ({d} 天)","ar":"خلال {y} سنة ({d} يوم)","bn":"{y} বছরে ({d} দিন)","id":"dalam {y} tahun ({d} hari)"}
+  },
+  "repeat": {
+    "every_seconds": {"en":"repeats every {n} seconds","fr":"se répète toutes les {n} secondes","es":"se repite cada {n} segundos","pt":"repete a cada {n} segundos","ru":"повторяется каждые {n} секунд","hi":"हर {n} सेकंड में दोहराता है","zh-Hans":"每 {n} 秒重复","ar":"يتكرر كل {n} ثانية","bn":"প্রতি {n} সেকেন্ডে পুনরাবৃত্তি","id":"berulang setiap {n} detik"},
+    "in_days": {"en":"repeats in {n} days","fr":"se répète dans {n} jours","es":"se repite en {n} días","pt":"repete em {n} dias","ru":"повтор через {n} дней","hi":"{n} दिन में दोहराता है","zh-Hans":"{n} 天后重复","ar":"يتكرر خلال {n} يومًا","bn":"{n} দিনে পুনরাবৃত্তি","id":"berulang dalam {n} hari"},
+    "in_day": {"en":"repeats in {n} day","fr":"se répète dans {n} jour","es":"se repite en {n} día","pt":"repete em {n} dia","ru":"повтор через {n} день","hi":"{n} दिन में दोहराता है","zh-Hans":"{n} 天后重复","ar":"يتكرر خلال {n} يوم","bn":"{n} দিনে পুনরাবৃত্তি","id":"berulang dalam {n} hari"},
+    "in_years": {"en":"repeats in {y} years ({d} days)","fr":"se répète dans {y} ans ({d} jours)","es":"se repite en {y} años ({d} días)","pt":"repete em {y} anos ({d} dias)","ru":"повтор через {y} лет ({d} дней)","hi":"{y} वर्ष में दोहराता है ({d} दिन)","zh-Hans":"{y} 年后重复 ({d} 天)","ar":"يتكرر خلال {y} سنوات ({d} يومًا)","bn":"{y} বছরে পুনরাবৃত্তি ({d} দিন)","id":"berulang dalam {y} tahun ({d} hari)"},
+    "in_year": {"en":"repeats in {y} year ({d} days)","fr":"se répète dans {y} an ({d} jours)","es":"se repite en {y} año ({d} días)","pt":"repete em {y} ano ({d} dias)","ru":"повтор через {y} год ({d} дней)","hi":"{y} वर्ष में दोहराता है ({d} दिन)","zh-Hans":"{y} 年后重复 ({d} 天)","ar":"يتكرر خلال {y} سنة ({d} يوم)","bn":"{y} বছরে পুনরাবৃত্তি ({d} দিন)","id":"berulang dalam {y} tahun ({d} hari)"}
+  }
+}

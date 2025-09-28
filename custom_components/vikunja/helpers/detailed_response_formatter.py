@@ -3,6 +3,14 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 
+# Optional localization imports are done lazily to avoid circulars when tests import
+# this module directly. We keep English defaults if localization module unavailable.
+try:  # pragma: no cover - defensive import
+    from .localization import build_detailed_parts, localized_priority, localize_due_phrase, localize_repeat_phrase, L
+except Exception:  # noqa: BLE001
+    build_detailed_parts = None  # type: ignore
+    localized_priority = None  # type: ignore
+
 def friendly_due_phrase(iso_dt: str) -> str:
     try:
         cleaned = iso_dt.rstrip('Z')
@@ -25,12 +33,9 @@ def friendly_due_phrase(iso_dt: str) -> str:
             return "tomorrow"
         if delta_days < 0:
             return "like currently"
-        # Future 2..364 days
         if 2 <= delta_days < 365:
             return f"in {delta_days} days"
-        # >= 365 days
         years = delta_days // 365
-        # Always include total days after number of years
         year_word = "year" if years == 1 else "years"
         return f"in {years} {year_word} ({delta_days} days)"
     except Exception:  # noqa: BLE001
@@ -53,7 +58,7 @@ def friendly_repeat_phrase(repeat_after_seconds: int) -> Optional[str]:
         if years >= 1:
             year_word = "year" if years == 1 else "years"
             phrase = f"repeats in {years} {year_word} ({days} days)"
-        else:  # safety fallback though logically unreachable due to earlier branch
+        else:  # fallback
             phrase = f"repeats in {days} days"
     return phrase
 
@@ -67,73 +72,113 @@ def build_detailed_response(
     extracted_label_ids: List[int],
     assignee_username_or_name: Optional[str],
     enable_user_assignment: bool,
+    lang: str | None = None,
 ) -> str:
-    details_parts: List[str] = []
-    # Project name (skip generic bucket names)
+    """Build a (potentially) localized detailed response string.
+
+    lang: language code; if None or 'en' or localization helpers missing, falls back to English.
+    """
+    # Collect lookup tables
+    project_name: Optional[str] = None
     try:
         project_id = task_data.get("project_id")
         if project_id and project_id != 1:
             proj_lookup: Dict[int, str] = {}
             for p in (projects or []):
-                if not isinstance(p, dict):
-                    continue
-                pid = p.get("id")
-                if pid is None:
-                    continue
-                pname = p.get("title") or p.get("name") or ""
-                if isinstance(pname, str):
-                    proj_lookup[pid] = pname.strip()
-            project_name = proj_lookup.get(project_id)
-            if project_name and project_name.lower() not in {"other", "misc", "general"}:
-                details_parts.append(f"project '{project_name}'")
+                if isinstance(p, dict):
+                    pid = p.get("id")
+                    pname = p.get("title") or p.get("name") or ""
+                    if pid is not None and isinstance(pname, str):
+                        proj_lookup[pid] = pname.strip()
+            raw_name = proj_lookup.get(project_id)
+            if raw_name and raw_name.lower() not in {"other", "misc", "general"}:
+                project_name = raw_name
     except Exception:  # noqa: BLE001
-        pass
+        project_name = None
 
-    # Labels (excluding auto voice unless it was originally there; still show if present in extracted list)
+    labels_part: Optional[str] = None
     try:
-        label_ids_attached = extracted_label_ids.copy()
-        if label_ids_attached:
+        if extracted_label_ids:
             label_lookup = {l.get("id"): l.get("title") for l in (labels or []) if isinstance(l, dict)}
-            label_names = [str(label_lookup.get(lid, str(lid))) for lid in label_ids_attached if lid in label_lookup or lid is not None]
+            label_names = [str(label_lookup.get(lid, str(lid))) for lid in extracted_label_ids if lid in label_lookup or lid is not None]
             if label_names:
-                details_parts.append("labels: " + ", ".join(label_names))
+                labels_part = ", ".join(label_names)
     except Exception:  # noqa: BLE001
-        pass
+        labels_part = None
 
-    # Due date
+    due_phrase: Optional[str] = None
     due_date = task_data.get("due_date")
     if due_date:
-        details_parts.append(f"due {friendly_due_phrase(due_date)}")
+        base_due = friendly_due_phrase(due_date)
+        if lang and lang != "en" and 'localize_due_phrase' in globals() and 'localize_due_phrase':  # type: ignore
+            try:
+                due_phrase = localize_due_phrase(base_due, lang)  # type: ignore
+            except Exception:  # noqa: BLE001
+                due_phrase = base_due
+        else:
+            due_phrase = base_due
 
-    # Assignee
-    if enable_user_assignment and assignee_username_or_name:
-        details_parts.append(f"assigned to {assignee_username_or_name}")
+    assignee = assignee_username_or_name if enable_user_assignment and assignee_username_or_name else None
 
-    # Priority (map 1-5 to words)
+    priority_word: Optional[str] = None
     try:
         priority = task_data.get("priority")
         if isinstance(priority, int):
-            priority_map = {
-                1: "low",
-                2: "medium",
-                3: "high",
-                4: "urgent",
-                5: "do now",
-            }
-            label = priority_map.get(priority)
-            if label:
-                details_parts.append(f"priority {label}")
+            if localized_priority and lang:
+                priority_word = localized_priority(priority, lang) or None
+            if not priority_word:  # fallback English
+                priority_map = {1: "low", 2: "medium", 3: "high", 4: "urgent", 5: "do now"}
+                priority_word = priority_map.get(priority)
     except Exception:  # noqa: BLE001
-        pass
+        priority_word = None
 
-    # Repeat
+    repeat_phrase: Optional[str] = None
     try:
         repeat_after = task_data.get("repeat_after")
-        fr = friendly_repeat_phrase(repeat_after) if isinstance(repeat_after, int) else None
-        if fr:
-            details_parts.append(fr)
+        raw_repeat = friendly_repeat_phrase(repeat_after) if isinstance(repeat_after, int) else None
+        if raw_repeat and lang and lang != "en" and 'localize_repeat_phrase' in globals():  # type: ignore
+            try:
+                repeat_phrase = localize_repeat_phrase(raw_repeat, lang)  # type: ignore
+            except Exception:  # noqa: BLE001
+                repeat_phrase = raw_repeat
+        else:
+            repeat_phrase = raw_repeat
     except Exception:  # noqa: BLE001
-        pass
+        repeat_phrase = None
 
-    detail_suffix = " (" + "; ".join(details_parts) + ")" if details_parts else ""
-    return f"Successfully added task: {task_title}{detail_suffix}"
+    # Build parts
+    if lang and lang != "en" and build_detailed_parts:
+        parts = build_detailed_parts(
+            lang=lang,
+            project_name=project_name,
+            labels_part=labels_part,
+            due_phrase=due_phrase,
+            assignee=assignee,
+            priority_word=priority_word,
+            repeat_phrase=repeat_phrase,
+        )
+        suffix = " (" + "; ".join(parts) + ")" if parts else ""
+        if lang and lang != "en" and 'L' in globals():  # type: ignore
+            try:
+                prefix = L("success_added", lang, title=task_title)  # type: ignore
+                return f"{prefix}{suffix}"
+            except Exception:  # noqa: BLE001
+                pass
+        return f"Successfully added task: {task_title}{suffix}"
+
+    # English / fallback legacy behavior
+    details_parts: List[str] = []
+    if project_name:
+        details_parts.append(f"project '{project_name}'")
+    if labels_part:
+        details_parts.append("labels: " + labels_part)
+    if due_phrase:
+        details_parts.append(f"due {due_phrase}")
+    if assignee:
+        details_parts.append(f"assigned to {assignee}")
+    if priority_word:
+        details_parts.append(f"priority {priority_word}")
+    if repeat_phrase:
+        details_parts.append(repeat_phrase)
+    suffix = " (" + "; ".join(details_parts) + ")" if details_parts else ""
+    return f"Successfully added task: {task_title}{suffix}"

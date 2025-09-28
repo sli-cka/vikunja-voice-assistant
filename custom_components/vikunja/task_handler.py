@@ -19,6 +19,10 @@ from .const import (
 from .api.vikunja_api import VikunjaAPI
 from .api.openai_api import OpenAIAPI
 from .helpers.detailed_response_formatter import build_detailed_response, friendly_due_phrase
+from .helpers.localization import (
+    get_language,
+    L,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -40,9 +44,10 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
     enable_user_assignment = domain_config.get(CONF_ENABLE_USER_ASSIGN, False)
     detailed_response = domain_config.get(CONF_DETAILED_RESPONSE, True)
     # Granular include flags removed; when detailed_response is true we include all available metadata.
+    lang = get_language(hass)
     if not all([vikunja_url, vikunja_api_key, openai_api_key]):
         _LOGGER.error("Missing configuration for Vikunja voice assistant")
-        return False, "Configuration error. Please check your Vikunja and OpenAI settings.", ""
+        return False, L("config_error", lang), ""
 
     vikunja_api = VikunjaAPI(vikunja_url, vikunja_api_key)
     projects, labels = await asyncio.gather(
@@ -81,7 +86,7 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
     )
     if not openai_response:
         _LOGGER.error("Failed to process task with OpenAI")
-        return False, "Sorry, I couldn't process your task due to a connection error. Please try again later.", ""
+        return False, L("openai_conn_error", lang), ""
     try:
         response_data = openai_response if isinstance(openai_response, dict) else json.loads(openai_response)
         task_data = response_data.get("task_data", {})
@@ -90,13 +95,13 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
         # rather than throwing an AttributeError.
         if task_data is None:
             _LOGGER.error("OpenAI response task_data was None")
-            return False, "Sorry, I couldn't process your task. Please try again.", ""
+            return False, L("openai_process_error", lang), ""
         if not isinstance(task_data, dict):
             _LOGGER.error("OpenAI response task_data not a dict: %r", type(task_data))
-            return False, "Sorry, I couldn't process your task. Please try again.", ""
+            return False, L("openai_process_error", lang), ""
         if not task_data.get("title"):
             _LOGGER.error("Missing required 'title' field in task data")
-            return False, "Sorry, I couldn't understand what task you wanted to create. Please try again.", ""
+            return False, L("openai_missing_title", lang), ""
 
         extracted_label_ids = []
         if isinstance(task_data, dict) and task_data.get("label_ids"):
@@ -149,30 +154,30 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
             # Build response message
             # detailed_response flag determines whether to include metadata in response
             if not detailed_response:
-                # Short form success message without metadata.
-                return True, f"Successfully added task: {task_title}", task_title
+                return True, L("success_added", lang, title=task_title), task_title
 
             # Build detailed response via helper module
             safe_task_title = task_title or ""
             try:
                 detailed_message = build_detailed_response(
-                task_title=safe_task_title,
-                task_data=task_data,
-                projects=projects,
-                labels=labels,
-                extracted_label_ids=extracted_label_ids,
-                assignee_username_or_name=assignee_username_or_name,
-                enable_user_assignment=enable_user_assignment,
+                    task_title=safe_task_title,
+                    task_data=task_data,
+                    projects=projects,
+                    labels=labels,
+                    extracted_label_ids=extracted_label_ids,
+                    assignee_username_or_name=assignee_username_or_name,
+                    enable_user_assignment=enable_user_assignment,
+                    lang=lang,
                 )
             except Exception as format_err:  # noqa: BLE001
                 _LOGGER.error("Error building detailed response: %s", format_err)
-                return True, f"Successfully added task: {safe_task_title}", safe_task_title
+                return True, L("success_added", lang, title=safe_task_title), safe_task_title
             return True, detailed_message, safe_task_title
         _LOGGER.error("Failed to create task in Vikunja")
-        return False, "Sorry, I couldn't add the task to Vikunja. Please check your Vikunja connection.", ""
+        return False, L("vikunja_add_error", lang), ""
     except json.JSONDecodeError as err:  # noqa: BLE001
         _LOGGER.error("Failed to parse OpenAI response as JSON: %s", err)
-        return False, "Sorry, there was an error processing your task. Please try again.", ""
+        return False, L("json_parse_error", lang), ""
     except Exception as err:  # noqa: BLE001
         _LOGGER.error("Unexpected error creating task: %s", err)
-        return False, "Sorry, an unexpected error occurred. Please try again.", ""
+        return False, L("unexpected_error", lang), ""
