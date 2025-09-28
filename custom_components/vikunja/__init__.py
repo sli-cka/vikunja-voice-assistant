@@ -84,6 +84,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             await user_cache_manager.refresh(force=True)
         hass.services.async_register(DOMAIN, "refresh_user_cache", _handle_refresh_users)
 
+    # Copy bundled custom sentences (all languages) into HA config dir before reload
+    try:
+        copy_custom_sentences(hass)
+    except Exception as sentence_err:  # noqa: BLE001
+        _LOGGER.error("Failed to copy custom sentences: %s", sentence_err)
+
     # Prompt conversation agent to reload custom sentences / intents
     await hass.services.async_call("conversation", "reload", {})
     return True
