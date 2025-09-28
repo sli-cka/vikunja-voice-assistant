@@ -38,7 +38,7 @@ async def process_task(hass, task_description: str, user_cache_users: List[Dict[
     voice_correction = domain_config.get(CONF_VOICE_CORRECTION, True)
     auto_voice_label = domain_config.get(CONF_AUTO_VOICE_LABEL, True)
     enable_user_assignment = domain_config.get(CONF_ENABLE_USER_ASSIGN, False)
-    detailed_response = domain_config.get(CONF_DETAILED_RESPONSE, False)
+    detailed_response = domain_config.get(CONF_DETAILED_RESPONSE, True)
     # Granular include flags removed; when detailed_response is true we include all available metadata.
 
     if not all([vikunja_url, vikunja_api_key, openai_api_key]):

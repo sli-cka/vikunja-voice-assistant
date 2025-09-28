@@ -63,7 +63,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         CONF_VOICE_CORRECTION: entry.data[CONF_VOICE_CORRECTION],
         CONF_AUTO_VOICE_LABEL: entry.data.get(CONF_AUTO_VOICE_LABEL, True),
         CONF_ENABLE_USER_ASSIGN: entry.data.get(CONF_ENABLE_USER_ASSIGN, False),
-    CONF_DETAILED_RESPONSE: entry.data.get(CONF_DETAILED_RESPONSE, False),
+        CONF_DETAILED_RESPONSE: entry.data.get(CONF_DETAILED_RESPONSE, True),
     }
 
     # User cache manager (optional feature)

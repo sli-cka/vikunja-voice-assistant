@@ -84,7 +84,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
                 vol.Required(CONF_AUTO_VOICE_LABEL, default=True): cv.boolean,
                 vol.Required(CONF_ENABLE_USER_ASSIGN, default=False): cv.boolean,
                 vol.Required(CONF_DUE_DATE, default="tomorrow"): due_date_selector,
-                vol.Required(CONF_DETAILED_RESPONSE, default=False): cv.boolean,
+                vol.Required(CONF_DETAILED_RESPONSE, default=True): cv.boolean,
             }
         )
 
@@ -146,7 +146,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
                     vol.Required(CONF_AUTO_VOICE_LABEL, default=user_input.get(CONF_AUTO_VOICE_LABEL, True)): cv.boolean,
                     vol.Required(CONF_ENABLE_USER_ASSIGN, default=user_input.get(CONF_ENABLE_USER_ASSIGN, False)): cv.boolean,
                     vol.Required(CONF_DUE_DATE, default=user_input.get(CONF_DUE_DATE, "tomorrow")): due_date_selector,
-                    vol.Required(CONF_DETAILED_RESPONSE, default=user_input.get(CONF_DETAILED_RESPONSE, False)): cv.boolean,
+                    vol.Required(CONF_DETAILED_RESPONSE, default=user_input.get(CONF_DETAILED_RESPONSE, True)): cv.boolean,
                 }
             )
 
