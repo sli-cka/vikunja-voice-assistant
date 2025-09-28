@@ -2,14 +2,14 @@
 
 # 🎙️ Vikunja Voice Assistant for Home Assistant
 
-<img src="https://raw.githubusercontent.com/NeoHuncho/vikunja-voice-assistant/main/logo.png" alt="Vikunja Voice Assistant logo" width="160" />  
+<img src="https://raw.githubusercontent.com/NeoHuncho/vikunja-voice-assistant/main/logo.png" alt="Vikunja Voice Assistant logo" width="160" />
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)[![HACS Default](https://img.shields.io/badge/HACS-Default-blue.svg)](https://hacs.xyz/) [![Powered by OpenAI](https://img.shields.io/badge/AI-OpenAI-ff69b4.svg)](https://platform.openai.com/)
 
 Say **“create a task”** or **“add a task”** → Your task goes straight into Vikunja!
 
 *[Video Demo 🎥](https://github.com/user-attachments/assets/c592b0e8-efc6-40d1-ad53-a442de69bfc5)*
-</div>  
+</div>
 
 
 
@@ -48,7 +48,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 4. Search: **Vikunja Voice Assistant**
 
 5. Fill out setup form (Vikunja URL, API token, OpenAI key, options)
-  
+
    * **Vikunja API Token** → User Settings → API Tokens
 
      * **Set the following permissions**:
@@ -86,7 +86,7 @@ Append this to your Home Assistant Voice Assistant’s conversation Agent custom
 
 
 ```
-If the user mentions or implies creating or adding a new task, 
+If the user mentions or implies creating or adding a new task,
 always call this tool (do not leave any field empty):
 
 tool_name: VikunjaAddTask
@@ -116,3 +116,56 @@ Check the [roadmap project](https://github.com/users/NeoHuncho/projects/1) to se
 ## 📜 License
 
 MIT – see [LICENSE](LICENSE).
+
+---
+
+## 🛠️ Development
+
+### Pre-commit Hooks
+
+This repo provides a `.pre-commit-config.yaml` that will automatically:
+
+* Run the translation key parity script (`scripts/check_translations.py`) – excluding the dynamic `relative_phrases.json` file.
+* Run the test suite (`pytest -q`) for a quick safety check.
+* Apply basic hygiene hooks (trailing whitespace, EOF fixer, JSON/YAML validation, debug statement detection).
+
+Install once:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+Run manually against all files (helpful after adding new hooks):
+
+```bash
+pre-commit run --all-files
+```
+
+If tests are slow for you locally, you can temporarily skip the pytest hook by committing with:
+
+```bash
+SKIP=pytest git commit -m "Your message"
+```
+
+### Adding/Updating Translations
+
+* UI & configuration strings live in `custom_components/vikunja/translations/*.json` (parity enforced).
+* Relative due/repeat phrases live in `relative_phrases.json` and are intentionally excluded from the parity check (structure differs).
+* Run `python scripts/check_translations.py` before committing changes to catch missing keys early.
+
+### Fast Test Run
+
+```bash
+python -m pytest -q
+```
+
+### Updating Hooks
+
+Edit `.pre-commit-config.yaml` then run:
+
+```bash
+pre-commit autoupdate
+```
+
+Commit the updated revisions.

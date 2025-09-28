@@ -10,7 +10,7 @@ USER_CACHE_FILENAME = "vikunja_users.json"
 USER_CACHE_REFRESH_HOURS = 24  # default refresh cadence
 DUE_DATE_OPTIONS = [
     "none",
-    "tomorrow", 
+    "tomorrow",
     "end_of_week",
     "end_of_month"
 ]

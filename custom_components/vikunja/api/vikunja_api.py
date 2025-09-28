@@ -13,7 +13,7 @@ class VikunjaAPI:
             "Content-Type": "application/json",
             "Authorization": f"Bearer {vikunja_api_key}"
         }
-        
+
     def test_connection(self):
         """Simple connectivity check by listing projects."""
         try:
@@ -26,7 +26,7 @@ class VikunjaAPI:
             if resp is not None and hasattr(resp, "text"):
                 _LOGGER.error("Response content: %s", resp.text)
             return False
-            
+
     def get_projects(self):
         try:
             response = requests.get(f"{self.url}/projects", headers=self.headers, timeout=30)

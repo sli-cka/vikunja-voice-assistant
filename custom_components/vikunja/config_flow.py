@@ -35,7 +35,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         }
-        
+
         # Simple test payload to validate API key
         payload = {
             "model": "gpt-5-nano",
@@ -43,7 +43,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
             "max_tokens": 1,
             "reasoning_effort": "minimal"
         }
-        
+
         try:
             timeout = aiohttp.ClientTimeout(total=30)
             async with aiohttp.ClientSession(timeout=timeout) as session:
@@ -62,7 +62,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
         errors = {}
-        
+
         # Build selector once (human-friendly labels, internal values preserved)
         due_date_selector = selector.SelectSelector(
             selector.SelectSelectorConfig(
@@ -92,27 +92,27 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
             # Strip spaces from API keys and tokens
             user_input[CONF_VIKUNJA_API_KEY] = user_input[CONF_VIKUNJA_API_KEY].strip()
             user_input[CONF_OPENAI_API_KEY] = user_input[CONF_OPENAI_API_KEY].strip()
-            
+
             base_url = user_input[CONF_VIKUNJA_URL].rstrip('/')
             if not base_url.endswith('/api/v1'):
                 api_url = f"{base_url}/api/v1"
             else:
                 api_url = base_url
-                
+
             vikunja_api = VikunjaAPI(
                 api_url,
                 user_input[CONF_VIKUNJA_API_KEY]
             )
-            
+
             # Test the Vikunja connection
             vikunja_success = await self.hass.async_add_executor_job(vikunja_api.test_connection)
-            
+
             if not vikunja_success:
                 errors["base"] = "cannot_connect"
             else:
                 # Test OpenAI connection
                 openai_success = await self._test_openai_connection(user_input[CONF_OPENAI_API_KEY])
-                
+
                 if not openai_success:
                     errors[CONF_OPENAI_API_KEY] = "invalid_openai_key"
                 else:
@@ -135,7 +135,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
 
                     # Single step flow now – if detailed response selected we just store the flag.
                     return self.async_create_entry(title=f"Vikunja ({api_url})", data=user_input)
-            
+
             # If there are errors, update the schema with the user's input as defaults
             data_schema = vol.Schema(
                 {

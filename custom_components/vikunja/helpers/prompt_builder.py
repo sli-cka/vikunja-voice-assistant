@@ -81,7 +81,7 @@ def build_task_creation_messages(
     system_message = {
         "role": "system",
         "content": f"""
-        You are an assistant that helps create tasks in Vikunja. 
+        You are an assistant that helps create tasks in Vikunja.
         Given a task description, you will create a JSON payload for the Vikunja API.
 
         Available projects: {json.dumps(project_names)}

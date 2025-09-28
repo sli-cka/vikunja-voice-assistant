@@ -9,9 +9,9 @@ labels: bug
 Clear summary of the problem.
 
 ## Steps To Reproduce (optional)
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 
 ## Logs (redact sensitive info)

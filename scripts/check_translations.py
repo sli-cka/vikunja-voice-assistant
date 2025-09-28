@@ -23,7 +23,7 @@ def flatten(d: Dict[str, Any], prefix: str = ""):
 
 
 def main():
-    files = sorted(TRANSLATION_DIR.glob("*.json"))
+    files = [f for f in sorted(TRANSLATION_DIR.glob("*.json")) if f.name != "relative_phrases.json"]
     if not files:
         print("No translation files found.")
         return 1
