@@ -39,7 +39,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
 ⏱️ *Create your first task in under 2 minutes!*
 
-1. In HACS → Search: **Vikunja Voice Assistant** → Install
+1. In HACS → Search: **[Vikunja Voice Assistant](https://home.coprin.ovh/hacs/repository/998003183)** → Install
 
 2. Restart Home Assistant
 
