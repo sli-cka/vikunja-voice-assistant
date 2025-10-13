@@ -1,8 +1,8 @@
 import asyncio
 import pytest
 
-from custom_components.vikunja.task_handler import process_task
-from custom_components.vikunja.const import (
+from custom_components.vikunja_voice_assistant.task_handler import process_task
+from custom_components.vikunja_voice_assistant.const import (
     DOMAIN,
     CONF_VIKUNJA_URL,
     CONF_VIKUNJA_API_KEY,
@@ -13,7 +13,7 @@ from custom_components.vikunja.const import (
     CONF_ENABLE_USER_ASSIGN,
     CONF_DETAILED_RESPONSE,
 )
-import custom_components.vikunja.task_handler as th_mod
+import custom_components.vikunja_voice_assistant.task_handler as th_mod
 
 
 class FakeHass:

@@ -1,4 +1,4 @@
-from custom_components.vikunja.helpers.prompt_builder import (
+from custom_components.vikunja_voice_assistant.helpers.prompt_builder import (
     build_task_creation_messages,
 )
 

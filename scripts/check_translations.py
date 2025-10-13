@@ -14,7 +14,7 @@ from typing import Any, Dict
 TRANSLATION_DIR = (
     Path(__file__).resolve().parent.parent
     / "custom_components"
-    / "vikunja"
+    / "vikunja_voice_assistant"
     / "translations"
 )
 

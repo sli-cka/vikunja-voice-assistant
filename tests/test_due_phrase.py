@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from custom_components.vikunja.helpers.detailed_response_formatter import (
+from custom_components.vikunja_voice_assistant.helpers.detailed_response_formatter import (
     friendly_due_phrase,
 )
 
