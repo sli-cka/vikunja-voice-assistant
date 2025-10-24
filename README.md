@@ -12,7 +12,9 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 </div>
 
 
-
+> **⚠️ Important Notice:**
+> Due to a pre-existing integration with the same integration directory name, all installs of this integration done **before October 23** must be manually removed and reinstalled.
+> Sorry for the inconvenience!
 
 
 ---
