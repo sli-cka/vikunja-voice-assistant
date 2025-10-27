@@ -32,7 +32,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
 * [Home Assistant](https://www.home-assistant.io/) with a [voice assistant set up](https://www.home-assistant.io/voice_control/)
 * [HACS](https://hacs.xyz/docs/use/download/download/#to-download-hacs-ossupervised)
-* Running Vikunja instance + API token
+* Running Vikunja instance + API token with [correct permissions](https://github.com/NeoHuncho/vikunja-voice-assistant?tab=readme-ov-file#%EF%B8%8F-installation-hacs--full-video-walkthrough)
 * OpenAI API key
 
 ---
