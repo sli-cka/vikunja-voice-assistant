@@ -1,0 +1,27 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Vikunja Sprachassistent",
+        "description": "Vikunja Sprachassistent-Integration einrichten",
+        "data": {
+          "vikunja_url": "Vikunja Basis-URL (z.B. https://vikunja.example.com)",
+          "vikunja_api_key": "Vikunja API-Token",
+          "openai_api_key": "OpenAI API-Schlüssel",
+          "voice_correction": "Spracherkennungs-Textkorrektur aktivieren (empfohlen)",
+          "default_due_date": "Standard-Fälligkeitsdatum, falls keines angegeben (gilt nur, wenn kein Projekt erwähnt wird)",
+          "auto_voice_label": "Automatisch ein 'voice'-Label zu über diese Integration erstellten Aufgaben hinzufügen",
+          "enable_user_assignment": "Benutzerzuweisung aktivieren",
+          "detailed_response": "Detaillierte Sprachantwort aktivieren (enthält Projekt, Labels, Fälligkeitsdatum, Zugewiesene, Priorität & Wiederholungsinfo)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zur Vikunja API fehlgeschlagen. Bitte überprüfen Sie Ihre URL und Ihr API-Token.",
+      "invalid_openai_key": "Ungültiger OpenAI API-Schlüssel. Bitte überprüfen Sie Ihren OpenAI API-Schlüssel."
+    },
+    "abort": {
+      "already_configured": "Dieses Vikunja-Konto ist bereits konfiguriert."
+    }
+  }
+}

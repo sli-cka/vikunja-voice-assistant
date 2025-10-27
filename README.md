@@ -21,10 +21,11 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
 ## ✨ Features
 
-* **Natural voice commands**: *“Create a task…”* or *“Add a task…”* 🗣️
+* **Natural voice commands**: *"Create a task…"* or *"Add a task…"* 🗣️
 * Supports **project, due date, priority, labels, recurrence** and more 📅
 * Optional: speech correction, auto voice label, default due date, user assignment
-* Supports english, mandarin chinese, hindi, spanish, arabic, french, bengali, portuguese, russian, indonesian 🌐
+* Supports 11 languages 🌐 [📖 Voice commands in all 11 languages](VOICE_COMMANDS.md)
+* Uses GPT 5 nano 🚄
 
 ---
 
@@ -112,6 +113,7 @@ Check the [roadmap project](https://github.com/users/NeoHuncho/projects/1) to se
 * ❌ Cannot create new labels (except auto-creating **voice**)
 * ❌ Cannot create new projects
 * ❌ Cannot create new assignee users (only assign existing)
+* ❌ Only works with one language at a time (selected Home Assistant language)
 
 ---
 
