@@ -1,0 +1,12 @@
+# syntax documentation :
+# https://developers.home-assistant.io/docs/voice/intent-recognition/template-sentence-syntax/#sentence-templates-syntax
+language: "de"
+intents:
+  VikunjaAddTask:
+    data:
+      - sentences:
+          - "[Ich | Ich möchte | Ich werde | Ich will | Bitte | Lass uns] (hinzufügen | erstellen | anlegen | machen | setzen | einfügen) [eine | ein | die | das | meine | neue] [neue | kommende | schnelle | einfache | tägliche | wöchentliche] (Aufgabe | Aufgaben | To-Do | Todo | Task) {task_description}"
+
+lists:
+  task_description:
+    wildcard: true

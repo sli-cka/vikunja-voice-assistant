@@ -25,6 +25,7 @@ DUE_DATE_OPTION_LABELS = {
         "ar": "بدون افتراضي",
         "bn": "কোনো ডিফল্ট নয়",
         "id": "Tidak ada default",
+        "de": "Kein Standard",
     },
     "tomorrow": {
         "en": "Tomorrow",
@@ -37,6 +38,7 @@ DUE_DATE_OPTION_LABELS = {
         "ar": "غدًا",
         "bn": "আগামীকাল",
         "id": "Besok",
+        "de": "Morgen",
     },
     "end_of_week": {
         "en": "End of week",
@@ -49,6 +51,7 @@ DUE_DATE_OPTION_LABELS = {
         "ar": "نهاية الأسبوع",
         "bn": "সপ্তাহের শেষ",
         "id": "Akhir minggu",
+        "de": "Ende der Woche",
     },
     "end_of_month": {
         "en": "End of month",
@@ -61,5 +64,6 @@ DUE_DATE_OPTION_LABELS = {
         "ar": "نهاية الشهر",
         "bn": "মাসের শেষ",
         "id": "Akhir bulan",
+        "de": "Ende des Monats",
     },
 }
