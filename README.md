@@ -56,9 +56,8 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
      * **Set the following permissions**:
      * Labels: Create, Read All
-     * Projects: Read All
+     * Projects: Read All, Projectusers (optional)
      * Tasks: Create
-     * Users: Read All (at the bottom of the list) - optional
 
        📹 [Video Guide](https://github.com/user-attachments/assets/aa60d448-650f-4148-9f11-1e27f12e37ac)
 
