@@ -19,7 +19,53 @@ from .api.vikunja_api import VikunjaAPI
 
 _LOGGER = logging.getLogger(__name__)
 
-VOWEL_SEARCH_SET = ["a", "e", "i", "o", "u", "y"]
+
+def _collect_project_users(api: VikunjaAPI) -> Dict[str, Dict[str, Any]]:
+    """Gather unique users across all accessible projects."""
+    combined: Dict[str, Dict[str, Any]] = {}
+    try:
+        projects = api.get_projects() or []
+    except Exception as err:  # noqa: BLE001
+        _LOGGER.error("Failed to retrieve projects for user cache: %s", err)
+        return combined
+
+    for project in projects:
+        project_id = project.get("id")
+        try:
+            project_id_int = int(project_id)
+        except (TypeError, ValueError):
+            _LOGGER.debug("Skipping project with invalid id: %s", project_id)
+            continue
+
+        if project_id_int == -1:
+            _LOGGER.debug("Skipping favorites pseudo-project (%s)", project_id_int)
+            continue
+
+        try:
+            users = api.get_project_users(project_id_int) or []
+        except Exception as err:  # noqa: BLE001
+            _LOGGER.error(
+                "Failed to retrieve project users for project %s: %s",
+                project_id_int,
+                err,
+            )
+            continue
+
+        for u in users:
+            if not isinstance(u, dict):
+                continue
+            user_id = u.get("id")
+            if user_id is None:
+                continue
+            key = str(user_id)
+            if key not in combined:
+                combined[key] = {
+                    "id": user_id,
+                    "name": u.get("name"),
+                    "username": u.get("username"),
+                }
+    return combined
+
 
 
 def _utc_now_iso() -> str:
@@ -31,26 +77,12 @@ def build_initial_user_cache_sync(
 ) -> None:
     """Initial synchronous (executor) build for config flow usage.
 
-    Performs vowel searches once and writes the cache file. Errors are swallowed
+    Fetches project users once and writes the cache file. Errors are swallowed
     (reported via logging) so that the config flow can proceed.
     """
     try:
         api = VikunjaAPI(vikunja_url, api_key)
-        combined: Dict[str, Dict[str, Any]] = {}
-        for letter in VOWEL_SEARCH_SET:
-            try:
-                users = api.search_users(letter) or []
-                for u in users:
-                    if isinstance(u, dict) and u.get("id") is not None:
-                        key = str(u.get("id"))
-                        if key not in combined:
-                            combined[key] = {
-                                "id": u.get("id"),
-                                "name": u.get("name"),
-                                "username": u.get("username"),
-                            }
-            except Exception:  # noqa: BLE001
-                continue
+        combined = _collect_project_users(api)
         path = os.path.join(hass_config_dir, USER_CACHE_FILENAME)
         data = {"users": list(combined.values()), "last_refresh": _utc_now_iso()}
         with open(path, "w", encoding="utf-8") as f:
@@ -116,20 +148,7 @@ class VikunjaUserCacheManager:
     # --------------- Refresh logic ---------------
     def _refresh_sync(self, vikunja_url: str, api_key: str) -> UserCache:
         api = VikunjaAPI(vikunja_url, api_key)
-        combined: Dict[str, Dict[str, Any]] = {}
-        for letter in VOWEL_SEARCH_SET:
-            try:
-                for u in api.search_users(letter) or []:
-                    if isinstance(u, dict) and u.get("id") is not None:
-                        key = str(u.get("id"))
-                        if key not in combined:
-                            combined[key] = {
-                                "id": u.get("id"),
-                                "name": u.get("name"),
-                                "username": u.get("username"),
-                            }
-            except Exception as err:  # noqa: BLE001
-                _LOGGER.error("User search failed for '%s': %s", letter, err)
+        combined = _collect_project_users(api)
         new_cache = UserCache(
             users=list(combined.values()), last_refresh=_utc_now_iso()
         )
