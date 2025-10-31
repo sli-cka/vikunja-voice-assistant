@@ -30,14 +30,40 @@ class VikunjaAPI:
             return False
 
     def get_projects(self):
+        """Return all accessible projects or [] on failure."""
         try:
             response = requests.get(
                 f"{self.url}/projects", headers=self.headers, timeout=30
             )
             response.raise_for_status()
-            return response.json()
+            data = response.json()
+            if isinstance(data, list):
+                return data
+            return []
         except requests.exceptions.RequestException as err:
             _LOGGER.error("Failed to get projects: %s", err)
+            resp = getattr(err, "response", None)
+            if resp is not None and hasattr(resp, "text"):
+                _LOGGER.error("Response content: %s", resp.text)
+            return []
+
+    def get_project_users(self, project_id: int):
+        """Return all users assigned to a project or [] on failure."""
+        try:
+            response = requests.get(
+                f"{self.url}/projects/{project_id}/projectusers",
+                headers=self.headers,
+                timeout=30,
+            )
+            response.raise_for_status()
+            data = response.json()
+            if isinstance(data, list):
+                return data
+            return []
+        except requests.exceptions.RequestException as err:
+            _LOGGER.error(
+                "Failed to get users for project %s: %s", project_id, err
+            )
             resp = getattr(err, "response", None)
             if resp is not None and hasattr(resp, "text"):
                 _LOGGER.error("Response content: %s", resp.text)

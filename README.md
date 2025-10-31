@@ -13,18 +13,18 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
 
 > **⚠️ Important Notice:**
-> Due to a pre-existing integration with the same integration directory name, all installs of this integration done **before October 23** must be manually removed and reinstalled.
-> Sorry for the inconvenience!
+> If you were using user assignments before version 1.4.6, you will need to create a new Vikunja token with the `Projectusers` permission for user assignments to work again.
 
 
 ---
 
 ## ✨ Features
 
-* **Natural voice commands**: *“Create a task…”* or *“Add a task…”* 🗣️
+* **Natural voice commands**: *"Create a task…"* or *"Add a task…"* 🗣️
 * Supports **project, due date, priority, labels, recurrence** and more 📅
 * Optional: speech correction, auto voice label, default due date, user assignment
-* Supports english, mandarin chinese, hindi, spanish, arabic, french, bengali, portuguese, russian, indonesian 🌐
+* Supports 11 languages 🌐 [📖 Voice commands in all 11 languages](VOICE_COMMANDS.md)
+* Uses GPT 5 nano 🚄
 
 ---
 
@@ -54,12 +54,11 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
    * **Vikunja API Token** → User Settings → API Tokens
 
      * **Set the following permissions**:
-     * Labels: Create, Read All
-     * Projects: Read All
+     * Labels: Create and Read All
+     * Projects: Read All, Projectusers (optional - for user assignment)
      * Tasks: Create
-     * Users: Read All (at the bottom of the list) - optional
 
-       📹 [Video Guide](https://github.com/user-attachments/assets/aa60d448-650f-4148-9f11-1e27f12e37ac)
+       📹 [Video Guide](https://github.com/user-attachments/assets/97927621-394b-4fb5-aa66-4cef0325f726)
 
    * **OpenAI API Key** → [Create one here](https://platform.openai.com/account/api-keys)
 
@@ -73,7 +72,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
 | Option                           | Purpose                                                      | Example/Default |
 | -------------------------------- | ------------------------------------------------------------ | --------------- |
-| Speech correction                | Fix STT mistakes before parsing                              | On              |
+| Speech correction                | Fix common speech-to-text errors                             | Enabled         |
 | Auto `voice` label               | Attaches/creates a `voice` label                             | Enabled         |
 | Default due date                 | Used if no date & no project given                           | tomorrow        |
 | Default due date choices         | none, tomorrow, end\_of\_week, end\_of\_month                | tomorrow        |
@@ -112,6 +111,7 @@ Check the [roadmap project](https://github.com/users/NeoHuncho/projects/1) to se
 * ❌ Cannot create new labels (except auto-creating **voice**)
 * ❌ Cannot create new projects
 * ❌ Cannot create new assignee users (only assign existing)
+* ❌ Only works with one language at a time (selected Home Assistant language)
 
 ---
 

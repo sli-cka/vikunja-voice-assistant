@@ -16,7 +16,19 @@ from typing import Dict, Any
 import json
 import os
 
-SUPPORTED_LANGS = {"en", "fr", "es", "pt", "ru", "hi", "zh-Hans", "ar", "bn", "id"}
+SUPPORTED_LANGS = {
+    "en",
+    "fr",
+    "es",
+    "pt",
+    "ru",
+    "hi",
+    "zh-Hans",
+    "ar",
+    "bn",
+    "id",
+    "de",
+}
 
 
 def get_language(hass) -> str:  # noqa: D401
@@ -37,6 +49,7 @@ _BASE: Dict[str, Dict[str, str]] = {
         "ar": "تمت إضافة المهمة: {title}",
         "bn": "টাস্ক যোগ করা হয়েছে: {title}",
         "id": "Tugas ditambahkan: {title}",
+        "de": "Aufgabe erfolgreich hinzugefügt: {title}",
     },
     "config_error": {
         "en": "Configuration error. Please check your Vikunja and OpenAI settings.",
@@ -49,6 +62,7 @@ _BASE: Dict[str, Dict[str, str]] = {
         "ar": "خطأ في الإعدادات. يرجى التحقق من إعدادات Vikunja و OpenAI.",
         "bn": "কনফিগারেশন ত্রুটি। Vikunja ও OpenAI সেটিংস পরীক্ষা করুন।",
         "id": "Kesalahan konfigurasi. Periksa pengaturan Vikunja dan OpenAI.",
+        "de": "Konfigurationsfehler. Bitte überprüfen Sie Ihre Vikunja- und OpenAI-Einstellungen.",
     },
     "openai_conn_error": {
         "en": "Sorry, I couldn't process your task due to a connection error. Please try again later.",
@@ -61,6 +75,7 @@ _BASE: Dict[str, Dict[str, str]] = {
         "ar": "تعذّر معالجة المهمة بسبب خطأ في الاتصال. أعد المحاولة لاحقًا.",
         "bn": "সংযোগ ত্রুটির কারণে টাস্ক প্রক্রিয়া করা যায়নি। পরে আবার চেষ্টা করুন।",
         "id": "Tidak dapat memproses tugas karena kesalahan koneksi. Coba lagi nanti.",
+        "de": "Entschuldigung, ich konnte Ihre Aufgabe aufgrund eines Verbindungsfehlers nicht verarbeiten. Bitte versuchen Sie es später erneut.",
     },
     "openai_process_error": {
         "en": "Sorry, I couldn't process your task. Please try again.",
@@ -73,6 +88,7 @@ _BASE: Dict[str, Dict[str, str]] = {
         "ar": "تعذر معالجة المهمة. أعد المحاولة.",
         "bn": "টাস্ক প্রক্রিয়া করা যায়নি। আবার চেষ্টা করুন।",
         "id": "Tidak dapat memproses tugas. Coba lagi.",
+        "de": "Entschuldigung, ich konnte Ihre Aufgabe nicht verarbeiten. Bitte versuchen Sie es erneut.",
     },
     "openai_missing_title": {
         "en": "Sorry, I couldn't understand what task you wanted to create. Please try again.",
@@ -85,6 +101,7 @@ _BASE: Dict[str, Dict[str, str]] = {
         "ar": "لم أفهم المهمة التي تريد إنشاءها. أعد المحاولة.",
         "bn": "কি টাস্ক তৈরি করতে চেয়েছেন বুঝতে পারিনি। আবার চেষ্টা করুন।",
         "id": "Saya tidak memahami tugas yang ingin dibuat. Coba lagi.",
+        "de": "Entschuldigung, ich konnte nicht verstehen, welche Aufgabe Sie erstellen wollten. Bitte versuchen Sie es erneut.",
     },
     "vikunja_add_error": {
         "en": "Sorry, I couldn't add the task to Vikunja. Please check your Vikunja connection.",
@@ -97,6 +114,7 @@ _BASE: Dict[str, Dict[str, str]] = {
         "ar": "تعذر إضافة المهمة إلى Vikunja. تحقق من الاتصال.",
         "bn": "Vikunja তে টাস্ক যোগ করা যায়নি। সংযোগ পরীক্ষা করুন।",
         "id": "Tidak dapat menambahkan tugas ke Vikunja. Periksa koneksi.",
+        "de": "Entschuldigung, ich konnte die Aufgabe nicht zu Vikunja hinzufügen. Bitte überprüfen Sie Ihre Vikunja-Verbindung.",
     },
     "json_parse_error": {
         "en": "Sorry, there was an error processing your task. Please try again.",
@@ -109,6 +127,7 @@ _BASE: Dict[str, Dict[str, str]] = {
         "ar": "حدث خطأ أثناء معالجة المهمة. أعد المحاولة.",
         "bn": "টাস্ক প্রক্রিয়া করতে গিয়ে ত্রুটি। আবার চেষ্টা করুন।",
         "id": "Terjadi kesalahan saat memproses tugas. Coba lagi.",
+        "de": "Entschuldigung, es gab einen Fehler bei der Verarbeitung Ihrer Aufgabe. Bitte versuchen Sie es erneut.",
     },
     "unexpected_error": {
         "en": "Sorry, an unexpected error occurred. Please try again.",
@@ -121,6 +140,7 @@ _BASE: Dict[str, Dict[str, str]] = {
         "ar": "حدث خطأ غير متوقع. أعد المحاولة.",
         "bn": "অপ্রত্যাশিত ত্রুটি ঘটেছে। আবার চেষ্টা করুন।",
         "id": "Terjadi kesalahan tak terduga. Coba lagi.",
+        "de": "Entschuldigung, ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     },
 }
 
@@ -137,6 +157,7 @@ _DETAIL_TOKENS: Dict[str, Dict[str, str]] = {
         "ar": "المشروع '{name}'",
         "bn": "প্রজেক্ট '{name}'",
         "id": "proyek '{name}'",
+        "de": "Projekt '{name}'",
     },
     "labels": {
         "en": "labels: {labels}",
@@ -149,6 +170,7 @@ _DETAIL_TOKENS: Dict[str, Dict[str, str]] = {
         "ar": "الوسوم: {labels}",
         "bn": "লেবেল: {labels}",
         "id": "label: {labels}",
+        "de": "Labels: {labels}",
     },
     "due": {
         "en": "due {phrase}",
@@ -161,6 +183,7 @@ _DETAIL_TOKENS: Dict[str, Dict[str, str]] = {
         "ar": "مستحق {phrase}",
         "bn": "নির্দিষ্ট {phrase}",
         "id": "jatuh tempo {phrase}",
+        "de": "fällig {phrase}",
     },
     "assigned": {
         "en": "assigned to {name}",
@@ -171,8 +194,9 @@ _DETAIL_TOKENS: Dict[str, Dict[str, str]] = {
         "hi": "असाइन {name}",
         "zh-Hans": "分配给 {name}",
         "ar": "مُسندة إلى {name}",
-        "bn": "কার কাছে দেওয়া: {name}",
+        "bn": "কার কাছে দেওয়া: {name}",
         "id": "ditugaskan ke {name}",
+        "de": "zugewiesen an {name}",
     },
     "priority": {
         "en": "priority {label}",
@@ -185,6 +209,7 @@ _DETAIL_TOKENS: Dict[str, Dict[str, str]] = {
         "ar": "أولوية {label}",
         "bn": "অগ্রাধিকার {label}",
         "id": "prioritas {label}",
+        "de": "Priorität {label}",
     },
     "repeat": {
         "en": "{phrase}",  # phrase already contains repeats wording
@@ -197,6 +222,7 @@ _DETAIL_TOKENS: Dict[str, Dict[str, str]] = {
         "ar": "{phrase}",
         "bn": "{phrase}",
         "id": "{phrase}",
+        "de": "{phrase}",
     },
 }
 
@@ -212,6 +238,7 @@ _PRIORITY_WORD = {
         "ar": "منخفضة",
         "bn": "কম",
         "id": "rendah",
+        "de": "niedrig",
     },
     2: {
         "en": "medium",
@@ -224,6 +251,7 @@ _PRIORITY_WORD = {
         "ar": "متوسطة",
         "bn": "মাঝারি",
         "id": "sedang",
+        "de": "mittel",
     },
     3: {
         "en": "high",
@@ -236,6 +264,7 @@ _PRIORITY_WORD = {
         "ar": "عالية",
         "bn": "উচ্চ",
         "id": "tinggi",
+        "de": "hoch",
     },
     4: {
         "en": "urgent",
@@ -248,6 +277,7 @@ _PRIORITY_WORD = {
         "ar": "عاجلة",
         "bn": "জরুরি",
         "id": "mendesak",
+        "de": "dringend",
     },
     5: {
         "en": "do now",
@@ -260,6 +290,7 @@ _PRIORITY_WORD = {
         "ar": "نفّذ الآن",
         "bn": "এখনই",
         "id": "lakukan sekarang",
+        "de": "sofort erledigen",
     },
 }
 
@@ -276,6 +307,7 @@ _DUE_BASE = {
         "ar": "اليوم",
         "bn": "আজ",
         "id": "hari ini",
+        "de": "heute",
     },
     "tomorrow": {
         "en": "tomorrow",
@@ -288,6 +320,7 @@ _DUE_BASE = {
         "ar": "غدًا",
         "bn": "আগামীকাল",
         "id": "besok",
+        "de": "morgen",
     },
     "like currently": {
         "en": "like currently",
@@ -300,6 +333,7 @@ _DUE_BASE = {
         "ar": "جارٍ",
         "bn": "চলমান",
         "id": "sedang berlangsung",
+        "de": "aktuell",
     },
     # Patterns with {n} and optional years/days composite handled in function
 }
@@ -349,6 +383,7 @@ def localize_due_phrase(raw: str, lang: str) -> str:
                     "ar": "خلال {n} يومًا",
                     "bn": "{n} দিনে",
                     "id": "dalam {n} hari",
+                    "de": "in {n} Tagen",
                 }
             tpl = templates.get(lang, templates["en"])
             return tpl.format(n=num)
@@ -374,6 +409,7 @@ def localize_due_phrase(raw: str, lang: str) -> str:
                     "ar": "خلال {y} سنوات {rest}",
                     "bn": "{y} বছরে {rest}",
                     "id": "dalam {y} tahun {rest}",
+                    "de": "in {y} Jahren {rest}",
                 }
             # singular detection
             if years == "1":
@@ -391,6 +427,7 @@ def localize_due_phrase(raw: str, lang: str) -> str:
                         "ar": "خلال {y} سنة {rest}",
                         "bn": "{y} বছরে {rest}",
                         "id": "dalam {y} tahun {rest}",
+                        "de": "in {y} Jahr {rest}",
                     }
                 templates.update({k: v for k, v in templates_sing.items()})
             tpl = templates.get(lang, templates["en"])
@@ -419,11 +456,12 @@ def localize_repeat_phrase(raw: str, lang: str) -> str:
                 "es": "se repite cada {n} segundos",
                 "pt": "repete a cada {n} segundos",
                 "ru": "повторяется каждые {n} секунд",
-                "hi": "हर {n} सेकंड में دوहराता है",
+                "hi": "हर {n} सेकंड में दोहराता है",
                 "zh-Hans": "每 {n} 秒重复",
                 "ar": "يتكرر كل {n} ثانية",
                 "bn": "প্রতি {n} সেকেন্ডে পুনরাবৃত্তি",
                 "id": "berulang setiap {n} detik",
+                "de": "wiederholt sich alle {n} Sekunden",
             }
         return templates.get(lang, templates["en"]).format(n=num)
     if raw.startswith("repeats in ") and raw.endswith(" days") and "year" not in raw:
@@ -442,6 +480,7 @@ def localize_repeat_phrase(raw: str, lang: str) -> str:
                 "ar": "يتكرر خلال {n} يومًا",
                 "bn": "{n} দিনে পুনরাবৃত্তি",
                 "id": "berulang dalam {n} hari",
+                "de": "wiederholt sich in {n} Tagen",
             }
         if num == "1":
             if rp and "in_day" in rp:
@@ -458,6 +497,7 @@ def localize_repeat_phrase(raw: str, lang: str) -> str:
                     "ar": "يتكرر خلال {n} يوم",
                     "bn": "{n} দিনে পুনরাবৃত্তি",
                     "id": "berulang dalam {n} hari",
+                    "de": "wiederholt sich in {n} Tag",
                 }
             templates.update(templates_sing)
         return templates.get(lang, templates["en"]).format(n=num)
@@ -478,6 +518,7 @@ def localize_repeat_phrase(raw: str, lang: str) -> str:
                 "ar": "يتكرر خلال {y} سنوات {rest}",
                 "bn": "{y} বছরে পুনরাবৃত্তি {rest}",
                 "id": "berulang dalam {y} tahun {rest}",
+                "de": "wiederholt sich in {y} Jahren {rest}",
             }
         if years == "1":
             if rp and "in_year" in rp:
@@ -492,8 +533,9 @@ def localize_repeat_phrase(raw: str, lang: str) -> str:
                     "hi": "{y} वर्ष में दोहराता है {rest}",
                     "zh-Hans": "{y} 年后重复 {rest}",
                     "ar": "يتكرر خلال {y} سنة {rest}",
-                    "bn": "{y} বছরে पुनরাবৃত্তि {rest}",
+                    "bn": "{y} বছরে पुनরাবৃত্তি {rest}",
                     "id": "berulang dalam {y} tahun {rest}",
+                    "de": "wiederholt sich in {y} Jahr {rest}",
                 }
             templates.update(templates_sing)
         return templates.get(lang, templates["en"]).format(y=years, rest=rest)
