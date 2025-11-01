@@ -99,7 +99,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     # Copy bundled custom sentences (all languages) into HA config dir before reload
     try:
-        copy_custom_sentences(hass)
+        await hass.async_add_executor_job(copy_custom_sentences, hass)
     except Exception as sentence_err:  # noqa: BLE001
         _LOGGER.error("Failed to copy custom sentences: %s", sentence_err)
 
