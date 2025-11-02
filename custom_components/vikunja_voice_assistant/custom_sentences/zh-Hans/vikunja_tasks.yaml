@@ -3,7 +3,7 @@ intents:
   VikunjaAddTask:
     data:
       - sentences:
-          - "[请|帮我|给我] (添加|创建|新建|加上) [一个|一条|新的|这条] (任务|事项) {task_description}"
+          - "[请|帮我|给我|我想|我要|麻烦|可以] (添加|创建|新建|加上|建立|加个|加一个|做个) [一个|一条|新的|这条|个|条] [新的|新|快速|简单|每日|每周] (任务|事项|task|to-do|todo|待办) {task_description}"
 lists:
   task_description:
     wildcard: true

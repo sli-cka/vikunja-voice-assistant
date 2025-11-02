@@ -3,7 +3,7 @@ intents:
   VikunjaAddTask:
     data:
       - sentences:
-          - "[adiciona|adicionar|cria|criar|coloca|ponha] [uma|a|nova|minha] (tarefa|tarefa de) {task_description}"
+          - "[eu quero|eu gostaria|por favor|pode|vamos] (adiciona|adicionar|adicione|cria|criar|crie|coloca|colocar|coloque|ponha|pôr|põe) [uma|a|nova|minha|uma nova|nova tarefa] [nova|rápida|simples|diária|semanal] (tarefa|tarefa de|to-do|todo|task) {task_description}"
 lists:
   task_description:
     wildcard: true

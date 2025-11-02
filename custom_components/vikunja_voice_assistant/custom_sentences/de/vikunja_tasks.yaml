@@ -5,7 +5,7 @@ intents:
   VikunjaAddTask:
     data:
       - sentences:
-          - "[Ich | Ich möchte | Ich werde | Ich will | Bitte | Lass uns] (hinzufügen | erstellen | anlegen | machen | setzen | einfügen) [eine | ein | die | das | meine | neue] [neue | kommende | schnelle | einfache | tägliche | wöchentliche] (Aufgabe | Aufgaben | To-Do | Todo | Task) {task_description}"
+          - "[Ich | Ich möchte | Ich werde | Ich will | Bitte | Lass uns] (hinzufügen | füge hinzu | erstellen | erstelle | anlegen | lege an | machen | mache | setzen | setze | einfügen | füge ein) [eine | ein | die | das | meine | neue] [neue | kommende | schnelle | einfache | tägliche | wöchentliche] (Aufgabe | Aufgaben | To-Do | Todo | Task) {task_description}"
 
 lists:
   task_description:
