@@ -8,6 +8,8 @@ This document lists the keywords and phrases you can use to create tasks in each
 
 ## 🇬🇧 English (en)
 
+**Required keywords:** Use an action word (add, create, make, etc.) + "task" or "todo"
+
 ### Example phrases:
 - "Create a task buy groceries"
 - "Add a task call mom tomorrow"
@@ -20,6 +22,8 @@ This document lists the keywords and phrases you can use to create tasks in each
 
 ## 🇩🇪 German (de)
 
+**Required keywords:** Use an action word (erstellen, erstelle, hinzufügen, füge hinzu, etc.) + "Aufgabe" or "Task"
+
 ### Example phrases:
 - "Erstelle eine Aufgabe Lebensmittel kaufen"
 - "Füge eine Aufgabe hinzu Mama anrufen morgen"
@@ -29,6 +33,8 @@ This document lists the keywords and phrases you can use to create tasks in each
 ---
 
 ## 🇫🇷 French (fr)
+
+**Required keywords:** Use an action word (ajoute, crée, créer, etc.) + "tâche"
 
 ### Example phrases:
 - "Ajoute une tâche acheter du pain"
@@ -41,6 +47,8 @@ This document lists the keywords and phrases you can use to create tasks in each
 
 ## 🇪🇸 Spanish (es)
 
+**Required keywords:** Use an action word (añade, crea, agrega, etc.) + "tarea"
+
 ### Example phrases:
 - "Añade una tarea comprar leche"
 - "Crea una tarea llamar a mamá mañana"
@@ -51,6 +59,8 @@ This document lists the keywords and phrases you can use to create tasks in each
 ---
 
 ## 🇵🇹 Portuguese (pt)
+
+**Required keywords:** Use an action word (adiciona, cria, coloca, etc.) + "tarefa"
 
 ### Example phrases:
 - "Adiciona uma tarefa comprar pão"
@@ -63,6 +73,8 @@ This document lists the keywords and phrases you can use to create tasks in each
 
 ## 🇷🇺 Russian (ru)
 
+**Required keywords:** Use an action word (добавь, создай, поставь, etc.) + "задачу" or "таск"
+
 ### Example phrases:
 - "Добавь задачу купить молоко"
 - "Создай новую задачу позвонить маме завтра"
@@ -73,6 +85,8 @@ This document lists the keywords and phrases you can use to create tasks in each
 ---
 
 ## 🇸🇦 Arabic (ar)
+
+**Required keywords:** Use an action word (أضف, أنشئ, etc.) + "مهمة"
 
 ### Example phrases:
 - "أضف مهمة شراء الحليب"
@@ -85,6 +99,8 @@ This document lists the keywords and phrases you can use to create tasks in each
 
 ## 🇮🇳 Hindi (hi)
 
+**Required keywords:** Use an action word (जोड़ो, बनाओ, ऐड करो, etc.) + "टास्क" or "कार्य"
+
 ### Example phrases:
 - "जोड़ो एक टास्क दूध खरीदना"
 - "बनाओ नई टास्क मम्मी को फोन करना कल"
@@ -95,6 +111,8 @@ This document lists the keywords and phrases you can use to create tasks in each
 ---
 
 ## 🇨🇳 Chinese Simplified (zh-Hans)
+
+**Required keywords:** Use an action word (添加, 创建, 新建, etc.) + "任务" or "事项"
 
 ### Example phrases:
 - "请添加一个任务买牛奶"
@@ -107,6 +125,8 @@ This document lists the keywords and phrases you can use to create tasks in each
 
 ## 🇧🇩 Bengali (bn)
 
+**Required keywords:** Use an action word (যোগ করো, তৈরি করো, বানাও, etc.) + "টাস্ক" or "কাজ"
+
 ### Example phrases:
 - "যোগ করো একটি টাস্ক দুধ কিনতে"
 - "তৈরি করো নতুন টাস্ক কাল মাকে ফোন করা"
@@ -117,6 +137,8 @@ This document lists the keywords and phrases you can use to create tasks in each
 ---
 
 ## 🇮🇩 Indonesian (id)
+
+**Required keywords:** Use an action word (tambah, buat, bikin, etc.) + "tugas" or "task"
 
 ### Example phrases:
 - "Tolong tambah tugas beli susu"
