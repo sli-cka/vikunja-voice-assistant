@@ -14,6 +14,20 @@
           "enable_user_assignment": "Enable user assignment",
           "detailed_response": "Enable detailed spoken response (includes project, labels, due date, assignee, priority & repeat info)"
         }
+      },
+      "reconfigure": {
+        "title": "Vikunja voice assistant",
+        "description": "Update Vikunja voice assistant settings for {name}",
+        "data": {
+          "vikunja_url": "Vikunja base URL (e.g. https://vikunja.example.com)",
+          "vikunja_api_key": "Vikunja API Token",
+          "openai_api_key": "OpenAI API Key",
+          "voice_correction": "Enable speech recognition text correction (recommended)",
+          "default_due_date": "Default due date if none specified (applies only when no project is mentioned)",
+          "auto_voice_label": "Automatically add a 'voice' label to tasks created via this integration",
+          "enable_user_assignment": "Enable user assignment",
+          "detailed_response": "Enable detailed spoken response (includes project, labels, due date, assignee, priority & repeat info)"
+        }
       }
     },
     "error": {
@@ -21,7 +35,8 @@
       "invalid_openai_key": "Invalid OpenAI API key. Please check your OpenAI API key."
     },
     "abort": {
-      "already_configured": "This Vikunja account is already configured."
+      "already_configured": "This Vikunja account is already configured.",
+      "reconfigure_successful": "Vikunja voice assistant configuration updated successfully."
     }
   }
 }
