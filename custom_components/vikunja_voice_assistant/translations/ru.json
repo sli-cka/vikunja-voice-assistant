@@ -14,6 +14,20 @@
           "enable_user_assignment": "Включить назначение пользователей",
           "detailed_response": "Включить подробный голосовой ответ (проект, метки, срок, исполнитель, приоритет, повтор)"
         }
+      },
+      "reconfigure": {
+        "title": "Голосовой помощник Vikunja",
+        "description": "Обновите настройки голосового помощника Vikunja для {name}",
+        "data": {
+          "vikunja_url": "Базовый URL Vikunja (пример https://vikunja.example.com)",
+          "vikunja_api_key": "API токен Vikunja",
+          "openai_api_key": "Ключ OpenAI API",
+          "voice_correction": "Включить исправление текста распознавания речи (рекомендуется)",
+          "default_due_date": "Дата по умолчанию, если не указана (только когда проект не упомянут)",
+          "auto_voice_label": "Автоматически добавлять метку 'voice' к задачам, созданным через интеграцию",
+          "enable_user_assignment": "Включить назначение пользователей",
+          "detailed_response": "Включить подробный голосовой ответ (проект, метки, срок, исполнитель, приоритет, повтор)"
+        }
       }
     },
     "error": {
@@ -21,7 +35,8 @@
       "invalid_openai_key": "Недействительный ключ OpenAI. Проверьте его."
     },
     "abort": {
-      "already_configured": "Эта учетная запись Vikunja уже настроена."
+      "already_configured": "Эта учетная запись Vikunja уже настроена.",
+      "reconfigure_successful": "Конфигурация голосового помощника Vikunja успешно обновлена."
     }
   }
 }
