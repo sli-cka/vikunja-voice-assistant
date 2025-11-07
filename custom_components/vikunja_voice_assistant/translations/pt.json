@@ -14,6 +14,20 @@
           "enable_user_assignment": "Ativar atribuição de usuário",
           "detailed_response": "Ativar resposta detalhada falada (inclui projeto, rótulos, data, responsável, prioridade e repetição)"
         }
+      },
+      "reconfigure": {
+        "title": "Assistente de voz Vikunja",
+        "description": "Atualizar as configurações do assistente de voz Vikunja para {name}",
+        "data": {
+          "vikunja_url": "URL base do Vikunja (ex. https://vikunja.example.com)",
+          "vikunja_api_key": "Token de API do Vikunja",
+          "openai_api_key": "Chave de API OpenAI",
+          "voice_correction": "Ativar correção de texto de reconhecimento de voz (recomendado)",
+          "default_due_date": "Data de vencimento padrão se nada for especificado (somente quando nenhum projeto é mencionado)",
+          "auto_voice_label": "Adicionar automaticamente o rótulo 'voice' às tarefas criadas por esta integração",
+          "enable_user_assignment": "Ativar atribuição de usuário",
+          "detailed_response": "Ativar resposta detalhada falada (inclui projeto, rótulos, data, responsável, prioridade e repetição)"
+        }
       }
     },
     "error": {
@@ -21,7 +35,8 @@
       "invalid_openai_key": "Chave de API OpenAI inválida. Verifique."
     },
     "abort": {
-      "already_configured": "Esta conta Vikunja já está configurada."
+      "already_configured": "Esta conta Vikunja já está configurada.",
+      "reconfigure_successful": "Configuração do assistente de voz Vikunja atualizada com sucesso."
     }
   }
 }
