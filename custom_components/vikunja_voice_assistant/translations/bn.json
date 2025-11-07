@@ -14,6 +14,20 @@
           "enable_user_assignment": "ইউজার এসাইনমেন্ট সক্রিয় করুন",
           "detailed_response": "বিস্তারিত ভয়েস প্রতিক্রিয়া সক্রিয় করুন (প্রজেক্ট, লেবেল, ডিউ তারিখ, অ্যাসাইনি, প্রায়োরিটি, পুনরাবৃত্তি)"
         }
+      },
+      "reconfigure": {
+        "title": "Vikunja ভয়েস সহকারী",
+        "description": "{name} এর জন্য Vikunja ভয়েস সহকারীর সেটিংস আপডেট করুন",
+        "data": {
+          "vikunja_url": "Vikunja বেস URL (যেমন https://vikunja.example.com)",
+          "vikunja_api_key": "Vikunja API টোকেন",
+          "openai_api_key": "OpenAI API কী",
+          "voice_correction": "ভয়েস রিকগনিশন টেক্সট সংশোধন সক্রিয় করুন (প্রস্তাবিত)",
+          "default_due_date": "কোন তারিখ ও প্রকল্প উল্লেখ না থাকলে ডিফল্ট ডিউ তারিখ",
+          "auto_voice_label": "এই ইন্টিগ্রেশনে তৈরি টাস্কে স্বয়ংক্রিয়ভাবে 'voice' লেবেল যোগ করুন",
+          "enable_user_assignment": "ইউজার এসাইনমেন্ট সক্রিয় করুন",
+          "detailed_response": "বিস্তারিত ভয়েস প্রতিক্রিয়া সক্রিয় করুন (প্রজেক্ট, লেবেল, ডিউ তারিখ, অ্যাসাইনি, প্রায়োরিটি, পুনরাবৃত্তি)"
+        }
       }
     },
     "error": {
@@ -21,7 +35,8 @@
       "invalid_openai_key": "অবৈধ OpenAI API কী। দয়া করে পরীক্ষা করুন।"
     },
     "abort": {
-      "already_configured": "এই Vikunja একাউন্টটি আগে থেকেই কনফিগার করা।"
+      "already_configured": "এই Vikunja একাউন্টটি আগে থেকেই কনফিগার করা।",
+      "reconfigure_successful": "Vikunja ভয়েস সহকারীর কনফিগারেশন সফলভাবে আপডেট হয়েছে।"
     }
   }
 }
