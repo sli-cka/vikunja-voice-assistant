@@ -14,6 +14,20 @@
           "enable_user_assignment": "उपयोगकर्ता असाइनमेंट सक्षम करें",
           "detailed_response": "विस्तृत वॉइस प्रतिक्रिया सक्षम करें (प्रोजेक्ट, लेबल, देय तिथि, असाइनी, प्राथमिकता, पुनरावृत्ति)"
         }
+      },
+      "reconfigure": {
+        "title": "Vikunja वॉइस असिस्टेंट",
+        "description": "{name} के लिए Vikunja वॉइस असिस्टेंट सेटिंग्स अपडेट करें",
+        "data": {
+          "vikunja_url": "Vikunja बेस URL (उदा. https://vikunja.example.com)",
+          "vikunja_api_key": "Vikunja API टोकन",
+          "openai_api_key": "OpenAI API कुंजी",
+          "voice_correction": "वॉइस रिकॉग्निशन टेक्स्ट सुधार सक्षम करें (अनुशंसित)",
+          "default_due_date": "कोई तिथि न होने और कोई प्रोजेक्ट न होने पर डिफ़ॉल्ट देय तिथि",
+          "auto_voice_label": "इस इंटीग्रेशन से बने टास्क पर स्वतः 'voice' लेबल जोड़ें",
+          "enable_user_assignment": "उपयोगकर्ता असाइनमेंट सक्षम करें",
+          "detailed_response": "विस्तृत वॉइस प्रतिक्रिया सक्षम करें (प्रोजेक्ट, लेबल, देय तिथि, असाइनी, प्राथमिकता, पुनरावृत्ति)"
+        }
       }
     },
     "error": {
@@ -21,7 +35,8 @@
       "invalid_openai_key": "अमान्य OpenAI API कुंजी। कृपया जाँचें।"
     },
     "abort": {
-      "already_configured": "यह Vikunja खाता पहले से कॉन्फ़िगर है।"
+      "already_configured": "यह Vikunja खाता पहले से कॉन्फ़िगर है।",
+      "reconfigure_successful": "Vikunja वॉइस असिस्टेंट कॉन्फ़िगरेशन सफलतापूर्वक अपडेट हो गया है।"
     }
   }
 }
