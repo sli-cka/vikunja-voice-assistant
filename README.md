@@ -4,7 +4,7 @@
 
 <img src="https://raw.githubusercontent.com/NeoHuncho/vikunja-voice-assistant/main/logo.png" alt="Vikunja Voice Assistant logo" width="160" />
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)[![HACS Default](https://img.shields.io/badge/HACS-Default-blue.svg)](https://hacs.xyz/) [![Powered by OpenAI](https://img.shields.io/badge/AI-OpenAI-ff69b4.svg)](https://platform.openai.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)[![HACS Default](https://img.shields.io/badge/HACS-Default-blue.svg)](https://hacs.xyz/)
 
 Say **“create a task”** or **“add a task”** → Your task goes straight into Vikunja!
 
@@ -12,7 +12,12 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 </div>
 
 
-> **⚠️ Important Notice:**
+> **⚠️ Important Notice (Breaking Changes):**
+> This version now uses Home Assistant's AI Task (`ai_task.generate_data`) pipeline instead of calling OpenAI directly.
+> After updating from a version before 2.0.0, you MUST reconfigure the integration:
+> - Select a compatible AI Task entity.
+> - Confirm your Vikunja API URL/token.
+> - Verify user assignment and other options.
 > If you were using user assignments before version 1.4.6, you will need to create a new Vikunja token with the `Projectusers` permission for user assignments to work again.
 
 
@@ -24,7 +29,6 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 * Supports **project, due date, priority, labels, recurrence** and more 📅
 * Optional: speech correction, auto voice label, default due date, user assignment
 * Supports 11 languages 🌐 [📖 Voice commands in all 11 languages](VOICE_COMMANDS.md)
-* Uses GPT 5 nano 🚄
 
 ---
 
@@ -33,7 +37,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 * [Home Assistant](https://www.home-assistant.io/) with a [voice assistant set up](https://www.home-assistant.io/voice_control/)
 * [HACS](https://hacs.xyz/docs/use/download/download/#to-download-hacs-ossupervised)
 * Running Vikunja instance + API token with [correct permissions](https://github.com/NeoHuncho/vikunja-voice-assistant?tab=readme-ov-file#%EF%B8%8F-installation-hacs--full-video-walkthrough)
-* OpenAI API key
+* Configured Home Assistant AI Task entity (from the `ai_task.generate_data` pipeline)
 
 ---
 
@@ -49,7 +53,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
 4. Search: **Vikunja Voice Assistant**
 
-5. Fill out setup form (Vikunja URL, API token, OpenAI key, options)
+5. Fill out setup form (Vikunja URL, API token, AI Task entity, options)
 
    * **Vikunja API Token** → User Settings → API Tokens
 
@@ -60,9 +64,11 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
        📹 [Video Guide](https://github.com/user-attachments/assets/97927621-394b-4fb5-aa66-4cef0325f726)
 
-   * **OpenAI API Key** → [Create one here](https://platform.openai.com/account/api-keys)
+   * **AI Task entity**
+     Select the Home Assistant `ai_task` entity that is configured to run your preferred LLM via `ai_task.generate_data`.
+     The integration sends a structured prompt to this entity; no direct OpenAI configuration is required in this integration anymore.
 
-     📹 [Video Guide](https://github.com/user-attachments/assets/1aae42cb-ba0b-4ebb-951c-bd017da45f71)
+     This keeps all model and provider configuration in Home Assistant while Vikunja Voice Assistant focuses on prompt building and Vikunja task creation.
 
 6. ✅ Done – Just say **"create a task"** !
 
@@ -81,6 +87,31 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
 ---
 
+## 🤖 AI Task and AI Provider Setup
+
+Starting from version 2.0.0, this integration relies on Home Assistant's AI Task (`ai_task.generate_data`) pipeline instead of calling OpenAI directly.
+
+### Supported AI Providers (Examples)
+
+You can use any AI provider that exposes an AI Task entity compatible with `ai_task.generate_data`.
+
+- Local LLM providers:
+  - Ollama
+- Cloud LLM
+  - OpenAI
+  - Google Gemini
+  - OpenRouter
+
+For configuration details and the latest list of supported providers, refer to the official Home Assistant documentation:
+
+- AI & LLM setup: https://www.home-assistant.io/integrations/?cat=ai
+- AI Task (`ai_task`) integration: https://www.home-assistant.io/integrations/ai_task/
+
+### Recommended Setup
+
+1. Configure an `ai_task` entity in Home Assistant using your preferred provider.
+2. In the Vikunja Voice Assistant integration options, select this AI Task entity.
+
 ## 🤖 AI Conversation Agent (Recommended)
 
 Append this to your Home Assistant Voice Assistant’s conversation Agent custom instructions:
@@ -96,6 +127,8 @@ tool_args: {
 }
 ```
 *This will allow your voice assistant to create tasks even if the keywords were missing.*
+
+
 
 
 📹 [Video Guide](https://github.com/user-attachments/assets/0440bc71-b748-4118-8afd-6f0f10b22003)

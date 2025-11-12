@@ -7,7 +7,7 @@ from homeassistant.config_entries import ConfigEntry
 from .const import (
     DOMAIN,
     CONF_VIKUNJA_API_KEY,
-    CONF_OPENAI_API_KEY,
+    CONF_AI_TASK_ENTITY,
     CONF_VIKUNJA_URL,
     CONF_DUE_DATE,
     CONF_VOICE_CORRECTION,
@@ -67,7 +67,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data[DOMAIN] = {
         CONF_VIKUNJA_URL: entry.data[CONF_VIKUNJA_URL],
         CONF_VIKUNJA_API_KEY: entry.data[CONF_VIKUNJA_API_KEY],
-        CONF_OPENAI_API_KEY: entry.data[CONF_OPENAI_API_KEY],
+        CONF_AI_TASK_ENTITY: entry.data[CONF_AI_TASK_ENTITY],
         CONF_DUE_DATE: entry.data[CONF_DUE_DATE],
         CONF_VOICE_CORRECTION: entry.data[CONF_VOICE_CORRECTION],
         CONF_AUTO_VOICE_LABEL: entry.data.get(CONF_AUTO_VOICE_LABEL, True),
