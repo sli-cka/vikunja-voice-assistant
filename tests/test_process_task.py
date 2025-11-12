@@ -6,7 +6,7 @@ from custom_components.vikunja_voice_assistant.const import (
     DOMAIN,
     CONF_VIKUNJA_URL,
     CONF_VIKUNJA_API_KEY,
-    CONF_OPENAI_API_KEY,
+    CONF_AI_TASK_ENTITY,
     CONF_DUE_DATE,
     CONF_VOICE_CORRECTION,
     CONF_AUTO_VOICE_LABEL,
@@ -61,31 +61,35 @@ class FakeVikunjaAPI:
         return True
 
 
-class FakeOpenAIAPI:
-    def __init__(self, api_key, *_, **__):
+class FakeLLMAPI:
+    """Fake wrapper for the HomeAssistantLLMAPI (or similar) used by task_handler."""
+
+    def __init__(self, *_, **__):
         self._next_response = None
 
     def set_response(self, task_data):
-        self._next_response = {"task_data": task_data}
+        # task_handler expects {"task_data": {...}} or None
+        self._next_response = {"task_data": task_data} if task_data is not None else None
 
-    def create_task_from_description(self, *_, **__):
+    async def create_task_from_description(self, *_, **__):
         return self._next_response
 
 
 @pytest.fixture(autouse=True)
 def patch_apis(monkeypatch):
     fake_vikunja = FakeVikunjaAPI("url", "key")
-    fake_openai = FakeOpenAIAPI("key")
+    fake_llm = FakeLLMAPI()
     monkeypatch.setattr(th_mod, "VikunjaAPI", lambda *a, **k: fake_vikunja)
-    monkeypatch.setattr(th_mod, "OpenAIAPI", lambda *a, **k: fake_openai)
-    return fake_vikunja, fake_openai
+    # Adjust this attribute name to match the actual LLM wrapper used in task_handler
+    monkeypatch.setattr(th_mod, "HomeAssistantLLMAPI", lambda *a, **k: fake_llm)
+    return fake_vikunja, fake_llm
 
 
 def base_config(**overrides):
     cfg = {
         CONF_VIKUNJA_URL: "https://example.com/api/v1",
         CONF_VIKUNJA_API_KEY: "vikkey",
-        CONF_OPENAI_API_KEY: "openkey",
+        CONF_AI_TASK_ENTITY: "ai_task.vikunja_llm",
         CONF_DUE_DATE: "none",
         CONF_VOICE_CORRECTION: True,
         CONF_AUTO_VOICE_LABEL: False,
@@ -104,10 +108,10 @@ def base_config(**overrides):
 
 
 def test_process_task_minimal(patch_apis):
-    fake_vikunja, fake_openai = patch_apis
+    fake_vikunja, fake_llm = patch_apis
     fake_vikunja._set_projects([])
     fake_vikunja._set_labels([])
-    fake_openai.set_response({"title": "Buy milk", "project_id": 1})
+    fake_llm.set_response({"title": "Buy milk", "project_id": 1})
     hass = FakeHass(base_config(CONF_DETAILED_RESPONSE=False))
     ok, msg, title = asyncio.run(process_task(hass, "Buy milk", []))
     assert ok is True
@@ -116,10 +120,10 @@ def test_process_task_minimal(patch_apis):
 
 
 def test_process_task_detailed_with_metadata(patch_apis):
-    fake_vikunja, fake_openai = patch_apis
+    fake_vikunja, fake_llm = patch_apis
     fake_vikunja._set_projects([{"id": 2, "title": "Home"}])
     fake_vikunja._set_labels([{"id": 9, "title": "errand"}])
-    fake_openai.set_response(
+    fake_llm.set_response(
         {
             "title": "Buy milk",
             "project_id": 2,
@@ -141,10 +145,10 @@ def test_process_task_detailed_with_metadata(patch_apis):
 
 
 def test_process_task_with_assignee(patch_apis):
-    fake_vikunja, fake_openai = patch_apis
+    fake_vikunja, fake_llm = patch_apis
     fake_vikunja._set_projects([])
     fake_vikunja._set_labels([])
-    fake_openai.set_response(
+    fake_llm.set_response(
         {"title": "Prepare slides", "project_id": 1, "assignee": "alice"}
     )
     users = [{"id": 7, "username": "alice", "name": "Alice"}]
@@ -157,10 +161,10 @@ def test_process_task_with_assignee(patch_apis):
     assert fake_vikunja._assignments == [(123, 7)]
 
 
-def test_process_task_openai_failure(patch_apis, monkeypatch):
-    fake_vikunja, fake_openai = patch_apis
-    # Force OpenAI to return None
-    fake_openai.set_response(None)
+def test_process_task_llm_failure(patch_apis, monkeypatch):
+    fake_vikunja, fake_llm = patch_apis
+    # Force LLM pipeline to return None
+    fake_llm.set_response(None)
     hass = FakeHass(base_config())
     ok, msg, title = asyncio.run(process_task(hass, "some description", []))
     assert ok is False
@@ -169,9 +173,9 @@ def test_process_task_openai_failure(patch_apis, monkeypatch):
 
 
 def test_process_task_missing_title(patch_apis):
-    fake_vikunja, fake_openai = patch_apis
-    # Provide response missing title
-    fake_openai.set_response({"task_data": {"project_id": 1}})  # malformed
+    fake_vikunja, fake_llm = patch_apis
+    # Provide response missing title (malformed task_data)
+    fake_llm.set_response({"project_id": 1})
     hass = FakeHass(base_config())
     ok, msg, title = asyncio.run(process_task(hass, "whatever", []))
     assert ok is False
