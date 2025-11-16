@@ -89,7 +89,7 @@ async def process_task(
     try:
         task_data = llm_response.get("task_data", {})
         # Some upstream responses in tests wrap the task payload under "task_data" but may
-        # produce None instead of an object. Treat that as an OpenAI processing failure
+        # produce None instead of an object. Treat that as an LLM processing failure
         # rather than throwing an AttributeError.
         if task_data is None:
             _LOGGER.error("LLM response task_data was None")
