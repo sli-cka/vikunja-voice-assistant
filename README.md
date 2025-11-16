@@ -97,7 +97,7 @@ You can use any AI provider that exposes an AI Task entity compatible with `ai_t
 
 - Local LLM providers:
   - Ollama
-- Cloud LLM
+- Cloud LLM providers:
   - OpenAI
   - Google Gemini
   - OpenRouter
