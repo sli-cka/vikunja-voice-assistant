@@ -28,7 +28,6 @@ class HomeAssistantLLMAPI:
         labels: Optional[List[Dict[str, Any]]],
         default_due_date: str = "none",
         voice_correction: bool = False,
-        reasoning_effort: str = "minimal",  # kept for parity with OpenAI signature
         users: Optional[List[Dict[str, Any]]] = None,
         enable_user_assignment: bool = False,
     ) -> Optional[Dict[str, Any]]:
