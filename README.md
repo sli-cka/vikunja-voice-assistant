@@ -14,11 +14,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
 > **⚠️ Important Notice (Breaking Changes):**
 > This version now uses Home Assistant's AI Task (`ai_task.generate_data`) pipeline instead of calling OpenAI directly.
-> After updating from a version before 2.0.0, you MUST reconfigure the integration:
-> - Select a compatible AI Task entity.
-> - Confirm your Vikunja API URL/token.
-> - Verify user assignment and other options.
-> If you were using user assignments before version 1.4.6, you will need to create a new Vikunja token with the `Projectusers` permission for user assignments to work again.
+> After updating from a version before 2.0.0, you MUST reconfigure the integration and **select a compatible AI Task entity**.
 
 
 ---
@@ -41,7 +37,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
 ---
 
-## ⚙️ Installation (HACS) | [Full Video Walkthrough](https://github.com/user-attachments/assets/c897b523-2539-42e2-ba03-fa9534a80c36)
+## ⚙️ Installation (HACS) | [Video Guide](https://github.com/user-attachments/assets/c897b523-2539-42e2-ba03-fa9534a80c36)
 
 ⏱️ *Create your first task in under 2 minutes!*
 
@@ -64,11 +60,13 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
        📹 [Video Guide](https://github.com/user-attachments/assets/97927621-394b-4fb5-aa66-4cef0325f726)
 
-   * **AI Task entity**
+   * **AI Task entity** [Video Guide OpenRouter](https://github.com/user-attachments/assets/5435bf42-e7b7-4150-8109-433847dd61d4)
      Select the Home Assistant `ai_task` entity that is configured to run your preferred LLM via `ai_task.generate_data`.
-     The integration sends a structured prompt to this entity; no direct OpenAI configuration is required in this integration anymore.
 
-     This keeps all model and provider configuration in Home Assistant while Vikunja Voice Assistant focuses on prompt building and Vikunja task creation.
+     Note: this integration relies on Home Assistant's AI Task pipeline (`ai_task.generate_data`). You can use any AI provider compatible with AI Task (examples: Ollama, OpenAI, Google Gemini, OpenRouter). See AI & LLM setup and the AI Task integration for details:
+
+     - AI & LLM setup: [LINK](https://www.home-assistant.io/integrations/?cat=ai)
+     - AI Task (`ai_task`) integration: [LINK](https://www.home-assistant.io/integrations/ai_task/)
 
 6. ✅ Done – Just say **"create a task"** !
 
@@ -86,31 +84,6 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 | Detailed response                | Speak back project, labels, due date, assignee, priority & repeat info | On             |
 
 ---
-
-## 🤖 AI Task and AI Provider Setup
-
-Starting from version 2.0.0, this integration relies on Home Assistant's AI Task (`ai_task.generate_data`) pipeline instead of calling OpenAI directly.
-
-### Supported AI Providers (Examples)
-
-You can use any AI provider that exposes an AI Task entity compatible with `ai_task.generate_data`.
-
-- Local LLM providers:
-  - Ollama
-- Cloud LLM providers:
-  - OpenAI
-  - Google Gemini
-  - OpenRouter
-
-For configuration details and the latest list of supported providers, refer to the official Home Assistant documentation:
-
-- AI & LLM setup: https://www.home-assistant.io/integrations/?cat=ai
-- AI Task (`ai_task`) integration: https://www.home-assistant.io/integrations/ai_task/
-
-### Recommended Setup
-
-1. Configure an `ai_task` entity in Home Assistant using your preferred provider.
-2. In the Vikunja Voice Assistant integration options, select this AI Task entity.
 
 ## 🤖 AI Conversation Agent (Recommended)
 
