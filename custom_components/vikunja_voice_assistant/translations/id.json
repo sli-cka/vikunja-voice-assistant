@@ -7,7 +7,7 @@
         "data": {
           "vikunja_url": "URL dasar Vikunja (mis. https://vikunja.example.com)",
           "vikunja_api_key": "Token API Vikunja",
-          "openai_api_key": "Kunci API OpenAI",
+          "ai_task_entity": "Entitas tugas AI",
           "voice_correction": "Aktifkan koreksi teks pengenalan suara (disarankan)",
           "default_due_date": "Tanggal jatuh tempo default jika tidak ditentukan (hanya saat tidak ada proyek disebut)",
           "auto_voice_label": "Otomatis tambahkan label 'voice' ke tugas yang dibuat melalui integrasi ini",
@@ -16,12 +16,12 @@
         }
       },
       "reconfigure": {
-        "title": "Asisten suara Vikunja",
-        "description": "Perbarui pengaturan asisten suara Vikunja untuk {name}",
+        "title": "Konfigurasi ulang asisten suara Vikunja",
+        "description": "Perbarui konfigurasi integrasi asisten suara Vikunja",
         "data": {
           "vikunja_url": "URL dasar Vikunja (mis. https://vikunja.example.com)",
           "vikunja_api_key": "Token API Vikunja",
-          "openai_api_key": "Kunci API OpenAI",
+          "ai_task_entity": "Entitas tugas AI",
           "voice_correction": "Aktifkan koreksi teks pengenalan suara (disarankan)",
           "default_due_date": "Tanggal jatuh tempo default jika tidak ditentukan (hanya saat tidak ada proyek disebut)",
           "auto_voice_label": "Otomatis tambahkan label 'voice' ke tugas yang dibuat melalui integrasi ini",
@@ -32,11 +32,12 @@
     },
     "error": {
       "cannot_connect": "Gagal terhubung ke API Vikunja, periksa URL dan token.",
-      "invalid_openai_key": "Kunci OpenAI tidak valid. Harap periksa."
+      "llm_conn_error": "Gagal memproses tugas dengan layanan AI Home Assistant."
     },
     "abort": {
       "already_configured": "Akun Vikunja ini sudah dikonfigurasi.",
-      "reconfigure_successful": "Konfigurasi asisten suara Vikunja berhasil diperbarui."
+      "reconfigure_entry_not_found": "Entri konfigurasi untuk dikonfigurasi ulang tidak ditemukan.",
+      "reconfigure_successful": "Konfigurasi berhasil diperbarui."
     }
   }
 }

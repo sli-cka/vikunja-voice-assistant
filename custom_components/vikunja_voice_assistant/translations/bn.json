@@ -7,7 +7,7 @@
         "data": {
           "vikunja_url": "Vikunja বেস URL (যেমন https://vikunja.example.com)",
           "vikunja_api_key": "Vikunja API টোকেন",
-          "openai_api_key": "OpenAI API কী",
+          "ai_task_entity": "AI টাস্ক সত্তা",
           "voice_correction": "ভয়েস রিকগনিশন টেক্সট সংশোধন সক্রিয় করুন (প্রস্তাবিত)",
           "default_due_date": "কোন তারিখ ও প্রকল্প উল্লেখ না থাকলে ডিফল্ট ডিউ তারিখ",
           "auto_voice_label": "এই ইন্টিগ্রেশনে তৈরি টাস্কে স্বয়ংক্রিয়ভাবে 'voice' লেবেল যোগ করুন",
@@ -16,12 +16,12 @@
         }
       },
       "reconfigure": {
-        "title": "Vikunja ভয়েস সহকারী",
-        "description": "{name} এর জন্য Vikunja ভয়েস সহকারীর সেটিংস আপডেট করুন",
+        "title": "Vikunja ভয়েস সহকারী পুনঃসংযোজন",
+        "description": "Vikunja ভয়েস সহকারী ইন্টিগ্রেশনের কনফিগারেশন আপডেট করুন",
         "data": {
           "vikunja_url": "Vikunja বেস URL (যেমন https://vikunja.example.com)",
           "vikunja_api_key": "Vikunja API টোকেন",
-          "openai_api_key": "OpenAI API কী",
+          "ai_task_entity": "AI টাস্ক সত্তা",
           "voice_correction": "ভয়েস রিকগনিশন টেক্সট সংশোধন সক্রিয় করুন (প্রস্তাবিত)",
           "default_due_date": "কোন তারিখ ও প্রকল্প উল্লেখ না থাকলে ডিফল্ট ডিউ তারিখ",
           "auto_voice_label": "এই ইন্টিগ্রেশনে তৈরি টাস্কে স্বয়ংক্রিয়ভাবে 'voice' লেবেল যোগ করুন",
@@ -32,11 +32,12 @@
     },
     "error": {
       "cannot_connect": "Vikunja API তে সংযোগ ব্যর্থ, URL ও টোকেন পরীক্ষা করুন।",
-      "invalid_openai_key": "অবৈধ OpenAI API কী। দয়া করে পরীক্ষা করুন।"
+      "llm_conn_error": "Home Assistant এর AI পরিষেবায় টাস্ক প্রক্রিয়া করা যায়নি।"
     },
     "abort": {
       "already_configured": "এই Vikunja একাউন্টটি আগে থেকেই কনফিগার করা।",
-      "reconfigure_successful": "Vikunja ভয়েস সহকারীর কনফিগারেশন সফলভাবে আপডেট হয়েছে।"
+      "reconfigure_entry_not_found": "পুনঃসংযোজনের জন্য কনফিগারেশন এন্ট্রি পাওয়া যায়নি।",
+      "reconfigure_successful": "কনফিগারেশন সফলভাবে আপডেট হয়েছে।"
     }
   }
 }

@@ -7,7 +7,7 @@
         "data": {
           "vikunja_url": "Vikunja Basis-URL (z.B. https://vikunja.example.com)",
           "vikunja_api_key": "Vikunja API-Token",
-          "openai_api_key": "OpenAI API-Schlüssel",
+          "ai_task_entity": "AI-Task-Entität",
           "voice_correction": "Spracherkennungs-Textkorrektur aktivieren (empfohlen)",
           "default_due_date": "Standard-Fälligkeitsdatum, falls keines angegeben (gilt nur, wenn kein Projekt erwähnt wird)",
           "auto_voice_label": "Automatisch ein 'voice'-Label zu über diese Integration erstellten Aufgaben hinzufügen",
@@ -16,12 +16,12 @@
         }
       },
       "reconfigure": {
-        "title": "Vikunja Sprachassistent",
-        "description": "Aktualisieren Sie die Einstellungen des Vikunja Sprachassistenten für {name}",
+        "title": "Vikunja Sprachassistent neu konfigurieren",
+        "description": "Aktualisieren Sie die Konfiguration der Vikunja Sprachassistent-Integration",
         "data": {
           "vikunja_url": "Vikunja Basis-URL (z.B. https://vikunja.example.com)",
           "vikunja_api_key": "Vikunja API-Token",
-          "openai_api_key": "OpenAI API-Schlüssel",
+          "ai_task_entity": "AI-Task-Entität",
           "voice_correction": "Spracherkennungs-Textkorrektur aktivieren (empfohlen)",
           "default_due_date": "Standard-Fälligkeitsdatum, falls keines angegeben (gilt nur, wenn kein Projekt erwähnt wird)",
           "auto_voice_label": "Automatisch ein 'voice'-Label zu über diese Integration erstellten Aufgaben hinzufügen",
@@ -32,11 +32,12 @@
     },
     "error": {
       "cannot_connect": "Verbindung zur Vikunja API fehlgeschlagen. Bitte überprüfen Sie Ihre URL und Ihr API-Token.",
-      "invalid_openai_key": "Ungültiger OpenAI API-Schlüssel. Bitte überprüfen Sie Ihren OpenAI API-Schlüssel."
+      "llm_conn_error": "Aufgabe konnte nicht mit dem Home-Assistant-KI-Dienst verarbeitet werden."
     },
     "abort": {
       "already_configured": "Dieses Vikunja-Konto ist bereits konfiguriert.",
-      "reconfigure_successful": "Konfiguration des Vikunja Sprachassistenten erfolgreich aktualisiert."
+      "reconfigure_entry_not_found": "Der zu konfigurierende Eintrag konnte nicht gefunden werden.",
+      "reconfigure_successful": "Konfiguration erfolgreich aktualisiert."
     }
   }
 }

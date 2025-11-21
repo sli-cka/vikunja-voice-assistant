@@ -1,7 +1,7 @@
 DOMAIN = "vikunja_voice_assistant"
 CONF_VIKUNJA_URL = "vikunja_url"
 CONF_VIKUNJA_API_KEY = "vikunja_api_key"
-CONF_OPENAI_API_KEY = "openai_api_key"
+CONF_AI_TASK_ENTITY = "ai_task_entity"
 CONF_DUE_DATE = "default_due_date"
 CONF_VOICE_CORRECTION = "voice_correction"
 CONF_AUTO_VOICE_LABEL = "auto_voice_label"

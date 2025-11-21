@@ -7,7 +7,7 @@
         "data": {
           "vikunja_url": "Vikunja बेस URL (उदा. https://vikunja.example.com)",
           "vikunja_api_key": "Vikunja API टोकन",
-          "openai_api_key": "OpenAI API कुंजी",
+          "ai_task_entity": "AI कार्य इकाई",
           "voice_correction": "वॉइस रिकॉग्निशन टेक्स्ट सुधार सक्षम करें (अनुशंसित)",
           "default_due_date": "कोई तिथि न होने और कोई प्रोजेक्ट न होने पर डिफ़ॉल्ट देय तिथि",
           "auto_voice_label": "इस इंटीग्रेशन से बने टास्क पर स्वतः 'voice' लेबल जोड़ें",
@@ -16,12 +16,12 @@
         }
       },
       "reconfigure": {
-        "title": "Vikunja वॉइस असिस्टेंट",
-        "description": "{name} के लिए Vikunja वॉइस असिस्टेंट सेटिंग्स अपडेट करें",
+        "title": "Vikunja वॉइस असिस्टेंट पुनः कॉन्फ़िगर करें",
+        "description": "Vikunja वॉइस असिस्टेंट इंटीग्रेशन की कॉन्फ़िगरेशन अपडेट करें",
         "data": {
           "vikunja_url": "Vikunja बेस URL (उदा. https://vikunja.example.com)",
           "vikunja_api_key": "Vikunja API टोकन",
-          "openai_api_key": "OpenAI API कुंजी",
+          "ai_task_entity": "AI कार्य इकाई",
           "voice_correction": "वॉइस रिकॉग्निशन टेक्स्ट सुधार सक्षम करें (अनुशंसित)",
           "default_due_date": "कोई तिथि न होने और कोई प्रोजेक्ट न होने पर डिफ़ॉल्ट देय तिथि",
           "auto_voice_label": "इस इंटीग्रेशन से बने टास्क पर स्वतः 'voice' लेबल जोड़ें",
@@ -32,11 +32,12 @@
     },
     "error": {
       "cannot_connect": "Vikunja API से कनेक्ट नहीं हो सका, कृपया URL और API टोकन जाँचें।",
-      "invalid_openai_key": "अमान्य OpenAI API कुंजी। कृपया जाँचें।"
+      "llm_conn_error": "Home Assistant की AI सेवा के साथ कार्य संसाधित नहीं किया जा सका।"
     },
     "abort": {
       "already_configured": "यह Vikunja खाता पहले से कॉन्फ़िगर है।",
-      "reconfigure_successful": "Vikunja वॉइस असिस्टेंट कॉन्फ़िगरेशन सफलतापूर्वक अपडेट हो गया है।"
+      "reconfigure_entry_not_found": "पुनः कॉन्फ़िगर करने के लिए कॉन्फ़िगरेशन एंट्री नहीं मिली।",
+      "reconfigure_successful": "कॉन्फ़िगरेशन सफलतापूर्वक अपडेट हो गई।"
     }
   }
 }

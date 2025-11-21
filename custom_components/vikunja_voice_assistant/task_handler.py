@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 from typing import Any, Dict, List
 
@@ -9,7 +8,7 @@ from .const import (
     DOMAIN,
     CONF_VIKUNJA_URL,
     CONF_VIKUNJA_API_KEY,
-    CONF_OPENAI_API_KEY,
+    CONF_AI_TASK_ENTITY,
     CONF_DUE_DATE,
     CONF_VOICE_CORRECTION,
     CONF_AUTO_VOICE_LABEL,
@@ -17,7 +16,7 @@ from .const import (
     CONF_DETAILED_RESPONSE,
 )
 from .api.vikunja_api import VikunjaAPI
-from .api.openai_api import OpenAIAPI
+from .api.homeassistant_llm_api import HomeAssistantLLMAPI
 from .helpers.detailed_response_formatter import build_detailed_response
 from .helpers.localization import (
     get_language,
@@ -39,7 +38,7 @@ async def process_task(
     domain_config = hass.data.get(DOMAIN, {})
     vikunja_url = domain_config.get(CONF_VIKUNJA_URL)
     vikunja_api_key = domain_config.get(CONF_VIKUNJA_API_KEY)
-    openai_api_key = domain_config.get(CONF_OPENAI_API_KEY)
+    ai_task_entity = domain_config.get(CONF_AI_TASK_ENTITY, "")
     default_due_date = domain_config.get(CONF_DUE_DATE, "none")
     voice_correction = domain_config.get(CONF_VOICE_CORRECTION, True)
     auto_voice_label = domain_config.get(CONF_AUTO_VOICE_LABEL, True)
@@ -47,7 +46,7 @@ async def process_task(
     detailed_response = domain_config.get(CONF_DETAILED_RESPONSE, True)
     # Granular include flags removed; when detailed_response is true we include all available metadata.
     lang = get_language(hass)
-    if not all([vikunja_url, vikunja_api_key, openai_api_key]):
+    if not all([vikunja_url, vikunja_api_key, ai_task_entity]):
         _LOGGER.error("Missing configuration for Vikunja voice assistant")
         return False, L("config_error", lang), ""
 
@@ -73,41 +72,34 @@ async def process_task(
         except Exception as label_err:  # noqa: BLE001
             _LOGGER.error("Could not ensure 'voice' label exists: %s", label_err)
 
-    openai_client = OpenAIAPI(openai_api_key)
+    llm_client = HomeAssistantLLMAPI(hass, ai_task_entity)
     users_for_prompt = user_cache_users if enable_user_assignment else []
-    openai_response = await hass.async_add_executor_job(
-        lambda: openai_client.create_task_from_description(
-            task_description,
-            projects,
-            labels,
-            default_due_date,
-            voice_correction,
-            users=users_for_prompt,
-            enable_user_assignment=enable_user_assignment,
-        )
+    llm_response = await llm_client.create_task_from_description(
+        task_description,
+        projects,
+        labels,
+        default_due_date,
+        voice_correction,
+        users=users_for_prompt,
+        enable_user_assignment=enable_user_assignment,
     )
-    if not openai_response:
-        _LOGGER.error("Failed to process task with OpenAI")
-        return False, L("openai_conn_error", lang), ""
+    if not llm_response:
+        _LOGGER.error("Failed to process task with Home Assistant LLM")
+        return False, L("llm_conn_error", lang), ""
     try:
-        response_data = (
-            openai_response
-            if isinstance(openai_response, dict)
-            else json.loads(openai_response)
-        )
-        task_data = response_data.get("task_data", {})
+        task_data = llm_response.get("task_data", {})
         # Some upstream responses in tests wrap the task payload under "task_data" but may
-        # produce None instead of an object. Treat that as an OpenAI processing failure
+        # produce None instead of an object. Treat that as an LLM processing failure
         # rather than throwing an AttributeError.
         if task_data is None:
-            _LOGGER.error("OpenAI response task_data was None")
-            return False, L("openai_process_error", lang), ""
+            _LOGGER.error("LLM response task_data was None")
+            return False, L("llm_process_error", lang), ""
         if not isinstance(task_data, dict):
-            _LOGGER.error("OpenAI response task_data not a dict: %r", type(task_data))
-            return False, L("openai_process_error", lang), ""
+            _LOGGER.error("LLM response task_data not a dict: %r", type(task_data))
+            return False, L("llm_process_error", lang), ""
         if not task_data.get("title"):
             _LOGGER.error("Missing required 'title' field in task data")
-            return False, L("openai_missing_title", lang), ""
+            return False, L("llm_missing_title", lang), ""
 
         extracted_label_ids = []
         if isinstance(task_data, dict) and task_data.get("label_ids"):
@@ -204,9 +196,6 @@ async def process_task(
             return True, detailed_message, safe_task_title
         _LOGGER.error("Failed to create task in Vikunja")
         return False, L("vikunja_add_error", lang), ""
-    except json.JSONDecodeError as err:  # noqa: BLE001
-        _LOGGER.error("Failed to parse OpenAI response as JSON: %s", err)
-        return False, L("json_parse_error", lang), ""
     except Exception as err:  # noqa: BLE001
         _LOGGER.error("Unexpected error creating task: %s", err)
         return False, L("unexpected_error", lang), ""

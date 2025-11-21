@@ -7,7 +7,7 @@
         "data": {
           "vikunja_url": "URL base de Vikunja (ej. https://vikunja.example.com)",
           "vikunja_api_key": "Token API de Vikunja",
-          "openai_api_key": "Clave API de OpenAI",
+          "ai_task_entity": "Entidad de tarea de IA",
           "voice_correction": "Habilitar corrección de texto de reconocimiento de voz (recomendado)",
           "default_due_date": "Fecha de vencimiento predeterminada si no se especifica (solo cuando no hay proyecto mencionado)",
           "auto_voice_label": "Agregar automáticamente la etiqueta 'voice' a tareas creadas por esta integración",
@@ -16,12 +16,12 @@
         }
       },
       "reconfigure": {
-        "title": "Asistente de voz Vikunja",
-        "description": "Actualiza la configuración del asistente de voz de Vikunja para {name}",
+        "title": "Reconfigurar asistente de voz Vikunja",
+        "description": "Actualiza la configuración de la integración del asistente de voz de Vikunja",
         "data": {
           "vikunja_url": "URL base de Vikunja (ej. https://vikunja.example.com)",
           "vikunja_api_key": "Token API de Vikunja",
-          "openai_api_key": "Clave API de OpenAI",
+          "ai_task_entity": "Entidad de tarea de IA",
           "voice_correction": "Habilitar corrección de texto de reconocimiento de voz (recomendado)",
           "default_due_date": "Fecha de vencimiento predeterminada si no se especifica (solo cuando no hay proyecto mencionado)",
           "auto_voice_label": "Agregar automáticamente la etiqueta 'voice' a tareas creadas por esta integración",
@@ -32,11 +32,12 @@
     },
     "error": {
       "cannot_connect": "No se pudo conectar a la API de Vikunja; verifica la URL y el token.",
-      "invalid_openai_key": "Clave de API de OpenAI inválida. Por favor verifica."
+      "llm_conn_error": "No se pudo procesar la tarea con el servicio de IA de Home Assistant."
     },
     "abort": {
       "already_configured": "Esta cuenta de Vikunja ya está configurada.",
-      "reconfigure_successful": "Configuración del asistente de voz Vikunja actualizada correctamente."
+      "reconfigure_entry_not_found": "No se pudo encontrar la entrada de configuración para reconfigurar.",
+      "reconfigure_successful": "Configuración actualizada correctamente."
     }
   }
 }

@@ -4,7 +4,7 @@
 
 <img src="https://raw.githubusercontent.com/NeoHuncho/vikunja-voice-assistant/main/logo.png" alt="Vikunja Voice Assistant logo" width="160" />
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)[![HACS Default](https://img.shields.io/badge/HACS-Default-blue.svg)](https://hacs.xyz/) [![Powered by OpenAI](https://img.shields.io/badge/AI-OpenAI-ff69b4.svg)](https://platform.openai.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)[![HACS Default](https://img.shields.io/badge/HACS-Default-blue.svg)](https://hacs.xyz/)
 
 Say **“create a task”** or **“add a task”** → Your task goes straight into Vikunja!
 
@@ -12,8 +12,9 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 </div>
 
 
-> **⚠️ Important Notice:**
-> If you were using user assignments before version 1.4.6, you will need to create a new Vikunja token with the `Projectusers` permission for user assignments to work again.
+> **⚠️ Important Notice (Breaking Changes):**
+> This version now uses Home Assistant's AI Task (`ai_task.generate_data`) pipeline instead of calling OpenAI directly.
+> After updating from a version before 2.0.0, you MUST reconfigure the integration and **select a compatible AI Task entity**.
 
 
 ---
@@ -24,7 +25,6 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 * Supports **project, due date, priority, labels, recurrence** and more 📅
 * Optional: speech correction, auto voice label, default due date, user assignment
 * Supports 11 languages 🌐 [📖 Voice commands in all 11 languages](VOICE_COMMANDS.md)
-* Uses GPT 5 nano 🚄
 
 ---
 
@@ -33,11 +33,11 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 * [Home Assistant](https://www.home-assistant.io/) with a [voice assistant set up](https://www.home-assistant.io/voice_control/)
 * [HACS](https://hacs.xyz/docs/use/download/download/#to-download-hacs-ossupervised)
 * Running Vikunja instance + API token with [correct permissions](https://github.com/NeoHuncho/vikunja-voice-assistant?tab=readme-ov-file#%EF%B8%8F-installation-hacs--full-video-walkthrough)
-* OpenAI API key
+* Configured Home Assistant AI Task entity (from the `ai_task.generate_data` pipeline)
 
 ---
 
-## ⚙️ Installation (HACS) | [Full Video Walkthrough](https://github.com/user-attachments/assets/c897b523-2539-42e2-ba03-fa9534a80c36)
+## ⚙️ Installation (HACS) | [Video Guide](https://github.com/user-attachments/assets/c897b523-2539-42e2-ba03-fa9534a80c36)
 
 ⏱️ *Create your first task in under 2 minutes!*
 
@@ -49,7 +49,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
 4. Search: **Vikunja Voice Assistant**
 
-5. Fill out setup form (Vikunja URL, API token, OpenAI key, options)
+5. Fill out setup form (Vikunja URL, API token, AI Task entity, options)
 
    * **Vikunja API Token** → User Settings → API Tokens
 
@@ -60,9 +60,13 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
 
        📹 [Video Guide](https://github.com/user-attachments/assets/97927621-394b-4fb5-aa66-4cef0325f726)
 
-   * **OpenAI API Key** → [Create one here](https://platform.openai.com/account/api-keys)
+   * **AI Task entity** [Video Guide OpenRouter](https://github.com/user-attachments/assets/5435bf42-e7b7-4150-8109-433847dd61d4)
+     Select the Home Assistant `ai_task` entity that is configured to run your preferred LLM via `ai_task.generate_data`.
 
-     📹 [Video Guide](https://github.com/user-attachments/assets/1aae42cb-ba0b-4ebb-951c-bd017da45f71)
+     Note: this integration relies on Home Assistant's AI Task pipeline (`ai_task.generate_data`). You can use any AI provider compatible with AI Task (examples: Ollama, OpenAI, Google Gemini, OpenRouter). See AI & LLM setup and the AI Task integration for details:
+
+     - AI & LLM setup: [LINK](https://www.home-assistant.io/integrations/?cat=ai)
+     - AI Task (`ai_task`) integration: [LINK](https://www.home-assistant.io/integrations/ai_task/)
 
 6. ✅ Done – Just say **"create a task"** !
 
@@ -96,6 +100,8 @@ tool_args: {
 }
 ```
 *This will allow your voice assistant to create tasks even if the keywords were missing.*
+
+
 
 
 📹 [Video Guide](https://github.com/user-attachments/assets/0440bc71-b748-4118-8afd-6f0f10b22003)
