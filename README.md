@@ -61,6 +61,7 @@ Say **“create a task”** or **“add a task”** → Your task goes straight 
        📹 [Video Guide](https://github.com/user-attachments/assets/97927621-394b-4fb5-aa66-4cef0325f726)
 
    * **AI Task entity** [Video Guide OpenRouter](https://github.com/user-attachments/assets/5435bf42-e7b7-4150-8109-433847dd61d4)
+
      Select the Home Assistant `ai_task` entity that is configured to run your preferred LLM via `ai_task.generate_data`.
 
      Note: this integration relies on Home Assistant's AI Task pipeline (`ai_task.generate_data`). You can use any AI provider compatible with AI Task (examples: Ollama, OpenAI, Google Gemini, OpenRouter). See AI & LLM setup and the AI Task integration for details:
