@@ -16,11 +16,40 @@
         }
       },
       "reconfigure": {
-        "title": "Reconfigurar assistente de voz Vikunja",
-        "description": "Atualize a configuração da integração do assistente de voz Vikunja",
+        "title": "Reconfigurar conexão Vikunja",
+        "description": "Atualizar configurações de conexão (URL e chave API). Use Configurar para alterar outras opções.",
         "data": {
           "vikunja_url": "URL base do Vikunja (ex. https://vikunja.example.com)",
-          "vikunja_api_key": "Token de API do Vikunja",
+          "vikunja_api_key": "Token de API do Vikunja"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reautenticar Vikunja",
+        "description": "O token API para {url} não é mais válido. Forneça um novo token API.",
+        "data": {
+          "vikunja_api_key": "Token de API do Vikunja"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Falha ao conectar à API Vikunja, verifique a URL e o token.",
+      "invalid_auth": "Token API inválido. Verifique suas credenciais.",
+      "llm_conn_error": "Falha ao processar a tarefa com o serviço de IA do Home Assistant."
+    },
+    "abort": {
+      "already_configured": "Esta conta Vikunja já está configurada.",
+      "reconfigure_entry_not_found": "A entrada de configuração para reconfiguração não foi encontrada.",
+      "reconfigure_successful": "Configuração atualizada com sucesso.",
+      "reauth_entry_not_found": "A entrada de configuração para reautenticação não foi encontrada.",
+      "reauth_successful": "Reautenticação bem-sucedida."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Configurar assistente de voz Vikunja",
+        "description": "Ajustar opções do assistente de voz Vikunja",
+        "data": {
           "ai_task_entity": "Entidade de tarefa de IA",
           "voice_correction": "Ativar correção de texto de reconhecimento de voz (recomendado)",
           "default_due_date": "Data de vencimento padrão se nada for especificado (somente quando nenhum projeto é mencionado)",
@@ -29,15 +58,6 @@
           "detailed_response": "Ativar resposta detalhada falada (inclui projeto, rótulos, data, responsável, prioridade e repetição)"
         }
       }
-    },
-    "error": {
-      "cannot_connect": "Falha ao conectar à API Vikunja, verifique a URL e o token.",
-      "llm_conn_error": "Falha ao processar a tarefa com o serviço de IA do Home Assistant."
-    },
-    "abort": {
-      "already_configured": "Esta conta Vikunja já está configurada.",
-      "reconfigure_entry_not_found": "A entrada de configuração para reconfiguração não foi encontrada.",
-      "reconfigure_successful": "Configuração atualizada com sucesso."
     }
   }
 }

@@ -4,6 +4,8 @@ import asyncio
 import logging
 from typing import Any, Dict, List
 
+from homeassistant.config_entries import ConfigEntryState
+
 from .const import (
     DOMAIN,
     CONF_VIKUNJA_URL,
@@ -15,7 +17,7 @@ from .const import (
     CONF_ENABLE_USER_ASSIGN,
     CONF_DETAILED_RESPONSE,
 )
-from .api.vikunja_api import VikunjaAPI
+from .api.vikunja_api import VikunjaAPI, VikunjaAuthenticationError
 from .api.homeassistant_llm_api import HomeAssistantLLMAPI
 from .helpers.detailed_response_formatter import build_detailed_response
 from .helpers.localization import (
@@ -51,10 +53,20 @@ async def process_task(
         return False, L("config_error", lang), ""
 
     vikunja_api = VikunjaAPI(vikunja_url, vikunja_api_key)
-    projects, labels = await asyncio.gather(
-        hass.async_add_executor_job(vikunja_api.get_projects),
-        hass.async_add_executor_job(vikunja_api.get_labels),
-    )
+    
+    try:
+        projects, labels = await asyncio.gather(
+            hass.async_add_executor_job(vikunja_api.get_projects),
+            hass.async_add_executor_job(vikunja_api.get_labels),
+        )
+    except VikunjaAuthenticationError:
+        _LOGGER.error("Authentication failed - triggering reauth flow")
+        # Find the config entry and trigger reauth
+        for entry in hass.config_entries.async_entries(DOMAIN):
+            if entry.state == ConfigEntryState.LOADED:
+                entry.async_start_reauth(hass)
+                break
+        return False, L("auth_error", lang), ""
 
     voice_label_id = None
     if auto_voice_label:
@@ -114,9 +126,17 @@ async def process_task(
             task_data.pop("label_ids", None)
 
         assignee_username_or_name = task_data.pop("assignee", None)
-        result = await hass.async_add_executor_job(
-            lambda: vikunja_api.add_task(task_data)
-        )
+        try:
+            result = await hass.async_add_executor_job(
+                lambda: vikunja_api.add_task(task_data)
+            )
+        except VikunjaAuthenticationError:
+            _LOGGER.error("Authentication failed while creating task - triggering reauth flow")
+            for entry in hass.config_entries.async_entries(DOMAIN):
+                if entry.state == ConfigEntryState.LOADED:
+                    entry.async_start_reauth(hass)
+                    break
+            return False, L("auth_error", lang), ""
         if result:
             try:
                 task_id = result.get("id") if isinstance(result, dict) else None

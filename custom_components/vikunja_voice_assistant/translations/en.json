@@ -16,11 +16,40 @@
         }
       },
       "reconfigure": {
-        "title": "Reconfigure Vikunja voice assistant",
-        "description": "Update the Vikunja voice assistant integration",
+        "title": "Reconfigure Vikunja connection",
+        "description": "Update connection settings (URL and API key). Use Configure to change other options.",
         "data": {
           "vikunja_url": "Vikunja base URL (e.g. https://vikunja.example.com)",
-          "vikunja_api_key": "Vikunja API Token",
+          "vikunja_api_key": "Vikunja API Token"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate Vikunja",
+        "description": "The API token for {url} is no longer valid. Please provide a new API token.",
+        "data": {
+          "vikunja_api_key": "Vikunja API Token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to Vikunja API, please check your URL and API token.",
+      "invalid_auth": "Invalid API token. Please check your credentials.",
+      "llm_conn_error": "Failed to process the task using Home Assistant's AI pipeline."
+    },
+    "abort": {
+      "already_configured": "This Vikunja account is already configured.",
+      "reconfigure_entry_not_found": "The configuration entry to reconfigure could not be found.",
+      "reconfigure_successful": "Configuration updated successfully.",
+      "reauth_entry_not_found": "The configuration entry to reauthenticate could not be found.",
+      "reauth_successful": "Reauthentication successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Configure Vikunja voice assistant",
+        "description": "Adjust options for the Vikunja voice assistant",
+        "data": {
           "ai_task_entity": "AI Task entity",
           "voice_correction": "Enable speech recognition text correction (recommended)",
           "default_due_date": "Default due date if none specified (applies only when no project is mentioned)",
@@ -29,15 +58,6 @@
           "detailed_response": "Enable detailed spoken response (includes project, labels, due date, assignee, priority & repeat info)"
         }
       }
-    },
-    "error": {
-      "cannot_connect": "Failed to connect to Vikunja API, please check your URL and API token.",
-      "llm_conn_error": "Failed to process the task using Home Assistant's AI pipeline."
-    },
-    "abort": {
-      "already_configured": "This Vikunja account is already configured.",
-      "reconfigure_entry_not_found": "The configuration entry to reconfigure could not be found.",
-      "reconfigure_successful": "Configuration updated successfully."
     }
   }
 }

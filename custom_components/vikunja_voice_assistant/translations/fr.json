@@ -16,11 +16,40 @@
         }
       },
       "reconfigure": {
-        "title": "Reconfigurer l'assistant vocal Vikunja",
-        "description": "Mettre à jour la configuration de l'intégration de l'assistant vocal Vikunja",
+        "title": "Reconfigurer la connexion Vikunja",
+        "description": "Mettre à jour les paramètres de connexion (URL et clé API). Utilisez Configurer pour modifier les autres options.",
         "data": {
           "vikunja_url": "URL de base Vikunja (ex. https://vikunja.example.com)",
-          "vikunja_api_key": "Jeton d'API Vikunja",
+          "vikunja_api_key": "Jeton d'API Vikunja"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Réauthentifier Vikunja",
+        "description": "Le jeton API pour {url} n'est plus valide. Veuillez fournir un nouveau jeton API.",
+        "data": {
+          "vikunja_api_key": "Jeton d'API Vikunja"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Échec de connexion à l'API Vikunja, veuillez vérifier l'URL et le jeton.",
+      "invalid_auth": "Jeton API invalide. Veuillez vérifier vos identifiants.",
+      "llm_conn_error": "Échec du traitement de la tâche via le service d'IA de Home Assistant."
+    },
+    "abort": {
+      "already_configured": "Ce compte Vikunja est déjà configuré.",
+      "reconfigure_entry_not_found": "L'entrée de configuration à reconfigurer est introuvable.",
+      "reconfigure_successful": "Configuration mise à jour avec succès.",
+      "reauth_entry_not_found": "L'entrée de configuration à réauthentifier est introuvable.",
+      "reauth_successful": "Réauthentification réussie."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Configurer l'assistant vocal Vikunja",
+        "description": "Ajuster les options de l'assistant vocal Vikunja",
+        "data": {
           "ai_task_entity": "Entité de tâche IA",
           "voice_correction": "Activer la correction du texte de reconnaissance vocale (recommandé)",
           "default_due_date": "Échéance par défaut si aucune n'est spécifiée (uniquement si aucun projet n'est mentionné)",
@@ -29,15 +58,6 @@
           "detailed_response": "Activer la réponse vocale détaillée (inclut projet, étiquettes, date, assigné, priorité et répétition)"
         }
       }
-    },
-    "error": {
-      "cannot_connect": "Échec de connexion à l'API Vikunja, veuillez vérifier l'URL et le jeton.",
-      "llm_conn_error": "Échec du traitement de la tâche via le service d'IA de Home Assistant."
-    },
-    "abort": {
-      "already_configured": "Ce compte Vikunja est déjà configuré.",
-      "reconfigure_entry_not_found": "L'entrée de configuration à reconfigurer est introuvable.",
-      "reconfigure_successful": "Configuration mise à jour avec succès."
     }
   }
 }

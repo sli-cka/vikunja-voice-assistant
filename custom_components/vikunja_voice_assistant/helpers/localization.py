@@ -142,6 +142,19 @@ _BASE: Dict[str, Dict[str, str]] = {
         "id": "Terjadi kesalahan tak terduga. Coba lagi.",
         "de": "Entschuldigung, ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     },
+    "auth_error": {
+        "en": "Authentication failed. Please update your Vikunja API token.",
+        "fr": "Échec de l'authentification. Veuillez mettre à jour votre jeton API Vikunja.",
+        "es": "Error de autenticación. Actualiza tu token API de Vikunja.",
+        "pt": "Falha na autenticação. Atualize seu token API do Vikunja.",
+        "ru": "Ошибка аутентификации. Обновите токен API Vikunja.",
+        "hi": "प्रमाणीकरण विफल। कृपया अपना Vikunja API टोकन अपडेट करें।",
+        "zh-Hans": "身份验证失败。请更新您的 Vikunja API 令牌。",
+        "ar": "فشلت المصادقة. يرجى تحديث رمز API الخاص بـ Vikunja.",
+        "bn": "প্রমাণীকরণ ব্যর্থ। আপনার Vikunja API টোকেন আপডেট করুন।",
+        "id": "Autentikasi gagal. Perbarui token API Vikunja Anda.",
+        "de": "Authentifizierung fehlgeschlagen. Bitte aktualisieren Sie Ihr Vikunja API-Token.",
+    },
 }
 
 

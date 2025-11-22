@@ -5,6 +5,11 @@ import secrets
 _LOGGER = logging.getLogger(__name__)
 
 
+class VikunjaAuthenticationError(Exception):
+    """Exception raised when API authentication fails."""
+    pass
+
+
 class VikunjaAPI:
     def __init__(self, url, vikunja_api_key):
         self.url = url.rstrip("/")
@@ -22,11 +27,16 @@ class VikunjaAPI:
             )
             response.raise_for_status()
             return True
-        except requests.exceptions.RequestException as err:
+        except requests.exceptions.HTTPError as err:
+            if err.response.status_code == 401:
+                raise VikunjaAuthenticationError("Invalid API token") from err
             _LOGGER.error("Connection test failed: %s", err)
             resp = getattr(err, "response", None)
             if resp is not None and hasattr(resp, "text"):
                 _LOGGER.error("Response content: %s", resp.text)
+            return False
+        except requests.exceptions.RequestException as err:
+            _LOGGER.error("Connection test failed: %s", err)
             return False
 
     def get_projects(self):
@@ -40,11 +50,16 @@ class VikunjaAPI:
             if isinstance(data, list):
                 return data
             return []
-        except requests.exceptions.RequestException as err:
+        except requests.exceptions.HTTPError as err:
+            if err.response.status_code == 401:
+                raise VikunjaAuthenticationError("Invalid API token") from err
             _LOGGER.error("Failed to get projects: %s", err)
             resp = getattr(err, "response", None)
             if resp is not None and hasattr(resp, "text"):
                 _LOGGER.error("Response content: %s", resp.text)
+            return []
+        except requests.exceptions.RequestException as err:
+            _LOGGER.error("Failed to get projects: %s", err)
             return []
 
     def get_project_users(self, project_id: int):
@@ -134,11 +149,16 @@ class VikunjaAPI:
             )
             response.raise_for_status()
             return response.json()
-        except requests.exceptions.RequestException as err:
+        except requests.exceptions.HTTPError as err:
+            if err.response.status_code == 401:
+                raise VikunjaAuthenticationError("Invalid API token") from err
             _LOGGER.error("Failed to create task in project %s: %s", project_id, err)
             resp = getattr(err, "response", None)
             if resp is not None and hasattr(resp, "text"):
                 _LOGGER.error("Response content: %s", resp.text)
+            return None
+        except requests.exceptions.RequestException as err:
+            _LOGGER.error("Failed to create task in project %s: %s", project_id, err)
             return None
 
     # --- User / Assignee helpers ---

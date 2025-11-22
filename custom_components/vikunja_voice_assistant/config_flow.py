@@ -32,8 +32,15 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
     _basic_input: dict | None = None
 
+    @staticmethod
+    def async_get_options_flow(config_entry):
+        """Get the options flow for this handler."""
+        from .options_flow import OptionsFlowHandler
+        return OptionsFlowHandler(config_entry)
+
 
     def _build_data_schema(self, defaults):
+        """Build schema for initial setup with all settings."""
         lang = get_language(self.hass)
         due_date_selector = selector.SelectSelector(
             selector.SelectSelectorConfig(
@@ -89,6 +96,22 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
                     CONF_DETAILED_RESPONSE,
                     default=defaults.get(CONF_DETAILED_RESPONSE, True),
                 ): cv.boolean,
+            }
+        )
+
+    def _build_reconfigure_schema(self, defaults):
+        """Build schema for reconfiguration with only connection-critical settings."""
+        token_selector = selector.TextSelector(
+            selector.TextSelectorConfig(type=selector.TextSelectorType.PASSWORD)
+        )
+
+        return vol.Schema(
+            {
+                vol.Required(CONF_VIKUNJA_URL, default=defaults.get(CONF_VIKUNJA_URL, "")): str,
+                vol.Required(
+                    CONF_VIKUNJA_API_KEY,
+                    default=defaults.get(CONF_VIKUNJA_API_KEY, ""),
+                ): token_selector,
             }
         )
 
@@ -160,7 +183,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
         )
 
     async def async_step_reconfigure(self, user_input=None):
-        """Handle reconfiguration initiated from an existing entry."""
+        """Handle reconfiguration of setup-critical settings."""
         entry_id = self.context.get("entry_id")
         if not entry_id:
             return self.async_abort(reason="reconfigure_entry_not_found")
@@ -181,18 +204,72 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
             )
 
             if connection_ok:
-                await self._ensure_user_cache(sanitized)
+                # Preserve existing optional settings that are managed via Configure
+                updated_data = dict(entry.data)
+                updated_data.update(sanitized)
 
-                self.hass.config_entries.async_update_entry(entry, data=sanitized)
+                self.hass.config_entries.async_update_entry(entry, data=updated_data)
                 await self.hass.config_entries.async_reload(entry.entry_id)
 
                 return self.async_abort(reason="reconfigure_successful")
 
             errors["base"] = "cannot_connect"
 
-        data_schema = self._build_data_schema(defaults)
+        data_schema = self._build_reconfigure_schema(defaults)
         return self.async_show_form(
             step_id="reconfigure",
             data_schema=data_schema,
             errors=errors,
+        )
+
+    async def async_step_reauth(self, entry_data=None):
+        """Handle reauthentication for invalid credentials."""
+        return await self.async_step_reauth_confirm()
+
+    async def async_step_reauth_confirm(self, user_input=None):
+        """Handle reauthentication confirmation."""
+        entry_id = self.context.get("entry_id")
+        if not entry_id:
+            return self.async_abort(reason="reauth_entry_not_found")
+
+        entry = self.hass.config_entries.async_get_entry(entry_id)
+        if entry is None:
+            return self.async_abort(reason="reauth_entry_not_found")
+
+        errors: dict[str, str] = {}
+        defaults = {CONF_VIKUNJA_API_KEY: ""}
+
+        if user_input is not None:
+            sanitized_key = user_input.get(CONF_VIKUNJA_API_KEY, "").strip()
+
+            connection_ok = await self._test_connection(
+                entry.data[CONF_VIKUNJA_URL], sanitized_key
+            )
+
+            if connection_ok:
+                updated_data = dict(entry.data)
+                updated_data[CONF_VIKUNJA_API_KEY] = sanitized_key
+
+                self.hass.config_entries.async_update_entry(entry, data=updated_data)
+                await self.hass.config_entries.async_reload(entry.entry_id)
+
+                return self.async_abort(reason="reauth_successful")
+
+            errors["base"] = "invalid_auth"
+
+        token_selector = selector.TextSelector(
+            selector.TextSelectorConfig(type=selector.TextSelectorType.PASSWORD)
+        )
+
+        data_schema = vol.Schema(
+            {
+                vol.Required(CONF_VIKUNJA_API_KEY, default=defaults.get(CONF_VIKUNJA_API_KEY, "")): token_selector,
+            }
+        )
+
+        return self.async_show_form(
+            step_id="reauth_confirm",
+            data_schema=data_schema,
+            errors=errors,
+            description_placeholders={"url": entry.data[CONF_VIKUNJA_URL]},
         )

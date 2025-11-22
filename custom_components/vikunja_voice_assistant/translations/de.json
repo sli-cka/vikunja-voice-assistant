@@ -16,11 +16,40 @@
         }
       },
       "reconfigure": {
-        "title": "Vikunja Sprachassistent neu konfigurieren",
-        "description": "Aktualisieren Sie die Konfiguration der Vikunja Sprachassistent-Integration",
+        "title": "Vikunja-Verbindung neu konfigurieren",
+        "description": "Verbindungseinstellungen aktualisieren (URL und API-Schlüssel). Verwenden Sie Konfigurieren für andere Optionen.",
         "data": {
           "vikunja_url": "Vikunja Basis-URL (z.B. https://vikunja.example.com)",
-          "vikunja_api_key": "Vikunja API-Token",
+          "vikunja_api_key": "Vikunja API-Token"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Vikunja erneut authentifizieren",
+        "description": "Das API-Token für {url} ist nicht mehr gültig. Bitte geben Sie ein neues API-Token ein.",
+        "data": {
+          "vikunja_api_key": "Vikunja API-Token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zur Vikunja API fehlgeschlagen. Bitte überprüfen Sie Ihre URL und Ihr API-Token.",
+      "invalid_auth": "Ungültiges API-Token. Bitte überprüfen Sie Ihre Anmeldedaten.",
+      "llm_conn_error": "Aufgabe konnte nicht mit dem Home-Assistant-KI-Dienst verarbeitet werden."
+    },
+    "abort": {
+      "already_configured": "Dieses Vikunja-Konto ist bereits konfiguriert.",
+      "reconfigure_entry_not_found": "Der zu konfigurierende Eintrag konnte nicht gefunden werden.",
+      "reconfigure_successful": "Konfiguration erfolgreich aktualisiert.",
+      "reauth_entry_not_found": "Der zu authentifizierende Eintrag konnte nicht gefunden werden.",
+      "reauth_successful": "Erneute Authentifizierung erfolgreich."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Vikunja Sprachassistent konfigurieren",
+        "description": "Optionen für den Vikunja Sprachassistenten anpassen",
+        "data": {
           "ai_task_entity": "AI-Task-Entität",
           "voice_correction": "Spracherkennungs-Textkorrektur aktivieren (empfohlen)",
           "default_due_date": "Standard-Fälligkeitsdatum, falls keines angegeben (gilt nur, wenn kein Projekt erwähnt wird)",
@@ -29,15 +58,6 @@
           "detailed_response": "Detaillierte Sprachantwort aktivieren (enthält Projekt, Labels, Fälligkeitsdatum, Zugewiesene, Priorität & Wiederholungsinfo)"
         }
       }
-    },
-    "error": {
-      "cannot_connect": "Verbindung zur Vikunja API fehlgeschlagen. Bitte überprüfen Sie Ihre URL und Ihr API-Token.",
-      "llm_conn_error": "Aufgabe konnte nicht mit dem Home-Assistant-KI-Dienst verarbeitet werden."
-    },
-    "abort": {
-      "already_configured": "Dieses Vikunja-Konto ist bereits konfiguriert.",
-      "reconfigure_entry_not_found": "Der zu konfigurierende Eintrag konnte nicht gefunden werden.",
-      "reconfigure_successful": "Konfiguration erfolgreich aktualisiert."
     }
   }
 }

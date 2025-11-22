@@ -2,7 +2,7 @@ import logging
 import os
 from homeassistant.helpers import config_validation as cv
 from homeassistant.core import HomeAssistant
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 
 from .const import (
     DOMAIN,
@@ -18,6 +18,7 @@ from .const import (
 from .services import setup_services
 from .user_cache import VikunjaUserCacheManager
 from .intents import register_intents
+from .api.vikunja_api import VikunjaAuthenticationError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -64,16 +65,33 @@ async def async_setup(hass: HomeAssistant, config):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up Vikunja from a config entry."""
+    # Connection settings come from entry.data (URL, API key)
+    # All other settings prefer entry.options, fall back to entry.data
     hass.data[DOMAIN] = {
         CONF_VIKUNJA_URL: entry.data[CONF_VIKUNJA_URL],
         CONF_VIKUNJA_API_KEY: entry.data[CONF_VIKUNJA_API_KEY],
-        CONF_AI_TASK_ENTITY: entry.data[CONF_AI_TASK_ENTITY],
-        CONF_DUE_DATE: entry.data[CONF_DUE_DATE],
-        CONF_VOICE_CORRECTION: entry.data[CONF_VOICE_CORRECTION],
-        CONF_AUTO_VOICE_LABEL: entry.data.get(CONF_AUTO_VOICE_LABEL, True),
-        CONF_ENABLE_USER_ASSIGN: entry.data.get(CONF_ENABLE_USER_ASSIGN, False),
-        CONF_DETAILED_RESPONSE: entry.data.get(CONF_DETAILED_RESPONSE, True),
+        CONF_AI_TASK_ENTITY: entry.options.get(
+            CONF_AI_TASK_ENTITY, entry.data.get(CONF_AI_TASK_ENTITY, "")
+        ),
+        CONF_DUE_DATE: entry.options.get(
+            CONF_DUE_DATE, entry.data.get(CONF_DUE_DATE, "tomorrow")
+        ),
+        CONF_VOICE_CORRECTION: entry.options.get(
+            CONF_VOICE_CORRECTION, entry.data.get(CONF_VOICE_CORRECTION, True)
+        ),
+        CONF_AUTO_VOICE_LABEL: entry.options.get(
+            CONF_AUTO_VOICE_LABEL, entry.data.get(CONF_AUTO_VOICE_LABEL, True)
+        ),
+        CONF_ENABLE_USER_ASSIGN: entry.options.get(
+            CONF_ENABLE_USER_ASSIGN, entry.data.get(CONF_ENABLE_USER_ASSIGN, False)
+        ),
+        CONF_DETAILED_RESPONSE: entry.options.get(
+            CONF_DETAILED_RESPONSE, entry.data.get(CONF_DETAILED_RESPONSE, True)
+        ),
     }
+
+    # Register options flow handler
+    entry.async_on_unload(entry.add_update_listener(update_listener))
 
     # User cache manager (optional feature)
     user_cache_manager = VikunjaUserCacheManager(hass)
@@ -81,7 +99,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     if hass.data[DOMAIN].get(CONF_ENABLE_USER_ASSIGN):
         user_cache_manager.schedule_periodic_refresh()
         if not user_cache_manager.data.users:
-            hass.async_create_task(user_cache_manager.refresh(force=True))
+            try:
+                await user_cache_manager.refresh(force=True)
+            except VikunjaAuthenticationError:
+                _LOGGER.error("Authentication failed during user cache refresh - triggering reauth")
+                entry.async_start_reauth(hass)
+                return True
+            except Exception as err:
+                _LOGGER.warning("Failed to refresh user cache during setup: %s", err)
 
     # Register intents and services
     register_intents(hass, lambda: user_cache_manager.data.users)
@@ -111,3 +136,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload a config entry (placeholder for future cleanup)."""
     return True
+
+
+async def update_listener(hass: HomeAssistant, entry: ConfigEntry):
+    """Handle options update."""
+    await hass.config_entries.async_reload(entry.entry_id)

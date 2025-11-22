@@ -16,11 +16,40 @@
         }
       },
       "reconfigure": {
-        "title": "Vikunja वॉइस असिस्टेंट पुनः कॉन्फ़िगर करें",
-        "description": "Vikunja वॉइस असिस्टेंट इंटीग्रेशन की कॉन्फ़िगरेशन अपडेट करें",
+        "title": "Vikunja कनेक्शन पुनः कॉन्फ़िगर करें",
+        "description": "कनेक्शन सेटिंग्स अपडेट करें (URL और API की)। अन्य विकल्पों के लिए कॉन्फ़िगर का उपयोग करें।",
         "data": {
           "vikunja_url": "Vikunja बेस URL (उदा. https://vikunja.example.com)",
-          "vikunja_api_key": "Vikunja API टोकन",
+          "vikunja_api_key": "Vikunja API टोकन"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Vikunja पुनः प्रमाणित करें",
+        "description": "{url} के लिए API टोकन अब मान्य नहीं है। कृपया नया API टोकन प्रदान करें।",
+        "data": {
+          "vikunja_api_key": "Vikunja API टोकन"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Vikunja API से कनेक्ट नहीं हो सका, कृपया URL और API टोकन जाँचें।",
+      "invalid_auth": "अमान्य API टोकन। कृपया अपने क्रेडेंशियल जाँचें।",
+      "llm_conn_error": "Home Assistant की AI सेवा के साथ कार्य संसाधित नहीं किया जा सका।"
+    },
+    "abort": {
+      "already_configured": "यह Vikunja खाता पहले से कॉन्फ़िगर है।",
+      "reconfigure_entry_not_found": "पुनः कॉन्फ़िगर करने के लिए कॉन्फ़िगरेशन एंट्री नहीं मिली।",
+      "reconfigure_successful": "कॉन्फ़िगरेशन सफलतापूर्वक अपडेट हो गई।",
+      "reauth_entry_not_found": "पुनः प्रमाणित करने के लिए कॉन्फ़िगरेशन एंट्री नहीं मिली।",
+      "reauth_successful": "पुनः प्रमाणीकरण सफल रहा।"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Vikunja वॉइस असिस्टेंट कॉन्फ़िगर करें",
+        "description": "Vikunja वॉइस असिस्टेंट के विकल्प समायोजित करें",
+        "data": {
           "ai_task_entity": "AI कार्य इकाई",
           "voice_correction": "वॉइस रिकॉग्निशन टेक्स्ट सुधार सक्षम करें (अनुशंसित)",
           "default_due_date": "कोई तिथि न होने और कोई प्रोजेक्ट न होने पर डिफ़ॉल्ट देय तिथि",
@@ -29,15 +58,6 @@
           "detailed_response": "विस्तृत वॉइस प्रतिक्रिया सक्षम करें (प्रोजेक्ट, लेबल, देय तिथि, असाइनी, प्राथमिकता, पुनरावृत्ति)"
         }
       }
-    },
-    "error": {
-      "cannot_connect": "Vikunja API से कनेक्ट नहीं हो सका, कृपया URL और API टोकन जाँचें।",
-      "llm_conn_error": "Home Assistant की AI सेवा के साथ कार्य संसाधित नहीं किया जा सका।"
-    },
-    "abort": {
-      "already_configured": "यह Vikunja खाता पहले से कॉन्फ़िगर है।",
-      "reconfigure_entry_not_found": "पुनः कॉन्फ़िगर करने के लिए कॉन्फ़िगरेशन एंट्री नहीं मिली।",
-      "reconfigure_successful": "कॉन्फ़िगरेशन सफलतापूर्वक अपडेट हो गई।"
     }
   }
 }

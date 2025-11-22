@@ -16,11 +16,40 @@
         }
       },
       "reconfigure": {
-        "title": "Перенастройка голосового помощника Vikunja",
-        "description": "Обновите конфигурацию интеграции голосового помощника Vikunja",
+        "title": "Перенастройка подключения Vikunja",
+        "description": "Обновить настройки подключения (URL и API ключ). Используйте Настройка для изменения других параметров.",
         "data": {
           "vikunja_url": "Базовый URL Vikunja (пример https://vikunja.example.com)",
-          "vikunja_api_key": "API токен Vikunja",
+          "vikunja_api_key": "API токен Vikunja"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Повторная аутентификация Vikunja",
+        "description": "Токен API для {url} больше не действителен. Предоставьте новый токен API.",
+        "data": {
+          "vikunja_api_key": "API токен Vikunja"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Не удалось подключиться к API Vikunja. Проверьте URL и токен.",
+      "invalid_auth": "Недействительный токен API. Проверьте учетные данные.",
+      "llm_conn_error": "Не удалось обработать задачу с помощью AI-сервиса Home Assistant."
+    },
+    "abort": {
+      "already_configured": "Эта учетная запись Vikunja уже настроена.",
+      "reconfigure_entry_not_found": "Запись конфигурации для перенастройки не найдена.",
+      "reconfigure_successful": "Конфигурация успешно обновлена.",
+      "reauth_entry_not_found": "Запись конфигурации для повторной аутентификации не найдена.",
+      "reauth_successful": "Повторная аутентификация выполнена успешно."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Настройка голосового помощника Vikunja",
+        "description": "Настроить параметры голосового помощника Vikunja",
+        "data": {
           "ai_task_entity": "Сущность AI Task",
           "voice_correction": "Включить исправление текста распознавания речи (рекомендуется)",
           "default_due_date": "Дата по умолчанию, если не указана (только когда проект не упомянут)",
@@ -29,15 +58,6 @@
           "detailed_response": "Включить подробный голосовой ответ (проект, метки, срок, исполнитель, приоритет, повтор)"
         }
       }
-    },
-    "error": {
-      "cannot_connect": "Не удалось подключиться к API Vikunja. Проверьте URL и токен.",
-      "llm_conn_error": "Не удалось обработать задачу с помощью AI-сервиса Home Assistant."
-    },
-    "abort": {
-      "already_configured": "Эта учетная запись Vikunja уже настроена.",
-      "reconfigure_entry_not_found": "Запись конфигурации для перенастройки не найдена.",
-      "reconfigure_successful": "Конфигурация успешно обновлена."
     }
   }
 }

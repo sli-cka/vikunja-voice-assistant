@@ -16,11 +16,40 @@
         }
       },
       "reconfigure": {
-        "title": "إعادة تهيئة مساعد الصوت Vikunja",
-        "description": "تحديث إعدادات تكامل مساعد الصوت Vikunja",
+        "title": "إعادة تهيئة اتصال Vikunja",
+        "description": "تحديث إعدادات الاتصال (URL ومفتاح API). استخدم تكوين لتغيير الخيارات الأخرى.",
         "data": {
           "vikunja_url": "عنوان URL الأساسي لـ Vikunja (مثال https://vikunja.example.com)",
-          "vikunja_api_key": "رمز واجهة برمجة تطبيقات Vikunja",
+          "vikunja_api_key": "رمز واجهة برمجة تطبيقات Vikunja"
+        }
+      },
+      "reauth_confirm": {
+        "title": "إعادة مصادقة Vikunja",
+        "description": "رمز API لـ {url} لم يعد صالحًا. يرجى تقديم رمز API جديد.",
+        "data": {
+          "vikunja_api_key": "رمز واجهة برمجة تطبيقات Vikunja"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "فشل الاتصال بواجهة Vikunja، يرجى التحقق من العنوان والرمز.",
+      "invalid_auth": "رمز API غير صالح. يرجى التحقق من بيانات الاعتماد.",
+      "llm_conn_error": "تعذّر معالجة المهمة عبر خدمة الذكاء الاصطناعي في Home Assistant."
+    },
+    "abort": {
+      "already_configured": "تم إعداد حساب Vikunja هذا مسبقًا.",
+      "reconfigure_entry_not_found": "تعذر العثور على مدخل الإعداد المطلوب إعادة تهيئته.",
+      "reconfigure_successful": "تم تحديث الإعدادات بنجاح.",
+      "reauth_entry_not_found": "تعذر العثور على مدخل الإعداد المطلوب إعادة مصادقته.",
+      "reauth_successful": "نجحت إعادة المصادقة."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "تكوين مساعد الصوت Vikunja",
+        "description": "ضبط خيارات مساعد الصوت Vikunja",
+        "data": {
           "ai_task_entity": "كيان مهمة الذكاء الاصطناعي",
           "voice_correction": "تفعيل تصحيح نص التعرف الصوتي (مستحسن)",
           "default_due_date": "تاريخ الاستحقاق الافتراضي عند عدم التحديد (يطبق فقط إذا لم يُذكر مشروع)",
@@ -29,15 +58,6 @@
           "detailed_response": "تفعيل استجابة صوتية مفصلة (تتضمن المشروع، الوسوم، تاريخ الاستحقاق، المكلَّف، الأولوية والتكرار)"
         }
       }
-    },
-    "error": {
-      "cannot_connect": "فشل الاتصال بواجهة Vikunja، يرجى التحقق من العنوان والرمز.",
-      "llm_conn_error": "تعذّر معالجة المهمة عبر خدمة الذكاء الاصطناعي في Home Assistant."
-    },
-    "abort": {
-      "already_configured": "تم إعداد حساب Vikunja هذا مسبقًا.",
-      "reconfigure_entry_not_found": "تعذر العثور على مدخل الإعداد المطلوب إعادة تهيئته.",
-      "reconfigure_successful": "تم تحديث الإعدادات بنجاح."
     }
   }
 }

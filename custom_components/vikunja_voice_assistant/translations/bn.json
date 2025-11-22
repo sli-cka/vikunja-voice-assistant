@@ -16,11 +16,40 @@
         }
       },
       "reconfigure": {
-        "title": "Vikunja ভয়েস সহকারী পুনঃসংযোজন",
-        "description": "Vikunja ভয়েস সহকারী ইন্টিগ্রেশনের কনফিগারেশন আপডেট করুন",
+        "title": "Vikunja সংযোগ পুনঃসংযোজন",
+        "description": "সংযোগ সেটিংস আপডেট করুন (URL এবং API কী)। অন্যান্য বিকল্পের জন্য কনফিগার ব্যবহার করুন।",
         "data": {
           "vikunja_url": "Vikunja বেস URL (যেমন https://vikunja.example.com)",
-          "vikunja_api_key": "Vikunja API টোকেন",
+          "vikunja_api_key": "Vikunja API টোকেন"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Vikunja পুনরায় প্রমাণীকরণ",
+        "description": "{url} এর জন্য API টোকেন আর বৈধ নয়। দয়া করে নতুন API টোকেন প্রদান করুন।",
+        "data": {
+          "vikunja_api_key": "Vikunja API টোকেন"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Vikunja API তে সংযোগ ব্যর্থ, URL ও টোকেন পরীক্ষা করুন।",
+      "invalid_auth": "অবৈধ API টোকেন। দয়া করে আপনার শংসাপত্র পরীক্ষা করুন।",
+      "llm_conn_error": "Home Assistant এর AI পরিষেবায় টাস্ক প্রক্রিয়া করা যায়নি।"
+    },
+    "abort": {
+      "already_configured": "এই Vikunja একাউন্টটি আগে থেকেই কনফিগার করা।",
+      "reconfigure_entry_not_found": "পুনঃসংযোজনের জন্য কনফিগারেশন এন্ট্রি পাওয়া যায়নি।",
+      "reconfigure_successful": "কনফিগারেশন সফলভাবে আপডেট হয়েছে।",
+      "reauth_entry_not_found": "পুনরায় প্রমাণীকরণের জন্য কনফিগারেশন এন্ট্রি পাওয়া যায়নি।",
+      "reauth_successful": "পুনরায় প্রমাণীকরণ সফল হয়েছে।"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Vikunja ভয়েস সহকারী কনফিগার করুন",
+        "description": "Vikunja ভয়েস সহকারীর বিকল্পগুলি সামঞ্জস্য করুন",
+        "data": {
           "ai_task_entity": "AI টাস্ক সত্তা",
           "voice_correction": "ভয়েস রিকগনিশন টেক্সট সংশোধন সক্রিয় করুন (প্রস্তাবিত)",
           "default_due_date": "কোন তারিখ ও প্রকল্প উল্লেখ না থাকলে ডিফল্ট ডিউ তারিখ",
@@ -29,15 +58,6 @@
           "detailed_response": "বিস্তারিত ভয়েস প্রতিক্রিয়া সক্রিয় করুন (প্রজেক্ট, লেবেল, ডিউ তারিখ, অ্যাসাইনি, প্রায়োরিটি, পুনরাবৃত্তি)"
         }
       }
-    },
-    "error": {
-      "cannot_connect": "Vikunja API তে সংযোগ ব্যর্থ, URL ও টোকেন পরীক্ষা করুন।",
-      "llm_conn_error": "Home Assistant এর AI পরিষেবায় টাস্ক প্রক্রিয়া করা যায়নি।"
-    },
-    "abort": {
-      "already_configured": "এই Vikunja একাউন্টটি আগে থেকেই কনফিগার করা।",
-      "reconfigure_entry_not_found": "পুনঃসংযোজনের জন্য কনফিগারেশন এন্ট্রি পাওয়া যায়নি।",
-      "reconfigure_successful": "কনফিগারেশন সফলভাবে আপডেট হয়েছে।"
     }
   }
 }

@@ -15,7 +15,7 @@ from .const import (
     CONF_VIKUNJA_API_KEY,
     DOMAIN,
 )
-from .api.vikunja_api import VikunjaAPI
+from .api.vikunja_api import VikunjaAPI, VikunjaAuthenticationError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,6 +25,9 @@ def _collect_project_users(api: VikunjaAPI) -> Dict[str, Dict[str, Any]]:
     combined: Dict[str, Dict[str, Any]] = {}
     try:
         projects = api.get_projects() or []
+    except VikunjaAuthenticationError:
+        # Re-raise authentication errors so they can be handled upstream
+        raise
     except Exception as err:  # noqa: BLE001
         _LOGGER.error("Failed to retrieve projects for user cache: %s", err)
         return combined
@@ -77,8 +80,9 @@ def build_initial_user_cache_sync(
 ) -> None:
     """Initial synchronous (executor) build for config flow usage.
 
-    Fetches project users once and writes the cache file. Errors are swallowed
-    (reported via logging) so that the config flow can proceed.
+    Fetches project users once and writes the cache file. Authentication errors
+    are re-raised, other errors are swallowed (reported via logging) so that the
+    config flow can proceed.
     """
     try:
         api = VikunjaAPI(vikunja_url, api_key)
@@ -87,6 +91,9 @@ def build_initial_user_cache_sync(
         data = {"users": list(combined.values()), "last_refresh": _utc_now_iso()}
         with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
+    except VikunjaAuthenticationError:
+        # Re-raise authentication errors
+        raise
     except Exception as err:  # noqa: BLE001
         _LOGGER.debug("Initial user cache build failed (non-fatal): %s", err)
 
